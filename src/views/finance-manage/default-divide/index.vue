@@ -1,12 +1,10 @@
 <template>
  <div class="container">
    <el-row>
-     <el-col :span="8">
-       平台分成：不低于
+     <el-col>
+       <span class="percent-tip">平台分成：不低于</span>
        <el-input-number v-model="platform_percent" controls-position="right" @change="handleChange" :min="1" :max="25" class="input-number-percent"></el-input-number>%
-     </el-col>
-     <el-col :span="8">
-       用户分成：不高于
+       <span class="percent-tip">用户分成：不高于</span>
        <el-input-number v-model="user_percent" controls-position="right" @change="handleChange" :min="1" :max="70" class="input-number-percent"></el-input-number>%
      </el-col>
    </el-row>
@@ -96,6 +94,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.percent-tip {
+  &:last-of-type {
+    margin-left: 40px;
+  }
+}
 .input-number-percent {
   margin: 0 5px;
 }
