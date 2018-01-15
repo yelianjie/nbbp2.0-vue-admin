@@ -330,7 +330,7 @@ export const asyncRouterMap = [
       { path: 'line', component: _import('charts/line'), name: 'lineChart', meta: { title: 'lineChart', noCache: true }},
       { path: 'mixchart', component: _import('charts/mixChart'), name: 'mixChart', meta: { title: 'mixChart', noCache: true }}
     ]
-  },
+  },*/
 
   {
     path: '/example',
@@ -362,7 +362,7 @@ export const asyncRouterMap = [
     ]
   },
 
-  {
+  /* {
     path: '/form',
     component: Layout,
     redirect: 'noredirect',

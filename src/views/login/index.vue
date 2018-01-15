@@ -9,14 +9,14 @@
         <span class="svg-container svg-container_login">
           <svg-icon icon-class="user" />
         </span>
-        <el-input name="username" type="text" v-model="loginForm.username" autoComplete="on" placeholder="username" />
+        <el-input name="username" type="text" v-model="loginForm.username" autoComplete="on" placeholder="请输入用户名" />
       </el-form-item>
 
       <el-form-item prop="password">
         <span class="svg-container">
           <svg-icon icon-class="password" />
         </span>
-        <el-input name="password" :type="passwordType" @keyup.enter.native="handleLogin" v-model="loginForm.password" autoComplete="on" placeholder="password" />
+        <el-input name="password" :type="passwordType" @keyup.enter.native="handleLogin" v-model="loginForm.password" autoComplete="on" placeholder="请输入密码" />
         <span class="show-pwd" @click="showPwd">
           <svg-icon icon-class="eye" />
         </span>
@@ -36,48 +36,34 @@
       <el-button class="thirdparty-button" type="primary" @click="showDialog=true">{{$t('login.thirdparty')}}</el-button>-->
     </el-form>
 
-    <el-dialog :title="$t('login.thirdparty')" :visible.sync="showDialog">
+    <!-- <el-dialog :title="$t('login.thirdparty')" :visible.sync="showDialog">
       {{$t('login.thirdpartyTips')}}
       <br/>
       <br/>
       <br/>
       <social-sign />
-    </el-dialog>
+    </el-dialog> -->
 
   </div>
 </template>
 
 <script>
-import { isvalidUsername } from '@/utils/validate'
-import LangSelect from '@/components/LangSelect'
-import SocialSign from './socialsignin'
+// import LangSelect from '@/components/LangSelect'
+// import SocialSign from './socialsignin'
 
 export default {
-  components: { LangSelect, SocialSign },
+  // components: { LangSelect, SocialSign },
   name: 'login',
   data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!isvalidUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
-      } else {
-        callback()
-      }
-    }
-    const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
-      } else {
-        callback()
-      }
-    }
     return {
+      message: null,
       loginForm: {
         username: 'admin',
         password: '1111111'
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        username: [{ required: true, trigger: 'blur', message: '请输入用户名' }],
+        password: [{ required: true, trigger: 'blur', message: '请输入密码' }]
       },
       passwordType: 'password',
       loading: false,
@@ -94,10 +80,24 @@ export default {
     },
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
+        this.message && this.message.close()
         if (valid) {
+          if (this.loginForm.username != 'admin') {
+            this.message = this.$message.error('用户不存在')
+            return false
+          }
+          if (this.loginForm.password != '1111111') {
+            this.message = this.$message.error('账户名或者登录密码不正确')
+            return false
+          }
+          
           this.loading = true
           this.$store.dispatch('LoginByUsername', this.loginForm).then(() => {
             this.loading = false
+            this.$message({
+              message: '登录成功',
+              type: 'success'
+            });
             this.$router.push({ path: '/' })
           }).catch(() => {
             this.loading = false
