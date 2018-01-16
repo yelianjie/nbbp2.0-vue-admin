@@ -70,8 +70,9 @@ export const asyncRouterMap = [
       component: _import('bar-manage/index'),
       name: 'barManage',
       meta: {
+        noCache: true,
         title: 'barManage',
-        icon: 'lock',
+        icon: 'bar',
         roles: ['admin'] // or you can only set roles in sub nav
       }
     }]
@@ -87,6 +88,7 @@ export const asyncRouterMap = [
       component: _import('bar-manage-do/edit/index'),
       name: 'barManageEdit',
       meta: {
+        noCache: true,
         title: 'barManageEdit',
         icon: 'lock',
         roles: ['admin'] // or you can only set roles in sub nav
@@ -103,8 +105,9 @@ export const asyncRouterMap = [
       component: _import('big-screen-manage/index'),
       name: 'bigScreenManage',
       meta: {
+        noCache: true,
         title: 'bigScreenManage',
-        icon: 'lock',
+        icon: 'bigscreen',
         roles: ['admin'] // or you can only set roles in sub nav
       }
     }]
@@ -123,8 +126,9 @@ export const asyncRouterMap = [
       component: _import('resource-manage/index'),
       name: 'resourceManage',
       meta: {
+        noCache: true,
         title: 'resourceManage',
-        icon: 'lock',
+        icon: 'resource',
         roles: ['admin'] // or you can only set roles in sub nav
       }
     }]
@@ -136,7 +140,7 @@ export const asyncRouterMap = [
     name: 'financeManage',
     meta: {
       title: 'financeManage',
-      icon: 'component',
+      icon: 'finance',
       roles: ['admin']
     },
     children: [{
@@ -144,8 +148,9 @@ export const asyncRouterMap = [
       component: _import('finance-manage/statistics/index'),
       name: 'statistics',
       meta: {
+        noCache: true,
         title: 'statistics',
-        icon: 'lock',
+        icon: 'statistics',
         roles: ['admin'] // or you can only set roles in sub nav
       }
     }, {
@@ -153,8 +158,9 @@ export const asyncRouterMap = [
       component: _import('finance-manage/default-divide/index'),
       name: 'defaultDivide',
       meta: {
+        noCache: true,
         title: 'defaultDivide',
-        icon: 'lock',
+        icon: 'divide',
         roles: ['admin'] // or you can only set roles in sub nav
       }
     }, {
@@ -162,8 +168,9 @@ export const asyncRouterMap = [
       component: _import('finance-manage/order-list/index'),
       name: 'orderList',
       meta: {
+        noCache: true,
         title: 'orderList',
-        icon: 'lock',
+        icon: 'order',
         roles: ['admin'] // or you can only set roles in sub nav
       }
     }, {
@@ -171,8 +178,9 @@ export const asyncRouterMap = [
       component: _import('finance-manage/recharge-list/index'),
       name: 'rechargeList',
       meta: {
+        noCache: true,
         title: 'rechargeList',
-        icon: 'lock',
+        icon: 'recharge',
         roles: ['admin'] // or you can only set roles in sub nav
       }
     }, {
@@ -180,8 +188,9 @@ export const asyncRouterMap = [
       component: _import('finance-manage/deposit-list/index'),
       name: 'depositList',
       meta: {
+        noCache: true,
         title: 'depositList',
-        icon: 'lock',
+        icon: 'deposit',
         roles: ['admin'] // or you can only set roles in sub nav
       }
     }]
@@ -193,7 +202,7 @@ export const asyncRouterMap = [
     name: 'userManage',
     meta: {
       title: 'userManage',
-      icon: 'component',
+      icon: 'userm',
       roles: ['admin']
     },
     children: [{
@@ -201,8 +210,9 @@ export const asyncRouterMap = [
       component: _import('user-manage/bar-manager/index'),
       name: 'barManager',
       meta: {
+        noCache: true,
         title: 'barManager',
-        icon: 'lock',
+        icon: 'barmanager',
         roles: ['admin'] // or you can only set roles in sub nav
       }
     }, {
@@ -210,8 +220,9 @@ export const asyncRouterMap = [
       component: _import('user-manage/agent-manager/index'),
       name: 'agentManager',
       meta: {
+        noCache: true,
         title: 'agentManager',
-        icon: 'lock',
+        icon: 'agent',
         roles: ['admin'] // or you can only set roles in sub nav
       }
     }, {
@@ -219,8 +230,9 @@ export const asyncRouterMap = [
       component: _import('user-manage/wx-manager/index'),
       name: 'wxManager',
       meta: {
+        noCache: true,
         title: 'wxManager',
-        icon: 'lock',
+        icon: 'wxuser',
         roles: ['admin'] // or you can only set roles in sub nav
       }
     }, {
@@ -228,8 +240,9 @@ export const asyncRouterMap = [
       component: _import('user-manage/recharge-manager/index'),
       name: 'rechargeManager',
       meta: {
+        noCache: true,
         title: 'rechargeManager',
-        icon: 'lock',
+        icon: 'member',
         roles: ['admin'] // or you can only set roles in sub nav
       }
     }]
@@ -241,7 +254,7 @@ export const asyncRouterMap = [
     name: 'systemManage',
     meta: {
       title: 'systemManage',
-      icon: 'component',
+      icon: 'system',
       roles: ['admin']
     },
     children: [{
@@ -249,8 +262,9 @@ export const asyncRouterMap = [
       component: _import('system-manage/system-user/index'),
       name: 'systemUser',
       meta: {
+        noCache: true,
         title: 'systemUser',
-        icon: 'lock',
+        icon: 'systemuser',
         roles: ['admin'] // or you can only set roles in sub nav
       }
     }, {
@@ -258,8 +272,9 @@ export const asyncRouterMap = [
       component: _import('system-manage/modify-password/index'),
       name: 'modifyPassword',
       meta: {
+        noCache: true,
         title: 'modifyPassword',
-        icon: 'lock',
+        icon: 'modifypassword',
         roles: ['admin'] // or you can only set roles in sub nav
       }
     }]

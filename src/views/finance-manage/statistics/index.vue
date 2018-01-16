@@ -107,6 +107,9 @@ export default {
       }]
     }
   },
+  mounted() {
+    console.log('statistics mounted!')
+  },
   methods: {
     onSubmit() {
       console.log('submit!')

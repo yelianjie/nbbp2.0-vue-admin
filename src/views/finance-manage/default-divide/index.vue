@@ -95,6 +95,7 @@ export default {
 
 <style lang="scss" scoped>
 .percent-tip {
+  font-size: 14px;
   &:last-of-type {
     margin-left: 40px;
   }

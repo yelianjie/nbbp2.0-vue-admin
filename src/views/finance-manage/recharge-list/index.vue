@@ -69,6 +69,9 @@ export default {
       }]
     }
   },
+  mounted() {
+    console.log('recharge mounted!')
+  },
   methods: {
     onSubmit() {
       console.log('submit!')
