@@ -12,7 +12,8 @@
 
 <style lang="scss">
 .container {
-  padding: 116px 32px 32px;
+  margin-top: 84px;
+  padding: 32px;
 }
 .el-date-editor .el-range-separator {
   box-sizing: content-box;

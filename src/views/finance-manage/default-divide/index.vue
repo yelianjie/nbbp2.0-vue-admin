@@ -1,11 +1,12 @@
 <template>
- <div class="container">
+ <div class="container" v-loading="loading">
    <el-row>
      <el-col>
        <span class="percent-tip">平台分成：不低于</span>
-       <el-input-number v-model="platform_percent" controls-position="right" @change="handleChange" :min="1" :max="25" class="input-number-percent"></el-input-number>%
+       <el-input-number v-model="platform_percent" controls-position="right" size="small" :min="25" :max="100" class="input-number-percent"></el-input-number>%
        <span class="percent-tip">用户分成：不高于</span>
-       <el-input-number v-model="user_percent" controls-position="right" @change="handleChange" :min="1" :max="70" class="input-number-percent"></el-input-number>%
+       <el-input-number v-model="user_percent" controls-position="right" size="small" :min="1" :max="50" class="input-number-percent"></el-input-number>%
+       <el-button type="primary" @click="setRate" style="margin-left:10px;">设置</el-button>
      </el-col>
    </el-row>
    <el-form :inline="true" :model="formInline" class="divide-form-inline">
@@ -17,7 +18,12 @@
       </el-form-item>
     </el-form>
 
-    <el-table :data="tableData" fit highlight-current-row style="width: 100%">
+    <el-table
+      v-loading="tableLoading"
+      :data="tableData" 
+      fit
+      highlight-current-row
+      style="width: 100%">
       <el-table-column 
       label="代理用户名"
       prop="nickname"
@@ -39,6 +45,14 @@
         </template>
       </el-table-column>
     </el-table>
+    <div class="pagination-container">
+      <el-pagination
+      background
+      @current-change="pageChange"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="100">
+      </el-pagination>
+    </div>
   </div> 
 </template>
 
@@ -47,8 +61,10 @@ export default {
   name: 'defaultDivide',
   data() {
     return {
+      loading: true,
+      tableLoading: false,
       platform_percent: 25,
-      user_percent: 70,
+      user_percent: 40,
       formInline: {
         username: ''
       },
@@ -65,13 +81,19 @@ export default {
   },
   mounted() {
     console.log('ggg')
+    setTimeout(() => {
+      this.loading = false
+    }, 2000)
   },
   methods: {
-    handleChange(value) {
-      console.log(value)
+    setRate() {
+      console.log(this.platform_percent, this.user_percent)
     },
     onSubmit() {
       console.log('submit!')
+    },
+    pageChange(currentPage) {
+      console.log(currentPage)
     },
     cancelEdit(row) {
       row.title = row.originalTitle

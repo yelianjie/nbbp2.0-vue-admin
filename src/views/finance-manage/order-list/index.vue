@@ -1,8 +1,8 @@
 <template>
-  <div class="container">
+  <div class="container" v-loading="loading">
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
       <el-form-item label="酒吧名称">
-        <el-select v-model="formInline.barName" placeholder="请选择" clearable>
+        <el-select v-model="formInline.barName" placeholder="请选择" clearable @clear="clearBar">
           <el-option
             v-for="item in bars"
             :key="item.value"
@@ -12,7 +12,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="类型">
-        <el-select v-model="formInline.type" placeholder="请选择" clearable>
+        <el-select v-model="formInline.type" placeholder="请选择" clearable @clear="clearType">
           <el-option
             v-for="item in types"
             :key="item.value"
@@ -23,6 +23,7 @@
       </el-form-item>
       <el-form-item label="时间">
         <el-date-picker
+          @change="dateChange"
           v-model="formInline.dateValue"
           type="daterange"
           range-separator="至"
@@ -35,6 +36,7 @@
       </el-form-item>
     </el-form>
     <el-table
+      v-loading="tableLoading"
       :data="tableData"
       style="width: 100%">
       <el-table-column
@@ -90,6 +92,8 @@ export default {
   name: 'orderList',
   data() {
     return {
+      loading: true,
+      tableLoading: false,
       bars: [{
         label: 'CMK酒吧',
         value: 10
@@ -121,12 +125,31 @@ export default {
       }]
     }
   },
+  mounted() {
+    console.log('ggg')
+    setTimeout(() => {
+      this.loading = false
+    }, 2000)
+  },
   methods: {
     onSubmit() {
       console.log('submit!')
     },
     pageChange(currentPage) {
       console.log(currentPage)
+    },
+    clearBar() {
+
+    },
+    dateChange(value) {
+      if (value == null) {
+
+      } else {
+        
+      }
+    },
+    clearType() {
+      
     }
   }
 }

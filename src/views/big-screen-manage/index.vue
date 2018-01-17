@@ -101,10 +101,10 @@ export default {
       console.log(index)
     },
     handleBigImgSuccess(res, file) {
-      this.bpThemeForm.img = URL.createObjectURL(file.raw);
+      this.form.bigImgUrl = URL.createObjectURL(file.raw);
     },
     handleMobileImgSuccess(res, file) {
-      this.bpThemeForm.img = URL.createObjectURL(file.raw);
+      this.form.mobileImgUrl = URL.createObjectURL(file.raw);
     },
     beforeBigImgUpload(file) {
       const isLt300K= file.size / 1024 < 300;

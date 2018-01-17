@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" v-loading="loading">
     <panel-number :paneldata="panelData"></panel-number>
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
       <el-form-item label="昵称">
@@ -7,6 +7,7 @@
       </el-form-item>
       <el-form-item label="时间">
         <el-date-picker
+          @change="dateChange"
           v-model="formInline.dateValue"
           type="daterange"
           range-separator="至"
@@ -19,6 +20,7 @@
       </el-form-item>
     </el-form>
     <el-table
+      v-loading="tableLoading"
       fit
       :data="tableData"
       style="width: 100%">
@@ -59,6 +61,8 @@ export default {
   name: 'wxManager',
   data() {
     return {
+      loading: true,
+      tableLoading: false,
       panelData: [{
         label: '用户总数',
         number: 5000
@@ -81,12 +85,21 @@ export default {
       }]
     }
   },
+  mounted() {
+    console.log('wxmanager mounted!')
+    setTimeout(() => {
+      this.loading = false
+    }, 2000)
+  },
   methods: {
     onSubmit() {
       console.log('submit')
     },
     pageChange(currentPage) {
       console.log(currentPage)
+    },
+    dateChange(value) {
+
     }
   },
   components: {

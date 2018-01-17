@@ -19,6 +19,7 @@ export default {
     systemManage: '系统管理',
     systemUser: '系统用户',
     modifyPassword: '修改密码',
+    city: '省市区管理',
     introduction: '简述',
     documentation: '文档',
     permission: '权限测试页',

@@ -1,5 +1,5 @@
 <template>
- <div class="sub-container">
+ <div class="sub-container" v-loading="loading">
    <el-row>
      <el-col :span="24">
        <el-button type="primary" @click.native="showEmptyDiaLog">添加礼物</el-button>
@@ -7,6 +7,7 @@
    </el-row>
    <div style="height:24px;"></div>
    <el-table
+      v-loading="tableLoading"
       :data="tableData"
       style="width: 100%">
       <el-table-column
@@ -45,8 +46,8 @@
       :total="100">
       </el-pagination>
     </div>
-    <el-dialog :title="dialogTitle"  :visible.sync="dialogFormVisible">
-      <el-form :model="bpGiftForm" :rules="bpGiftFormRules" label-width="140px" ref="bpGiftFormRules">
+    <el-dialog :title="dialogTitle"  :visible.sync="dialogFormVisible" @close="clearForm">
+      <el-form :model="bpGiftForm" status-icon :rules="bpGiftFormRules" label-width="140px" ref="bpGiftForm">
         <el-form-item label="礼物名称" prop="title">
           <el-input v-model="bpGiftForm.title" auto-complete="off"></el-input>
         </el-form-item>
@@ -56,33 +57,38 @@
             accept="image/*"
             action="https://jsonplaceholder.typicode.com/posts/"
             :show-file-list="false"
-            :on-success="handleAvatarSuccess"
-            :before-upload="beforeAvatarUpload">
+            :on-success="handleIconSuccess"
+            :before-upload="beforeIconUpload">
             <img v-if="bpGiftForm.img" :src="bpGiftForm.img" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
         </el-form-item>
-        <el-form-item label="类型" prop="type">
+        <!-- <el-form-item label="类型" prop="type">
           <el-input v-model="bpGiftForm.type" auto-complete="off"></el-input>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="价格" prop="price">
-          <el-input v-model="bpGiftForm.price" auto-complete="off" type="number"></el-input>
+          <el-input v-model.number="bpGiftForm.price" auto-complete="off" type="number"></el-input>
+        </el-form-item>
+        <el-form-item label="文件包" prop="zipurl">
+          <el-upload
+            ref="zipUpload"
+            class="upload-demo"
+            :before-upload="beforeZipUpload"
+            drag
+            :limit="1"
+            :before-remove="beforeRemoveZip"
+            :on-remove="handleRemoveZip"
+            :on-exceed="handleExceedZip"
+            action="https://jsonplaceholder.typicode.com/posts/">
+            <i class="el-icon-upload"></i>
+            <div class="el-upload__text">将ZIP文件拖到此处，或<em>点击上传</em></div>
+          </el-upload>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
         <el-button type="primary" @click="_beforeAddBpTime">确 定</el-button>
       </div>
-    </el-dialog>
-    <el-dialog
-      title="提示"
-      :visible.sync="dialogDeleteVisible"
-      width="30%">
-      <span>是否确定删除该礼物</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogDeleteVisible = false">取 消</el-button>
-        <el-button type="primary" @click="DeleteTime">确 定</el-button>
-      </span>
     </el-dialog>
  </div>
 </template>
@@ -91,35 +97,37 @@
 export default {
   name: 'bpgift',
   data() {
-    var checkPrice = (rule, value, callback) => {
+    var isInteger = (rule, value, callback) => {
       if (!value) {
-        return callback(new Error('请输入价格'));
+        return callback(new Error('请输入' + rule.label));
       }
-      value = Number(value)
       if (!Number.isInteger(value)) {
-        callback(new Error('请输入整数'));
+        callback(new Error('请输入整数'))
       } else {
         callback()
       }
     }
     return {
+      loading: true,
+      tableLoading: false,
       dialogTitle: '添加礼物',
       dialogFormVisible: false,
-      dialogDeleteVisible: false,
       bpGiftForm: {
         title: '',
         img: '',
         type: '',
-        price: ''
+        price: '',
+        zipurl: ''
       },
       bpGiftFormRules: {
         title: [
-          { required: true, trigger: 'blur', message: '请输入礼物名称' },
-          { max: 5, trigger: 'blur', message: '礼物名称不能超过5个字符' }
+          { required: true, trigger: 'blur', message: '请输入主题名称' },
+          { max: 5, trigger: 'blur', message: '主题名称不能超过5个字符' }
         ],
         img: [{ required: true, trigger: 'blur', message: '请上传图片' }],
-        type: [{ required: true, trigger: 'blur', message: '请输入类型' }],
-        price: [{ required: true, validator: checkPrice, trigger: 'blur'}]
+        /* type: [{ required: true, trigger: 'blur', message: '请输入类型' }], */
+        price: [{ required: true, validator: isInteger, trigger: 'blur', label: '价格'}],
+        zipurl: [{ required: true, trigger: 'blur', message: '请上传文件包'}]
       },
       tableData: [{
         title: '玫瑰花',
@@ -136,8 +144,15 @@ export default {
   },
   mounted() {
     console.log('init bpgift')
+    setTimeout(() => {
+      this.loading = false
+    }, 2000)
   },
   methods: {
+    clearForm() {
+      this.$refs.bpGiftForm.clearValidate()
+      this.$refs.bpGiftForm.resetFields()
+    },
     pageChange(currentPage) {
 
     },
@@ -150,8 +165,21 @@ export default {
       this.dialogFormVisible = true
     },
     handleDelete(row, index) {
-      console.log(row)
-      this.dialogDeleteVisible = true
+      this.$confirm('是否确定删除该礼物?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })      
+      })
     },
     DeleteTime() {
 
@@ -166,15 +194,37 @@ export default {
         }
       })
     },
-    handleAvatarSuccess(res, file) {
+    handleIconSuccess(res, file) {
       this.bpGiftForm.img = URL.createObjectURL(file.raw);
     },
-    beforeAvatarUpload(file) {
+    beforeIconUpload(file) {
       const isLt50K= file.size / 1024 < 100;
       if (!isLt50K) {
         this.$message.error('上传图片大小不能超过 50K!');
       }
       return isLt50K
+    },
+    beforeZipUpload(file) {
+      const isZip = file.type === 'application/x-zip-compressed'
+      if (!isZip) {
+        this.$message.error('文件包只能是Zip格式！')
+        return false
+      }
+      return isZip
+    },
+    handleExceedZip(files, fileList) {
+      console.log('exceed')
+      this.$message.error('请先删除原有的文件包再上传！')
+    },
+    beforeRemoveZip(file, fileList) {
+      return this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+    },
+    handleRemoveZip(file, fileList) {
+      console.log(file)
     }
   }
 }

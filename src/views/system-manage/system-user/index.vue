@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" v-loading="loading">
     <el-row>
       <el-col :span="24">
         <el-button type="primary" @click.native="showEmptyDiaLog">添加用户</el-button>
@@ -7,6 +7,7 @@
     </el-row>
     <div style="height:24px;"></div>
     <el-table
+      v-loading="tableLoading"
       :data="tableData"
       style="width: 100%">
       <el-table-column
@@ -37,6 +38,7 @@
       <el-table-column
       label="操作">
       <template slot-scope="scope">
+        <el-button @click="handleEdit(scope.row, scope.$index)" type="text" size="small">编辑</el-button>
         <el-button @click="handleDelete(scope.row, scope.$index)" type="text" size="small">删除</el-button>
       </template>
       </el-table-column>
@@ -48,10 +50,11 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="100">
       </el-pagination>
-      <el-dialog :title="dialogTitle"  :visible.sync="dialogFormVisible">
-        <el-form :model="systemUserForm" :rules="systemUserFormRules" label-width="140px" ref="systemUserFormRules">
+    </div>
+    <el-dialog :title="dialogTitle"  :visible.sync="dialogFormVisible" @close="clearForm">
+        <el-form :model="systemUserForm" status-icon :rules="systemUserFormRules" label-width="140px" ref="systemUserForm">
           <el-form-item label="用户名" prop="username">
-            <el-input v-model="systemUserForm.title" auto-complete="off"></el-input>
+            <el-input v-model="systemUserForm.username" auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="图片" prop="img">
             <el-upload
@@ -66,7 +69,9 @@
             </el-upload>
           </el-form-item>
           <el-form-item label="角色" prop="role">
-            <el-input v-model="systemUserForm.role" auto-complete="off"></el-input>
+            <el-select v-model="systemUserForm.role" placeholder="请选择">
+              <el-option value="1" label="超级管理员"></el-option>
+            </el-select>
           </el-form-item>
           <el-form-item label="真实姓名" prop="name">
             <el-input v-model="systemUserForm.name" auto-complete="off"></el-input>
@@ -77,17 +82,6 @@
           <el-button type="primary" @click="_beforeAddBpTime">确 定</el-button>
         </div>
       </el-dialog>
-      <el-dialog
-        title="提示"
-        :visible.sync="dialogDeleteVisible"
-        width="30%">
-      <span>是否确定删除该系统用户</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogDeleteVisible = false">取 消</el-button>
-        <el-button type="primary" @click="DeleteTime">确 定</el-button>
-      </span>
-      </el-dialog>
-    </div>
   </div>
 </template>
 
@@ -96,14 +90,15 @@ export default {
   name: 'systemUser',
   data() {
     return {
+      loading: true,
+      tableLoading: false,
       dialogTitle: '添加系统用户',
       dialogFormVisible: false,
-      dialogDeleteVisible: false,
       systemUserForm: {
-        title: '',
+        username: '',
         img: '',
-        type: '',
-        price: ''
+        role: '1',
+        name: ''
       },
       systemUserFormRules: {
         username: [{ required: true, trigger: 'blur', message: '请输入用户名' }],
@@ -120,7 +115,16 @@ export default {
       }]
     }
   },
+  mounted() {
+    setTimeout(() => {
+      this.loading = false
+    }, 2000)
+  },
   methods: {
+    clearForm() {
+      this.$refs.systemUserForm.clearValidate()
+      this.$refs.systemUserForm.resetFields()
+    },
     pageChange(currentPage) {
 
     },
@@ -133,14 +137,27 @@ export default {
       this.dialogFormVisible = true
     },
     handleDelete(row, index) {
-      console.log(row)
-      this.dialogDeleteVisible = true
+      this.$confirm('是否确定删除该系统用户?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })      
+      })
     },
     DeleteTime() {
 
     },
     _beforeAddBpTime() {
-      this.$refs.systemUserFormRules.validate(valid => {
+      this.$refs.systemUserForm.validate(valid => {
         if (valid) {
           console.log('valid')
         } else {
@@ -162,3 +179,31 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.avatar-uploader  {
+  /deep/ .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    &:hover {
+      border-color: #409EFF;
+    }
+  }
+}
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 100px;
+  height: 100px;
+  line-height: 100px;
+  text-align: center;
+}
+.avatar {
+  width: 100px;
+  height: 100px;
+  display: block;
+}
+</style>

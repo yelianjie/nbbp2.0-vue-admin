@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" v-loading="loading">
     <panel-number :paneldata="panelData"></panel-number>
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
       <el-form-item label="昵称">
@@ -10,6 +10,7 @@
       </el-form-item>
     </el-form>
     <el-table
+      v-loading="tableLoading"
       fit
       :data="tableData"
       style="width: 100%">
@@ -54,6 +55,8 @@ export default {
   name: 'rechargeManager',
   data() {
     return {
+      loading: true,
+      tableLoading: false,
       panelData: [{
         label: '会员总数',
         number: 5000
@@ -75,6 +78,12 @@ export default {
         rest: 500
       }]
     }
+  },
+  mounted() {
+    console.log('rechargemanager mounted!')
+    setTimeout(() => {
+      this.loading = false
+    }, 2000)
   },
   methods: {
     onSubmit() {

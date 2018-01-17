@@ -238,6 +238,18 @@ $color: #606266;
     font-size: 13px;
     margin-top: 20px;
   }
+  .avatar-uploader  {
+    /deep/ .el-upload {
+      border: 1px dashed #d9d9d9;
+      border-radius: 6px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      &:hover {
+        border-color: #409EFF;
+      }
+    }
+  }
 }
 .line {
   border-bottom: 1px solid #ebeef5;

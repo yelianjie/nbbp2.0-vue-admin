@@ -1,11 +1,12 @@
 <template>
-  <div class="container">
+  <div class="container" v-loading="loading">
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
       <el-form-item label="昵称">
         <el-input v-model="formInline.nickname" placeholder="请输入昵称"></el-input>
       </el-form-item>
       <el-form-item label="时间">
         <el-date-picker
+          @change="dateChange"
           v-model="formInline.dateValue"
           type="daterange"
           range-separator="至"
@@ -18,6 +19,7 @@
       </el-form-item>
     </el-form>
     <el-table
+      v-loading="tableLoading"
       fit
       :data="tableData"
       style="width: 100%">
@@ -57,6 +59,8 @@ export default {
   name: 'rechargeList',
   data() {
     return {
+      loading: true,
+      tableLoading: false,
       formInline: {
         nickname: '',
         dateValue: ''
@@ -71,6 +75,9 @@ export default {
   },
   mounted() {
     console.log('recharge mounted!')
+    setTimeout(() => {
+      this.loading = false
+    }, 2000)
   },
   methods: {
     onSubmit() {
@@ -78,7 +85,14 @@ export default {
     },
     pageChange(currentPage) {
       console.log(currentPage)
-    }
+    },
+    dateChange(value) {
+      if (value == null) {
+
+      } else {
+        
+      }
+    },
   }
 }
 </script>

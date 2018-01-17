@@ -1,11 +1,11 @@
 <template>
- <div class="container">
+ <div class="container" v-loading="loading">
    <el-form :inline="true" :model="formInline" class="demo-form-inline">
       <el-form-item label="昵称">
         <el-input v-model="formInline.nickname" placeholder="请输入昵称"></el-input>
       </el-form-item>
       <el-form-item label="身份">
-        <el-select v-model="formInline.identity" placeholder="请选择" clearable>
+        <el-select v-model="formInline.identity" placeholder="请选择" clearable @close="clearIdentity">
           <el-option
             v-for="item in identitys"
             :key="item.value"
@@ -19,6 +19,7 @@
       </el-form-item>
     </el-form>
     <el-table
+      v-loading="tableLoading"
       fit
       :data="tableData"
       style="width: 100%">
@@ -62,6 +63,8 @@ export default {
   name: 'depositList',
   data() {
     return {
+      loading: true,
+      tableLoading: false,
       formInline: {
         nickname: '',
         identity: ''
@@ -88,12 +91,21 @@ export default {
       }]
     }
   },
+  mounted() {
+    console.log('deposit mounted!')
+    setTimeout(() => {
+      this.loading = false
+    }, 2000)
+  },
   methods: {
     onSubmit() {
       console.log('submit!')
     },
     pageChange(currentPage) {
       console.log(currentPage)
+    },
+    clearIdentity() {
+
     }
   }
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" v-loading="loading">
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
       <el-form-item label="酒吧名称">
         <el-select v-model="formInline.barName" placeholder="请选择" clearable>
@@ -23,7 +23,7 @@
         <el-cascader
           :options="CityInfo"
           v-model="form.selectedOptions"
-          :change-on-select="true"
+          :change-on-select="false"
           :clearable="true"
           :filterable="true"
           @change="handleChange">
@@ -34,6 +34,7 @@
       </el-form-item>
     </el-form>
     <el-table
+      v-loading="tableLoading"
       :data="tableData"
       style="width: 100%">
       <el-table-column
@@ -101,6 +102,8 @@ export default {
   name: 'barManage',
   data() {
     return {
+      loading: true,
+      tableLoading: false,
       CityInfo: CityInfo,
       form: {
         city: '',
@@ -136,6 +139,11 @@ export default {
         status: 2
       }]
     }
+  },
+  mounted() {
+    setTimeout(() => {
+      this.loading = false
+    }, 2000)
   },
   methods: {
     onSubmit() {
@@ -193,6 +201,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.container {
+  /deep/ .el-loading-mask {
+    z-index: 2000;
+  }
+}
 
 </style>
 

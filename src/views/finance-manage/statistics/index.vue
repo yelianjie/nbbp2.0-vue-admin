@@ -1,8 +1,8 @@
 <template>
-  <div class="container">
+  <div class="container" v-loading="loading">
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
       <el-form-item label="酒吧名称">
-        <el-select v-model="formInline.barName" placeholder="请选择" clearable>
+        <el-select v-model="formInline.barName" placeholder="请选择" clearable @clear="clearBar">
           <el-option
             v-for="item in bars"
             :key="item.value"
@@ -13,6 +13,7 @@
       </el-form-item>
       <el-form-item label="时间">
         <el-date-picker
+          @change="dateChange"
           v-model="dateValue"
           type="daterange"
           range-separator="至"
@@ -25,6 +26,7 @@
       </el-form-item>
     </el-form>
     <el-table
+      v-loading="tableLoading"
       :data="tableData"
       style="width: 100%">
       <el-table-column
@@ -81,6 +83,8 @@ export default {
   name: 'statistics',
   data() {
     return {
+      loading: true,
+      tableLoading: false,
       dateValue: '',
       bars: [{
         label: 'CMK酒吧',
@@ -109,6 +113,9 @@ export default {
   },
   mounted() {
     console.log('statistics mounted!')
+    setTimeout(() => {
+      this.loading = false
+    }, 2000)
   },
   methods: {
     onSubmit() {
@@ -132,6 +139,16 @@ export default {
     },
     pageChange(currentPage) {
       console.log(currentPage)
+    },
+    clearBar() {
+
+    },
+    dateChange(value) {
+      if (value == null) {
+
+      } else {
+
+      }
     }
   }
 }

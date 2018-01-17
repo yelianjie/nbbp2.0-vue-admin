@@ -5,22 +5,22 @@
     <el-row :gutter="24" style="margin-bottom:32px;">
       <el-col :xs="24" :sm="24" :lg="12">
         <div class="chart-wrapper">
-          <line-chart :chart-data="lineChartData"></line-chart>
+          <line-chart :chart-data="lineChartData1"></line-chart>
         </div>
       </el-col>
       <el-col :xs="24" :sm="24" :lg="12">
         <div class="chart-wrapper">
-          <line-chart :chart-data="lineChartData"></line-chart>
+          <line-chart :chart-data="lineChartData2"></line-chart>
         </div>
       </el-col>
       <el-col :xs="24" :sm="24" :lg="12">
         <div class="chart-wrapper">
-          <line-chart :chart-data="lineChartData"></line-chart>
+          <line-chart :chart-data="lineChartData3"></line-chart>
         </div>
       </el-col>
       <el-col :xs="24" :sm="24" :lg="12">
         <div class="chart-wrapper">
-          <line-chart :chart-data="lineChartData"></line-chart>
+          <line-chart :chart-data="lineChartData4"></line-chart>
         </div>
       </el-col>
     </el-row>
@@ -101,7 +101,230 @@ export default {
   },
   data() {
     return {
-      lineChartData: lineChartData.newVisitis
+      lineChartData1: {
+        xAxis: {
+          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          boundaryGap: false,
+          axisTick: {
+            show: false
+          }
+        },
+        grid: {
+          left: 10,
+          right: 10,
+          bottom: 20,
+          top: 30,
+          containLabel: true
+        },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'cross'
+          },
+          padding: [5, 10]
+        },
+        yAxis: {
+          axisTick: {
+            show: false
+          }
+        },
+        title: {
+          text: '每日消费趋势',
+          top: '-5px'
+        },
+        series: [
+        {
+          name: '消费额',
+          label: {
+            show: true
+          },
+          smooth: true,
+          type: 'line',
+          itemStyle: {
+            normal: {
+              color: '#3888fa',
+              lineStyle: {
+                color: '#3888fa',
+                width: 2
+              },
+              areaStyle: {
+                color: '#f3f8ff'
+              }
+            }
+          },
+          data: lineChartData.newVisitis.actualData,
+          animationDuration: 2800,
+          animationEasing: 'quadraticOut'
+        }]
+      },
+      lineChartData2: {
+        xAxis: {
+          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          boundaryGap: false,
+          axisTick: {
+            show: false
+          }
+        },
+        grid: {
+          left: 10,
+          right: 10,
+          bottom: 20,
+          top: 30,
+          containLabel: true
+        },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'cross'
+          },
+          padding: [5, 10]
+        },
+        yAxis: {
+          axisTick: {
+            show: false
+          }
+        },
+        title: {
+          text: '每日新增用户',
+          top: '-5px'
+        },
+        series: [
+        {
+          name: '新增用户',
+          label: {
+            show: true
+          },
+          smooth: true,
+          type: 'line',
+          itemStyle: {
+            normal: {
+              color: '#3888fa',
+              lineStyle: {
+                color: '#3888fa',
+                width: 2
+              },
+              areaStyle: {
+                color: '#f3f8ff'
+              }
+            }
+          },
+          data: lineChartData.newVisitis.actualData,
+          animationDuration: 2800,
+          animationEasing: 'quadraticOut'
+        }]
+      },
+      lineChartData3: {
+        xAxis: {
+          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          boundaryGap: false,
+          axisTick: {
+            show: false
+          }
+        },
+        grid: {
+          left: 10,
+          right: 10,
+          bottom: 20,
+          top: 30,
+          containLabel: true
+        },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'cross'
+          },
+          padding: [5, 10]
+        },
+        yAxis: {
+          axisTick: {
+            show: false
+          }
+        },
+        title: {
+          text: '总消费趋势',
+          top: '-5px'
+        },
+        series: [
+        {
+          name: '累计消费额',
+          label: {
+            show: true
+          },
+          smooth: true,
+          type: 'line',
+          itemStyle: {
+            normal: {
+              color: '#3888fa',
+              lineStyle: {
+                color: '#3888fa',
+                width: 2
+              },
+              areaStyle: {
+                color: '#f3f8ff'
+              }
+            }
+          },
+          data: lineChartData.newVisitis.actualData,
+          animationDuration: 2800,
+          animationEasing: 'quadraticOut'
+        }]
+      },
+      lineChartData4: {
+        xAxis: {
+          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          boundaryGap: false,
+          axisTick: {
+            show: false
+          }
+        },
+        grid: {
+          left: 10,
+          right: 10,
+          bottom: 20,
+          top: 30,
+          containLabel: true
+        },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'cross'
+          },
+          padding: [5, 10]
+        },
+        yAxis: {
+          axisTick: {
+            show: false
+          }
+        },
+        title: {
+          text: '每日活跃用户',
+          top: '-5px'
+        },
+        series: [
+        {
+          name: '活跃用户',
+          label: {
+            show: true
+          },
+          smooth: true,
+          type: 'line',
+          itemStyle: {
+            normal: {
+              color: '#3888fa',
+              lineStyle: {
+                color: '#3888fa',
+                width: 2
+              },
+              areaStyle: {
+                color: '#f3f8ff'
+              }
+            }
+          },
+          data: lineChartData.newVisitis.actualData,
+          animationDuration: 2800,
+          animationEasing: 'quadraticOut'
+        }]
+      }
     }
   },
   methods: {

@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" v-loading="loading">
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
       <el-form-item label="用户名">
         <el-input v-model="formInline.nickname" placeholder="请输入昵称"></el-input>
@@ -9,6 +9,7 @@
       </el-form-item>
     </el-form>
     <el-table
+      v-loading="tableLoading"
       fit
       :data="tableData"
       style="width: 100%">
@@ -55,6 +56,8 @@ export default {
   name: 'agentManager',
   data() {
     return {
+      loading: true,
+      tableLoading: false,
       formInline: {
         nickname: ''
       },
@@ -66,6 +69,11 @@ export default {
       }]
     }
   },
+  mounted() {
+    setTimeout(() => {
+      this.loading = false
+    }, 2000)
+  },
   methods: {
     onSubmit() {
       console.log('submit!')
@@ -74,7 +82,21 @@ export default {
       console.log(currentPage)
     },
     handleDelete(row, index) {
-
+      this.$confirm('是否确定删除该代理?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })      
+      })
     }
   }
 }

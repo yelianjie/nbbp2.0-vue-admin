@@ -29,7 +29,8 @@ export default {
       input: '',
       map: null,
       mapSearch: null,
-      selectItem: null
+      selectItem: null,
+      geocoder: null
     }
   },
   methods: {
@@ -49,13 +50,16 @@ export default {
       this.mapSearch.search(queryString)
     },
     handleSelect(item) {
-      console.log(item)
-      this.selectItem = item
-      this.map.clearOverlays()
-      var point = new BMap.Point(item.point.lng, item.point.lat)
-      this.map.centerAndZoom(point, 15)
-      var marker = new BMap.Marker(point)
-      this.map.addOverlay(marker)
+      this.geocoder.getLocation(item.point, (result) => {
+        console.log(result)
+        this.selectItem = result
+        this.map.clearOverlays()
+        var point = new BMap.Point(result.point.lng, result.point.lat)
+        this.map.centerAndZoom(point, 15)
+        var marker = new BMap.Marker(point)
+        this.map.addOverlay(marker)
+      })
+      
     },
     onSubmit(){
       this.$emit('closeDialog', this.selectItem)
@@ -77,7 +81,8 @@ export default {
     let _this = this
     this.$nextTick(() => {
       this.map = new BMap.Map("map_container")
-      var geolocation = new BMap.Geolocation();   
+      var geolocation = new BMap.Geolocation()
+      this.geocoder = new BMap.Geocoder()
       geolocation.getCurrentPosition(function(result) {
         if(this.getStatus() == BMAP_STATUS_SUCCESS) {
           var pt = result.point;

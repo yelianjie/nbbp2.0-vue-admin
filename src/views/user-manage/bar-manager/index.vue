@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" v-loading="loading">
     <el-row>
       <el-col :span="24">
         <el-button type="primary" @click.native="showEmptyDiaLog">添加酒吧管理</el-button>
@@ -7,6 +7,7 @@
     </el-row>
     <div style="height:24px;"></div>
     <el-table
+      v-loading="tableLoading"
       :data="tableData"
       style="width: 100%">
       <el-table-column
@@ -43,14 +44,14 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="100">
       </el-pagination>
-      <el-dialog :title="dialogTitle"  :visible.sync="dialogFormVisible">
+      <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible" @close="clearForm">
         <el-tabs v-model="activeName">
           <el-tab-pane label="扫码绑定" name="s1">
             <img src="http://nb.siweiquanjing.com/attachment/bar/20171227191747_227.png" class="scanQrcode">
             <p class="scanTip">扫一扫二维码，直接绑定</p>
           </el-tab-pane>
           <el-tab-pane label="完善信息" name="s2" :disabled="!isScan">
-            <el-form :model="barManagerForm" :rules="barManagerFormRules" label-width="80px" ref="barManagerFormRules">
+            <el-form :model="barManagerForm" :rules="barManagerFormRules" label-width="80px" ref="barManagerForm">
               <el-form-item label="微信昵称" prop="nickname">
                 <el-input v-model="barManagerForm.nickname" auto-complete="off" :disabled="true"></el-input>
               </el-form-item>
@@ -70,16 +71,6 @@
           <el-button type="primary" @click="addBarManager">确 定</el-button>
         </div>
       </el-dialog>
-      <el-dialog
-        title="提示"
-        :visible.sync="dialogDeleteVisible"
-        width="30%">
-      <span>是否确定删除该酒吧管理员</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogDeleteVisible = false">取 消</el-button>
-        <el-button type="primary" @click="DeleteBarManager">确 定</el-button>
-      </span>
-      </el-dialog>
     </div>
   </div>
 </template>
@@ -89,11 +80,12 @@ export default {
   name: 'barManager',
   data() {
     return {
+      loading: true,
+      tableLoading: false,
       activeName: 's1',
       isScan: false,
       dialogTitle: '添加酒吧管理员',
       dialogFormVisible: false,
-      dialogDeleteVisible: false,
       barManagerForm: {
         nickname: '',
         img: '',
@@ -114,6 +106,11 @@ export default {
         create_at: '2017-05-05 14:00:00'
       }]
     }
+  },
+  mounted() {
+    setTimeout(() => {
+      this.loading = false
+    }, 2000)
   },
   methods: {
     onSubmit() {
@@ -137,7 +134,25 @@ export default {
       this.dialogFormVisible = true
     },
     handleDelete() {
-      
+      this.$confirm('是否确定删除该酒吧管理员?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })      
+      })
+    },
+    clearForm() {
+      this.$refs.barManagerForm.clearValidate()
+      this.$refs.barManagerForm.resetFields()
     }
   }
 }

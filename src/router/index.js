@@ -280,6 +280,28 @@ export const asyncRouterMap = [
     }]
   },
   /* {
+    path: '/city',
+    component: Layout,
+    redirect: '/city/index',
+    name: 'city',
+    meta: {
+      title: 'city',
+      icon: 'system',
+      roles: ['admin']
+    },
+    children: [{
+      path: 'index',
+      component: _import('city/index'),
+      name: 'city',
+      meta: {
+        noCache: true,
+        title: 'city',
+        icon: 'city',
+        roles: ['admin'] // or you can only set roles in sub nav
+      }
+    }]
+  }, */
+  /* {
     path: '/permission',
     component: Layout,
     redirect: '/permission/index',

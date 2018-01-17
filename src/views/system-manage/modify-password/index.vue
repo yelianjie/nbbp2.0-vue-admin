@@ -1,5 +1,5 @@
 <template>
-  <el-form :model="modifyForm" :rules="rules" ref="modifyForm" class="modifyForm" label-width="140px">
+  <el-form :model="modifyForm" status-icon :rules="rules" ref="modifyForm" class="modifyForm" label-width="140px">
     <el-form-item label="旧密码" prop="oldPass">
       <el-input v-model="modifyForm.oldPass" type="password"></el-input>
     </el-form-item>
@@ -19,6 +19,16 @@
 export default {
   name: 'modifyPassword',
   data() {
+    var checkConfirmPassword = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('确认密码不能为空'));
+      }
+      if (value != this.modifyForm.newPass) {
+        return callback(new Error('两次密码输入不一致'));
+      }
+      callback()
+    }
+
     return {
       modifyForm: {
         oldPass: '',
@@ -27,16 +37,13 @@ export default {
       },
       rules: {
         oldPass: [
-          { required: true, message: '请输入旧密码', trigger: 'blur' },
-          { min: 6, max: 12, message: '长度在 6 到 12 个字符', trigger: 'blur' }
+          { required: true, message: '请输入旧密码', trigger: 'blur' }
         ],
         newPass: [
-          { required: true, message: '请输入新密码', trigger: 'blur' },
-          { min: 6, max: 12, message: '长度在 6 到 12 个字符', trigger: 'blur' }
+          { required: true, message: '请输入新密码', trigger: 'blur' }
         ],
         confirmNewPass: [
-          { required: true, message: '确认新密码', trigger: 'blur' },
-          { min: 6, max: 12, message: '长度在 6 到 12 个字符', trigger: 'blur' }
+          { required: true, validator: checkConfirmPassword, trigger: 'blur' }
         ]
       }
     }
