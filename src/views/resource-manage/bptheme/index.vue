@@ -47,7 +47,7 @@
       </el-pagination>
     </div>
     <el-dialog :title="dialogTitle"  :visible.sync="dialogFormVisible" @close="clearForm">
-      <el-form :model="bpThemeForm" status-icon :rules="bpThemeFormRules" label-width="140px" ref="bpThemeFormRules">
+      <el-form :model="bpThemeForm" status-icon :rules="bpThemeFormRules" label-width="140px" ref="bpThemeForm">
         <el-form-item label="主题名称" prop="title">
           <el-input v-model="bpThemeForm.title" auto-complete="off"></el-input>
         </el-form-item>
@@ -185,7 +185,7 @@ export default {
 
     },
     _beforeAddBpTime() {
-      this.$refs.bpThemeFormRules.validate(valid => {
+      this.$refs.bpThemeForm.validate(valid => {
         if (valid) {
           console.log('valid')
         } else {

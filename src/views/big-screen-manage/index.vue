@@ -15,16 +15,30 @@
       <div slot="header" class="clearfix">
         <span>背景添加</span>
       </div>
-      <el-row>
-        <el-col :xs="6" :sm="6" :md="4" :lg="4" :xl="4">
-          <el-upload
-            action="https://jsonplaceholder.typicode.com/posts/"
-            list-type="picture-card"
-            :on-preview="handlePictureCardPreview"
-            :on-remove="handleRemove">
-            <i class="el-icon-plus"></i>
-          </el-upload>
-        </el-col>
+      <h3 class="bg-title">图片背景</h3>
+      <el-row class="row-flex">
+        <upload-preview :list="picBgs" type="image" :on-remove="handleRemove"></upload-preview>
+        <el-upload
+          accept="image/*"
+          action="https://jsonplaceholder.typicode.com/posts/"
+          list-type="picture-card"
+          :show-file-list="false"
+          :on-success="handlePictureSuccess">
+          <i class="el-icon-plus"></i>
+        </el-upload>
+      </el-row>
+      <h3 class="bg-title">视频背景</h3>
+      <el-row class="row-flex">
+        <upload-preview :list="videoBgs" type="video" :on-remove="handleRemove"></upload-preview>
+        <el-upload
+          accept="video/webm"
+          action="https://jsonplaceholder.typicode.com/posts/"
+          list-type="picture-card"
+          :show-file-list="false"
+          :before-upload="beforeUpload"
+          :on-success="handleVideoSuccess">
+          <i class="el-icon-plus"></i>
+        </el-upload>
       </el-row>
     </el-card>
     <el-card class="box-card">
@@ -67,6 +81,7 @@
 </template>
 
 <script>
+import UploadPreview from './componets/upload-preview'
 import FixBottomBtns from '@/components/FixBottomBtns/index'
 export default {
   name: 'bigScreenManage',
@@ -80,16 +95,32 @@ export default {
       form: {
         bigImgUrl: '',
         mobileImgUrl: ''
-      }
+      },
+      picBgs: [],
+      videoBgs: []
     }
   },
+  mounted() {
+
+  },
   methods: {
-    handleRemove(file, fileList) {
-      console.log(file, fileList)
+    beforeUpload(file) {
+      console.log(file)
+    },
+    handleRemove(index) {
+      this.picBgs.splice(index, 1)
     },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url
       this.dialogVisible = true
+    },
+    handlePictureSuccess(response, file, fileList) {
+      console.log(file)
+      this.picBgs.push(file)
+    },
+    handleVideoSuccess(response, file, fileList) {   
+      console.log(file)
+      this.videoBgs.push(file)
     },
     handleRemoveBigScreenPic(file, fileList) {
 
@@ -122,7 +153,8 @@ export default {
     }
   },
   components: {
-    FixBottomBtns
+    FixBottomBtns,
+    UploadPreview
   }
 }
 </script>
@@ -159,5 +191,13 @@ export default {
   width: 178px;
   height: 178px;
   display: block;
+}
+.row-flex {
+  display: flex;
+}
+.bg-title {
+  font-weight: normal;
+  font-size: 15px;
+  color: #6c6c6c;
 }
 </style>

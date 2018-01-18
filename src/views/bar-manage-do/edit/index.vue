@@ -163,8 +163,10 @@ export default {
     }
   },
   methods: {
-    handleBtnClick(index) {
-
+    handleBtnClick(index, cb) {
+      setTimeout(() => {
+        cb && cb()
+      }, 2000)
     },
     handleChange(value) {
       console.log(value)

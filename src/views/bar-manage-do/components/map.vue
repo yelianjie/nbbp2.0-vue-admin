@@ -44,7 +44,7 @@ export default {
           onSearchComplete: function(result){
             cb(_this.searchFilterBack(result))
           },
-          pageCapacity: 10
+          pageCapacity: 50
         })
       }
       this.mapSearch.search(queryString)
@@ -62,6 +62,11 @@ export default {
       
     },
     onSubmit(){
+      if (this.selectItem == null) {
+        this.$message.error('请输入地址并点击下拉地址进行选择定位')
+        return
+      }
+      
       this.$emit('closeDialog', this.selectItem)
     },
     searchFilterBack(result) {

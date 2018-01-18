@@ -2,6 +2,7 @@
   <div class="login-container">
     <el-form class="login-form" autoComplete="on" :model="loginForm" :rules="loginRules" ref="loginForm" label-position="left">
       <div class="title-container">
+        <img class="logo" src="../../assets/logo.png" />
         <h3 class="title">{{$t('login.title')}}</h3>
         <!-- <lang-select class="set-language"></lang-select> -->
       </div>
@@ -179,6 +180,12 @@ $light_gray:#eee;
   @include relative;
   height: 100vh;
   background-color: $bg;
+  .logo {
+    display: block;
+    margin: 0 auto 20px;
+    width: 120px;
+    height: 120px;
+  }
   .login-form {
     position: absolute;
     left: 0;

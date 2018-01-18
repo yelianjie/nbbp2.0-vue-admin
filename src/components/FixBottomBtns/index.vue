@@ -1,15 +1,23 @@
 <template>
   <div class="fixed_bottom">
-    <el-button v-for="(v, i) in btns" :key="i" :type="v.type" @click.native="btnClick(i)">{{v.text}}</el-button>
+    <el-button v-for="(v, i) in btns" :key="i" :type="v.type" @click.native="btnClick(i)" :loading="loading">{{v.text}}</el-button>
   </div>
 </template>
 
 <script>
 export default {
+  data() {
+    return {
+      loading: false
+    }
+  },
   props: ['btns'],
   methods: {
     btnClick(index) {
-      this.$emit('FixBtnClick', index)
+      this.loading = true
+      this.$emit('FixBtnClick', index, () => {
+        this.loading = false
+      })
     }
   }
 }

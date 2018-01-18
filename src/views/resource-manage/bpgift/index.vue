@@ -185,7 +185,7 @@ export default {
 
     },
     _beforeAddBpTime() {
-      this.$refs.bpGiftFormRules.validate(valid => {
+      this.$refs.bpGiftForm.validate(valid => {
         if (valid) {
           console.log('valid')
         } else {
