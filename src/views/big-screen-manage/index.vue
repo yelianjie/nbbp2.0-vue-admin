@@ -23,6 +23,7 @@
           action="https://jsonplaceholder.typicode.com/posts/"
           list-type="picture-card"
           :show-file-list="false"
+          :on-progress="handleProgress"
           :on-success="handlePictureSuccess">
           <i class="el-icon-plus"></i>
         </el-upload>
@@ -104,6 +105,9 @@ export default {
 
   },
   methods: {
+    handleProgress(event, file, fileList) {
+      console.log(event, file)
+    },
     beforeUpload(file) {
       console.log(file)
     },

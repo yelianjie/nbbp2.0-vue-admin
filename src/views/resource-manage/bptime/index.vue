@@ -16,7 +16,7 @@
       width="220">
     </el-table-column>
     <el-table-column
-      prop="price"
+      prop="default_price"
       label="价格"
       width="350">
     </el-table-column>
@@ -31,9 +31,10 @@
   <div class="pagination-container">
     <el-pagination
     background
-    @current-change="pageChange"
+    @size-change="handleSizeChange"
+    @current-change="handleCurrentChange"
     layout="total, sizes, prev, pager, next, jumper"
-    :total="100">
+    :total="total">
     </el-pagination>
   </div>
   <el-dialog :title="dialogTitle"  :visible.sync="dialogFormVisible" @close="clearForm">
@@ -41,8 +42,8 @@
       <el-form-item label="霸屏时间" prop="time">
         <el-input v-model.number="bpTimeForm.time" auto-complete="off"></el-input>
       </el-form-item>
-      <el-form-item label="价格" prop="price">
-        <el-input v-model.number="bpTimeForm.price" auto-complete="off"></el-input>
+      <el-form-item label="价格" prop="default_price">
+        <el-input v-model.number="bpTimeForm.default_price" auto-complete="off"></el-input>
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
@@ -54,15 +55,17 @@
 </template>
 
 <script>
+import  * as api from '@/api/resource'
 export default {
   name: 'bptime',
   data() {
+    var reg = /^\d+(?=\.{0,1}\d+$|$)/
     var isInteger = (rule, value, callback) => {
       if (!value) {
         return callback(new Error('请输入' + rule.label));
       }
-      if (!Number.isInteger(value)) {
-        callback(new Error('请输入整数'))
+      if (!reg.test(value)) {
+        callback(new Error('请输入正数'))
       } else {
         callback()
       }
@@ -74,15 +77,23 @@ export default {
       dialogFormVisible: false,
       bpTimeForm: {
         time: '',
-        price: ''
+        default_price: ''
+      },
+      bpTimeFormReset: {
+        time: '',
+        default_price: ''
       },
       bpTimeFormRules: {
         time: [
           {  required: true, validator: isInteger, trigger: 'blur', label: '霸屏时间' }
         ],
-        price: [
+        default_price: [
           {  required: true, validator: isInteger, trigger: 'blur', label: '价格' }
         ]
+      },
+      params: {
+        page: 1,
+        pageSize: 10
       },
       tableData: [{
         time: 60,
@@ -90,23 +101,40 @@ export default {
       }, {
         time: 10,
         price: 20
-      }]
+      }],
+      total: 0
     }
   },
+  created() {
+    this.getData()
+  },
   mounted() {
-    setTimeout(() => {
-      this.loading = false
-    }, 2000)
   },
   methods: {
-    pageChange(currentPage) {
-
+    getData () {
+      this.loading = true
+      api.getBpTimes(this.params).then((response) => {
+        let result = response.data.result
+        this.tableData = result.data
+        this.total = result.total
+        this.loading = false
+      })
+    },
+    handleSizeChange(val) {
+      this.params.pageSize = val
+      this.getData()
+    },
+    handleCurrentChange(val) {
+      this.params.page = val
+      this.getData()
+      console.log(`当前页: ${val}`)
     },
     showEmptyDiaLog() {
       this.dialogTitle = '添加时间'
       this.dialogFormVisible = true
     },
-    handleEdit() {
+    handleEdit(row) {
+      this.bpTimeForm = Object.assign({}, row)
       this.dialogTitle = '编辑时间'
       this.dialogFormVisible = true
     },
@@ -133,11 +161,34 @@ export default {
     clearForm() {
       this.$refs.bpTimeForm.clearValidate()
       this.$refs.bpTimeForm.resetFields()
+      this.bpTimeForm = this.bpTimeFormReset
     },
     _beforeAddBpTime() {
       this.$refs.bpTimeForm.validate(valid => {
         if (valid) {
-          console.log('valid')
+          let request = () => {}
+          let msg = ''
+          if (this.dialogTitle == '添加时间') {
+            request = api.addBpTime
+            msg = '添加成功'
+          } else {
+            request = api.updateBpTime
+            msg = '更新成功'
+          }
+          request(this.bpTimeForm).then((response) => {
+            this.$message({
+              message: msg,
+              type: 'success'
+            })
+            this.clearForm()
+            this.dialogFormVisible = false
+            this.getData()
+          }).catch((error) => {
+            this.$message({
+              message: error.msg,
+              type: 'error'
+            })
+          })
         } else {
           console.log('error submit!!')
           return false

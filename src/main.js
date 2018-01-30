@@ -24,6 +24,23 @@ Vue.use(Element, {
   i18n: (key, value) => i18n.t(key, value)
 })
 
+/* Vue.mixin({
+  methods: {
+    filterCode (key, code) {
+      if (Codes[key]) {
+        var find = Codes[key].error.find((v) => v.code === code)
+        if (find) {
+          return find
+        } else {
+          if (code === Codes[key].success.code) {
+            return null
+          }
+        }
+      }
+    }
+  }
+}) */
+
 // register global utility filters.
 Object.keys(filters).forEach(key => {
   Vue.filter(key, filters[key])

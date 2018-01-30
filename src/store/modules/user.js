@@ -46,13 +46,18 @@ const user = {
   actions: {
     // 用户名登录
     LoginByUsername({ commit }, userInfo) {
-      const username = userInfo.username.trim()
+      userInfo.name = userInfo.name.trim()
       return new Promise((resolve, reject) => {
-        loginByUsername(username, userInfo.password).then(response => {
+        loginByUsername(userInfo).then(response => {
           const data = response.data
-          commit('SET_TOKEN', data.token)
-          setToken(response.data.token)
-          resolve()
+          if (data._error) {
+            reject(data._error)
+          } else {
+            commit('SET_TOKEN', data.result.tokenId)
+            setToken(data.result.tokenId)
+            commit('SET_NAME', data.result.userinfo.nickname)
+            resolve(data)
+          }
         }).catch(error => {
           reject(error)
         })
@@ -62,7 +67,10 @@ const user = {
     // 获取用户信息
     GetUserInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
-        getUserInfo(state.token).then(response => {
+        commit('SET_ROLES', ['admin'])
+        commit('SET_AVATAR', 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif')
+        resolve(['admin'])
+        /* getUserInfo(state.token).then(response => {
           if (!response.data) { // 由于mockjs 不支持自定义状态码只能这样hack
             reject('error')
           }
@@ -74,7 +82,7 @@ const user = {
           resolve(response)
         }).catch(error => {
           reject(error)
-        })
+        }) */
       })
     },
 

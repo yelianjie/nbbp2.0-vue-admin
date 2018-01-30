@@ -6,18 +6,18 @@
         <h3 class="title">{{$t('login.title')}}</h3>
         <!-- <lang-select class="set-language"></lang-select> -->
       </div>
-      <el-form-item prop="username">
+      <el-form-item prop="name">
         <span class="svg-container svg-container_login">
           <svg-icon icon-class="user" />
         </span>
-        <el-input name="username" type="text" v-model="loginForm.username" autoComplete="on" placeholder="请输入用户名" />
+        <el-input name="name" type="text" v-model="loginForm.name" autoComplete="on" placeholder="请输入用户名" />
       </el-form-item>
 
-      <el-form-item prop="password">
+      <el-form-item prop="pwd">
         <span class="svg-container">
           <svg-icon icon-class="password" />
         </span>
-        <el-input name="password" :type="passwordType" @keyup.enter.native="handleLogin" v-model="loginForm.password" autoComplete="on" placeholder="请输入密码" />
+        <el-input name="pwd" :type="passwordType" @keyup.enter.native="handleLogin" v-model="loginForm.pwd" autoComplete="on" placeholder="请输入密码" />
         <span class="show-pwd" @click="showPwd">
           <svg-icon icon-class="eye" />
         </span>
@@ -59,12 +59,12 @@ export default {
     return {
       message: null,
       loginForm: {
-        username: 'admin',
-        password: '1111111'
+        name: '',
+        pwd: ''
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', message: '请输入用户名' }],
-        password: [{ required: true, trigger: 'blur', message: '请输入密码' }]
+        name: [{ required: true, trigger: 'blur', message: '请输入用户名' }],
+        pwd: [{ required: true, trigger: 'blur', message: '请输入密码' }]
       },
       passwordType: 'password',
       loading: false,
@@ -83,25 +83,20 @@ export default {
       this.$refs.loginForm.validate(valid => {
         this.message && this.message.close()
         if (valid) {
-          if (this.loginForm.username != 'admin') {
-            this.message = this.$message.error('用户不存在')
-            return false
-          }
-          if (this.loginForm.password != '1111111') {
-            this.message = this.$message.error('账户名或者登录密码不正确')
-            return false
-          }
-          
           this.loading = true
-          this.$store.dispatch('LoginByUsername', this.loginForm).then(() => {
+          this.$store.dispatch('LoginByUsername', this.loginForm).then((response) => {
             this.loading = false
             this.$message({
               message: '登录成功',
               type: 'success'
             });
             this.$router.push({ path: '/' })
-          }).catch(() => {
+          }).catch((error) => {
             this.loading = false
+            this.$message({
+              message: error.msg,
+              type: 'error'
+            });
           })
         } else {
           console.log('error submit!!')

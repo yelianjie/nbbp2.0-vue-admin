@@ -1,20 +1,21 @@
 import request from '@/utils/request'
-
-export function loginByUsername(username, password) {
-  const data = {
-    username,
-    password
-  }
+/**
+ * 后台登录
+ * @param {Object} data 
+ */
+export function loginByUsername(data) {
   return request({
-    url: '/login/login',
+    url: '/admin/login/sublogin',
     method: 'post',
     data
   })
 }
-
+/**
+ * 退出登录
+ */
 export function logout() {
   return request({
-    url: '/login/logout',
+    url: '/admin/users/loginOut',
     method: 'post'
   })
 }
