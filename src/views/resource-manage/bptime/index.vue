@@ -55,12 +55,12 @@
 </template>
 
 <script>
-import  * as api from '@/api/resource'
+import  { getBpTimes, addBpTime, updateBpTime, deleteBp } from '@/api/resource'
 export default {
   name: 'bptime',
   data() {
     var reg = /^\d+(?=\.{0,1}\d+$|$)/
-    var isInteger = (rule, value, callback) => {
+    var isPositive = (rule, value, callback) => {
       if (!value) {
         return callback(new Error('请输入' + rule.label));
       }
@@ -79,29 +79,19 @@ export default {
         time: '',
         default_price: ''
       },
-      bpTimeFormReset: {
-        time: '',
-        default_price: ''
-      },
       bpTimeFormRules: {
         time: [
-          {  required: true, validator: isInteger, trigger: 'blur', label: '霸屏时间' }
+          {  required: true, validator: isPositive, trigger: 'blur', label: '霸屏时间' }
         ],
         default_price: [
-          {  required: true, validator: isInteger, trigger: 'blur', label: '价格' }
+          {  required: true, validator: isPositive, trigger: 'blur', label: '价格' }
         ]
       },
       params: {
         page: 1,
         pageSize: 10
       },
-      tableData: [{
-        time: 60,
-        price: 100
-      }, {
-        time: 10,
-        price: 20
-      }],
+      tableData: [],
       total: 0
     }
   },
@@ -109,11 +99,12 @@ export default {
     this.getData()
   },
   mounted() {
+    this.bpTimeFormReset = Object.assign({}, this.bpTimeForm)
   },
   methods: {
     getData () {
       this.loading = true
-      api.getBpTimes(this.params).then((response) => {
+      getBpTimes(this.params).then((response) => {
         let result = response.data.result
         this.tableData = result.data
         this.total = result.total
@@ -144,19 +135,21 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
+        deleteBp({id: row.id}).then(() => {
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+          this.getData()
+        }).catch((error) => {
+          this.$message({
+            type: 'error',
+            message: error.msg
+          })
         })
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        })      
+        
+      }).catch(() => {     
       })
-    },
-    DeleteTime() {
-
     },
     clearForm() {
       this.$refs.bpTimeForm.clearValidate()
@@ -169,10 +162,10 @@ export default {
           let request = () => {}
           let msg = ''
           if (this.dialogTitle == '添加时间') {
-            request = api.addBpTime
+            request = addBpTime
             msg = '添加成功'
           } else {
-            request = api.updateBpTime
+            request = updateBpTime
             msg = '更新成功'
           }
           request(this.bpTimeForm).then((response) => {

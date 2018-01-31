@@ -3,7 +3,7 @@
     <transition-group name="upload-item">
       <li tabindex="0" class="el-upload-list__item is-success" v-for="(v, i) in list" :key="i">
         <img src="../../../assets/pixel.gif" class="el-upload-list__item-thumbnail thumb-placeholder" :style="{'background-image': 'url('+ v.url + ')'}" v-if="type == 'image'" :id="'image_file_'+i"/>
-        <img src="../../../assets/pixel.gif" class="el-upload-list__item-thumbnail thumb-placeholder" style="background-image:url(../../../assets/bg-video-place.png)" v-if="type == 'video'" :id="'video_file_'+i">
+        <img src="../../../assets/pixel.gif" class="el-upload-list__item-thumbnail thumb-placeholder" :style="{'background-image':'url('+ placeHolder +')'}" v-if="type == 'video'" :id="'video_file_'+i">
         <a class="el-upload-list__item-name"><i class="el-icon-document"></i>timg.jpg</a>
         <label class="el-upload-list__item-status-label">
           <i class="el-icon-upload-success el-icon-check"></i>
@@ -20,7 +20,14 @@
 
 <script>
 import BigPicture from '../../../vendor/BigPicture'
+import placeHolder from '@/assets/bg-video-place.png'
+import { removeResource } from '@/api/screen'
 export default {
+  data () {
+    return {
+      placeHolder: placeHolder
+    }
+  },
   props: ['list', 'onRemove', 'type'],
   methods: {
     previewFile(index) {
@@ -38,7 +45,22 @@ export default {
       
     },
     deleteFile(index) {
-      this.onRemove(index)
+      console.log(this.list[index].id)
+      this.$confirm('确定删除该资源吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        removeResource({id: this.list[index].id}).then((response) => {
+          this.onRemove(index)
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+        })
+      }).catch(() => {    
+      })
+      
     }
   }
 }

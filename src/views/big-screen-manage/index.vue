@@ -10,6 +10,9 @@
         placeholder="请输入内容"
         v-model="textarea">
       </el-input>
+      <div style="text-align:right;margin-top:20px;">
+        <el-button type="primary" @click="saveNotice">确定</el-button>
+      </div>
     </el-card>
     <el-card class="box-card">
       <div slot="header" class="clearfix">
@@ -20,11 +23,14 @@
         <upload-preview :list="picBgs" type="image" :on-remove="handleRemove"></upload-preview>
         <el-upload
           accept="image/*"
-          action="https://jsonplaceholder.typicode.com/posts/"
+          :headers="headers"
+          :data="{type: 1}"
+          :action="'/admin/file_upload/uploadBg'| uploadPrefixUrl"
           list-type="picture-card"
           :show-file-list="false"
+          :before-upload="beforeImageUpload"
           :on-progress="handleProgress"
-          :on-success="handlePictureSuccess">
+          :on-success="handleImageSuccess">
           <i class="el-icon-plus"></i>
         </el-upload>
       </el-row>
@@ -32,11 +38,14 @@
       <el-row class="row-flex">
         <upload-preview :list="videoBgs" type="video" :on-remove="handleRemove"></upload-preview>
         <el-upload
-          accept="video/webm"
-          action="https://jsonplaceholder.typicode.com/posts/"
+          accept="video/*"
+          :headers="headers"
+          :data="{type: 2}"
+          :action="'/admin/file_upload/uploadBg'| uploadPrefixUrl"
           list-type="picture-card"
           :show-file-list="false"
-          :before-upload="beforeUpload"
+          :before-upload="beforeVideoUpload"
+          :on-progress="handleProgress"
           :on-success="handleVideoSuccess">
           <i class="el-icon-plus"></i>
         </el-upload>
@@ -52,10 +61,14 @@
           <el-upload
             class="avatar-uploader"
             accept="image/*"
-            action="https://jsonplaceholder.typicode.com/posts/"
+            :headers="headers"
+            :data="{type: 2}"
+            :action="'/admin/file_upload/uploadAdvert'| uploadPrefixUrl"
+            list-type="picture-card"
             :show-file-list="false"
-            :on-success="handleBigImgSuccess"
-            :before-upload="beforeBigImgUpload">
+            :before-upload="beforeImageUpload"
+            :on-progress="handleProgress"
+            :on-success="handleBigImgSuccess">
             <img v-if="form.bigImgUrl" :src="form.bigImgUrl" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
@@ -66,10 +79,14 @@
          <el-upload
             class="avatar-uploader"
             accept="image/*"
-            action="https://jsonplaceholder.typicode.com/posts/"
+            :headers="headers"
+            :data="{type: 1}"
+            :action="'/admin/file_upload/uploadAdvert'| uploadPrefixUrl"
+            list-type="picture-card"
             :show-file-list="false"
-            :on-success="handleMobileImgSuccess"
-            :before-upload="beforeMobileImgUpload">
+            :before-upload="beforeImageUpload"
+            :on-progress="handleProgress"
+            :on-success="handleMobileImgSuccess">
             <img v-if="form.mobileImgUrl" :src="form.mobileImgUrl" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
@@ -77,39 +94,64 @@
        </el-col>
      </el-row>
     </el-card>
-    <fix-bottom-btns :btns="actionBtns" @FixBtnClick="handleBtnClick"></fix-bottom-btns>
   </div> 
 </template>
 
 <script>
 import UploadPreview from './componets/upload-preview'
-import FixBottomBtns from '@/components/FixBottomBtns/index'
+import { mapGetters } from 'vuex'
+import { addNotice } from '@/api/screen.js'
 export default {
   name: 'bigScreenManage',
+  computed: {
+    ...mapGetters([
+      'token'
+    ])
+  },
   data() {
     return {
       textarea: '',
-      actionBtns: [{
-        text: '确定',
-        type: 'primary'
-      }],
       form: {
         bigImgUrl: '',
         mobileImgUrl: ''
       },
       picBgs: [],
-      videoBgs: []
+      videoBgs: [],
+      headers: {}
     }
   },
   mounted() {
-
+    this.headers = {
+      tId: this.token
+    }
   },
   methods: {
+    saveNotice() {
+      /* addNotice({content: this.textarea}).then((response) => {
+        this.$message.success('添加成功')
+      }) */
+    },
     handleProgress(event, file, fileList) {
       console.log(event, file)
     },
-    beforeUpload(file) {
-      console.log(file)
+    beforeVideoUpload(file) {
+      const isWebm = file.type === 'video/webm'
+      const isLt10M = file.size / 1024 / 1024 < 10
+      if (!isWebm) {
+        this.$message.error('上传视频只能是 Webm 格式!')
+        return isWebm
+      }
+      if (!isLt10M) {
+        this.$message.error('上传视频大小不能超过 10MB!')
+      }
+      return isWebm && isLt10M
+    },
+    beforeImageUpload(file) {
+      const isLt2M = file.size / 1024 / 1024 < 2
+      if (!isLt2M) {
+        this.$message.error('上传视频大小不能超过 2MB!');
+      }
+      return isLt2M
     },
     handleRemove(index) {
       this.picBgs.splice(index, 1)
@@ -118,22 +160,19 @@ export default {
       this.dialogImageUrl = file.url
       this.dialogVisible = true
     },
-    handlePictureSuccess(response, file, fileList) {
-      console.log(file)
-      this.picBgs.push(file)
+    handleImageSuccess(response, file, fileList) {
+      console.log(response)
+      this.picBgs.push({
+        url: file.url,
+        id: response.result
+      })
     },
     handleVideoSuccess(response, file, fileList) {   
       console.log(file)
-      this.videoBgs.push(file)
-    },
-    handleRemoveBigScreenPic(file, fileList) {
-
-    },
-    handleRemoveMobilePic(file, fileList) {
-
-    },
-    handleBtnClick(index) {
-      console.log(index)
+      this.videoBgs.push({
+        url: file.url,
+        id: response.result
+      })
     },
     handleBigImgSuccess(res, file) {
       this.form.bigImgUrl = URL.createObjectURL(file.raw);
@@ -157,7 +196,6 @@ export default {
     }
   },
   components: {
-    FixBottomBtns,
     UploadPreview
   }
 }
@@ -186,14 +224,14 @@ export default {
 .avatar-uploader-icon {
   font-size: 28px;
   color: #8c939d;
-  width: 178px;
-  height: 178px;
-  line-height: 178px;
+  width: 148px;
+  height: 148px;
+  line-height: 148px;
   text-align: center;
 }
 .avatar {
-  width: 178px;
-  height: 178px;
+  width: 148px;
+  height: 148px;
   display: block;
 }
 .row-flex {

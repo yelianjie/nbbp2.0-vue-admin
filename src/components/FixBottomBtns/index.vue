@@ -35,6 +35,10 @@ export default {
   z-index: 1;
   background-color: #fff;
   box-shadow: 1px 1px 3px rgba(0,0,0,.5);
+  transition: left .28s;
+}
+#app .hideSidebar .fixed_bottom {
+  left: 36px;
 }
 </style>
 

@@ -16,17 +16,15 @@
         width="220">
       </el-table-column>
       <el-table-column
-        prop="img"
+        prop="icon"
         label="图片"
         width="150">
+        <template slot-scope="scope">
+          <img :src="scope.row.icon | uploadPrefixUrl" style="width: 80px;height: 80px;"/>
+        </template>
       </el-table-column>
       <el-table-column
-        prop="type"
-        label="类型"
-        width="120">
-      </el-table-column>
-      <el-table-column
-        prop="price"
+        prop="default_price"
         label="价格"
         width="160">
       </el-table-column>
@@ -43,7 +41,7 @@
       background
       @current-change="pageChange"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="100">
+      :total="total">
       </el-pagination>
     </div>
     <el-dialog :title="dialogTitle"  :visible.sync="dialogFormVisible" @close="clearForm">
@@ -51,25 +49,28 @@
         <el-form-item label="主题名称" prop="title">
           <el-input v-model="bpThemeForm.title" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="图片" prop="img">
+        <el-form-item label="图片" prop="icon">
           <el-upload
             class="avatar-uploader"
             accept="image/*"
-            action="https://jsonplaceholder.typicode.com/posts/"
+            action=""
+            :http-request="uploadIcon"
             :show-file-list="false"
-            :on-success="handleIconSuccess"
             :before-upload="beforeIconUpload">
-            <img v-if="bpThemeForm.img" :src="bpThemeForm.img" class="avatar">
+            <img v-if="bpThemeForm.icon" :src="bpThemeForm.icon | uploadPrefixUrl" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
         </el-form-item>
         <!-- <el-form-item label="类型" prop="type">
           <el-input v-model="bpThemeForm.type" auto-complete="off"></el-input>
         </el-form-item> -->
-        <el-form-item label="价格" prop="price">
-          <el-input v-model.number="bpThemeForm.price" auto-complete="off"></el-input>
+        <el-form-item label="价格" prop="default_price">
+          <el-input v-model.number="bpThemeForm.default_price" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="文件包" prop="zipurl">
+        <el-form-item label="主题地址" prop="url">
+          <el-input v-model.number="bpThemeForm.url" auto-complete="off"></el-input>
+        </el-form-item>
+        <!--<el-form-item label="文件包" prop="zipurl">
           <el-upload
             ref="zipUpload"
             class="upload-demo"
@@ -83,7 +84,22 @@
             <i class="el-icon-upload"></i>
             <div class="el-upload__text">将ZIP文件拖到此处，或<em>点击上传</em></div>
           </el-upload>
-        </el-form-item>
+        </el-form-item>-->
+        <!--<el-form-item label="主题资源配置项" prop="url">
+          <el-upload
+            ref="zipUpload"
+            class="upload-demo"
+            :before-upload="beforeZipUpload"
+            drag
+            :limit="1"
+            :before-remove="beforeRemoveZip"
+            :on-remove="handleRemoveZip"
+            :on-exceed="handleExceedZip"
+            action="https://jsonplaceholder.typicode.com/posts/">
+            <i class="el-icon-upload"></i>
+            <div class="el-upload__text">将ZIP文件拖到此处，或<em>点击上传</em></div>
+          </el-upload>
+        </el-form-item>-->
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -94,15 +110,17 @@
 </template>
 
 <script>
+import  { getBpThemes, addBpTheme, updateBpTheme, uploadImg, deleteBp } from '@/api/resource'
 export default {
   name: 'bptheme',
   data() {
-    var isInteger = (rule, value, callback) => {
+    var reg = /^\d+(?=\.{0,1}\d+$|$)/
+    var isPositive = (rule, value, callback) => {
       if (!value) {
         return callback(new Error('请输入' + rule.label));
       }
-      if (!Number.isInteger(value)) {
-        callback(new Error('请输入整数'))
+      if (!reg.test(value)) {
+        callback(new Error('请输入正数'))
       } else {
         callback()
       }
@@ -114,44 +132,49 @@ export default {
       dialogFormVisible: false,
       bpThemeForm: {
         title: '',
-        img: '',
-        type: '',
-        price: '',
-        zipurl: ''
+        icon: '',
+        default_price: '',
+        url: ''
       },
       bpThemeFormRules: {
         title: [
           { required: true, trigger: 'blur', message: '请输入主题名称' },
           { max: 5, trigger: 'blur', message: '主题名称不能超过5个字符' }
         ],
-        img: [{ required: true, trigger: 'blur', message: '请上传图片' }],
+        icon: [{ required: true, trigger: 'blur', message: '请上传图片' }],
         /* type: [{ required: true, trigger: 'blur', message: '请输入类型' }], */
-        price: [{ required: true, validator: isInteger, trigger: 'blur', label: '价格'}],
-        zipurl: [{ required: true, trigger: 'blur', message: '请上传文件包'}]
+        default_price: [{ required: true, validator: isPositive, trigger: 'blur', label: '价格'}],
+        url: [{ required: true, trigger: 'blur', message: '请输入主题地址' }]
+        /* url: [{ required: true, trigger: 'blur', message: '请上传主题资源配置项'}] */
       },
-      tableData: [{
-        title: '生日霸屏',
-        img: '',
-        type: 1,
-        price: 100
-      }, {
-        title: '求约霸屏',
-        img: '',
-        type: 1,
-        price: 200
-      }]
+      tableData: [],
+      params: {
+        page: 1,
+        pageSize: 10
+      },
+      total: 0
     }
   },
+  created() {
+    this.getData()
+  },
   mounted() {
-    console.log('init bptheme')
-    setTimeout(() => {
-      this.loading = false
-    }, 2000)
+    this.bpThemeFormReset = Object.assign({}, this.bpThemeForm)
   },
   methods: {
+    getData () {
+      this.loading = true
+      getBpThemes(this.params).then((response) => {
+        let result = response.data.result
+        this.tableData = result.data
+        this.total = result.total
+        this.loading = false
+      })
+    },
     clearForm() {
       this.$refs.bpThemeForm.clearValidate()
       this.$refs.bpThemeForm.resetFields()
+      this.bpThemeForm = Object.assign({}, this.bpThemeFormReset)
     },
     pageChange(currentPage) {
 
@@ -160,7 +183,8 @@ export default {
       this.dialogTitle = '添加主题'
       this.dialogFormVisible = true
     },
-    handleEdit() {
+    handleEdit(row, index) {
+      this.bpThemeForm = Object.assign({}, row)
       this.dialogTitle = '编辑主题'
       this.dialogFormVisible = true
     },
@@ -170,9 +194,17 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
+        deleteBp({id: row.id}).then(() => {
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+          this.getData()
+        }).catch((error) => {
+          this.$message({
+            type: 'error',
+            message: error.msg
+          })
         })
       }).catch(() => {
         this.$message({
@@ -181,24 +213,52 @@ export default {
         })      
       })
     },
-    DeleteTime() {
-
-    },
     _beforeAddBpTime() {
       this.$refs.bpThemeForm.validate(valid => {
         if (valid) {
-          console.log('valid')
+          let request = () => {}
+          let msg = ''
+          if (this.dialogTitle == '添加主题') {
+            request = addBpTheme
+            msg = '添加成功'
+          } else {
+            request = updateBpTheme
+            msg = '更新成功'
+          }
+          request(this.bpThemeForm).then((response) => {
+            this.$message({
+              message: msg,
+              type: 'success'
+            })
+            this.clearForm()
+            this.dialogFormVisible = false
+            this.getData()
+          }).catch((error) => {
+            this.$message({
+              message: error.msg,
+              type: 'error'
+            })
+          })
         } else {
           console.log('error submit!!')
           return false
         }
       })
     },
-    handleIconSuccess(res, file) {
-      this.bpThemeForm.img = URL.createObjectURL(file.raw);
+    uploadIcon(item) {
+      if (!this.beforeIconUpload(item.file))
+        return
+      let formData = new FormData()
+      formData.append('file', item.file)
+      uploadImg(formData).catch(err => {
+        this.$message.error('上传失败，请重新上传')
+      }).then(res => {
+        this.$message.success('上传成功')
+        this.bpThemeForm.icon = res.data.result
+      })
     },
     beforeIconUpload(file) {
-      const isLt50K= file.size / 1024 < 100;
+      const isLt50K= file.size / 1024 < 50;
       if (!isLt50K) {
         this.$message.error('上传图片大小不能超过 50K!');
       }

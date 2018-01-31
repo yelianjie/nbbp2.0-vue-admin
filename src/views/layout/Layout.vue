@@ -44,6 +44,10 @@ export default {
 		top: 0;
 		left: 180px;
 		right: 0;
-		z-index: 1;
+		z-index: 3;
+		transition: left .28s;
+	}
+	#app .hideSidebar .top_layout_fixed {
+		left: 36px;
 	}
 </style>

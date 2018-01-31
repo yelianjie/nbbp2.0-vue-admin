@@ -3,11 +3,11 @@ import { Message } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
 import { filterCode } from '@/utils/code'
-
 // create an axios instance
 const service = axios.create({
   baseURL: process.env.BASE_API, // api的base_url
   timeout: 5000 // request timeout
+  /* headers: { 'Content-Type': 'application/x-www-form-urlencoded' } */
 })
 
 // request interceptor
@@ -19,6 +19,7 @@ service.interceptors.request.use(config => {
   }
   return config
 }, error => {
+  console.log('errrrrrr')
   // Do something with request error
   console.log(error) // for debug
   Promise.reject(error)

@@ -19,7 +19,7 @@ export default {
   name: 'resourceManage',
   data() {
     return {
-      currentView: 'bptime'
+      currentView: 'bptheme'
     }
   },
   methods: {
