@@ -1,7 +1,6 @@
 <template>
-  <ul class="el-upload-list el-upload-list--picture-card" style="display:block;">
-    <transition-group name="upload-item">
-      <li tabindex="0" class="el-upload-list__item is-success" v-for="(v, i) in list" :key="i">
+    <transition-group name="upload-item" tag="div" class="el-upload-list el-upload-list--picture-card" style="display:block;">
+      <div tabindex="0" class="el-upload-list__item is-success" v-for="(v, i) in list" :key="i">
         <img src="../../../assets/pixel.gif" class="el-upload-list__item-thumbnail thumb-placeholder" :style="{'background-image': 'url('+ v.url + ')'}" v-if="type == 'image'" :id="'image_file_'+i"/>
         <img src="../../../assets/pixel.gif" class="el-upload-list__item-thumbnail thumb-placeholder" :style="{'background-image':'url('+ placeHolder +')'}" v-if="type == 'video'" :id="'video_file_'+i">
         <a class="el-upload-list__item-name"><i class="el-icon-document"></i>timg.jpg</a>
@@ -11,11 +10,10 @@
         <i class="el-icon-close"></i><i class="el-icon-close-tip">按 delete 键可删除</i><!---->
         <span class="el-upload-list__item-actions">
           <span class="el-upload-list__item-preview" @click="previewFile(i)"><i class="el-icon-zoom-in"></i></span>
-          <span class="el-upload-list__item-delete" @click="deleteFile(i)"><i class="el-icon-delete"></i></span>
+          <span class="el-upload-list__item-delete" @click="deleteFile(i, v.type)"><i class="el-icon-delete"></i></span>
         </span>
-      </li>
+      </div>
     </transition-group>
-  </ul>
 </template>
 
 <script>
@@ -44,9 +42,9 @@ export default {
       }
       
     },
-    deleteFile(index) {
-      console.log(this.list[index].id)
-      this.$confirm('确定删除该资源吗?', '提示', {
+    deleteFile(index, type) {
+      this.onRemove(index, type)
+      /* this.$confirm('确定删除该资源吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -59,7 +57,7 @@ export default {
           })
         })
       }).catch(() => {    
-      })
+      }) */
       
     }
   }
@@ -71,6 +69,7 @@ export default {
   background-color: transparent;
   background-size: cover;
   background-repeat: no-repeat;
+  background-position: center;
 }
 .upload-item-enter-active, .upload-item-leave-active {
   transition: all 1s;

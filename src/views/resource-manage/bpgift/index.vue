@@ -179,6 +179,8 @@ export default {
         this.tableData = result.data
         this.total = result.total
         this.loading = false
+      }).catch((error) => {
+        this.loading = false
       })
     },
     clearForm() {
