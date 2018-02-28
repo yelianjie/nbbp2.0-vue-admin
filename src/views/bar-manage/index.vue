@@ -2,21 +2,15 @@
   <div class="container" v-loading="loading">
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
       <el-form-item label="酒吧名称">
-        <el-select v-model="formInline.barName" placeholder="请选择" clearable>
-          <el-option
-            v-for="item in bars"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
+        <el-input v-model="formInline.nickname" placeholder="请输入酒吧名称"></el-input>
       </el-form-item>
       <el-form-item label="状态">
         <el-select v-model="formInline.status" placeholder="状态选择">
-          <el-option label="全部" value="0"></el-option>
+          <el-option label="全部" value=""></el-option>
           <el-option label="审核通过" value="1"></el-option>
-          <el-option label="审核未通过" value="2"></el-option>
-          <el-option label="已解约" value="3"></el-option>
+          <el-option label="审核未通过" value="0"></el-option>
+          <el-option label="已解约" value="-1"></el-option>
+          <el-option label="已删除" value="-2"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item  label="地区">
@@ -38,18 +32,22 @@
       :data="tableData"
       style="width: 100%">
       <el-table-column
-        prop="logo"
         label="酒吧logo"
         width="120">
+        <template slot-scope="scope">
+          <img class="avatar" :src="scope.row.logo | uploadPrefixUrl"/>
+        </template>
       </el-table-column>
       <el-table-column
         prop="name"
-        label="酒吧名称">
+        label="酒吧名称"
+        width="220">
       </el-table-column>
       <el-table-column
-        prop="area"
-        label="地区"
-        width="150">
+        label="地区">
+        <template slot-scope="scope">
+          {{scope.row.province_name}}{{scope.row.city_name}}{{scope.row.area_name}}{{scope.row.address}}
+        </template>
       </el-table-column>
       <el-table-column
         prop="join_at"
@@ -65,6 +63,9 @@
         prop="status"
         label="状态"
         width="120">
+        <template slot-scope="scope">
+          {{status[scope.row.status]}}
+        </template>
       </el-table-column>
       <el-table-column
       label="操作"
@@ -78,9 +79,10 @@
     <div class="pagination-container">
       <el-pagination
       background
-      @current-change="pageChange"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="100">
+      :total="total">
       </el-pagination>
     </div>
     <el-dialog
@@ -98,6 +100,7 @@
 
 <script>
 import CityInfo from '@/vendor/city-data.js'
+import { getBars } from '@/api/barManage'
 export default {
   name: 'barManage',
   data() {
@@ -111,6 +114,12 @@ export default {
         minerae: '',
         selectedOptions: []
       },
+      status: {
+        '1': '审核通过',
+        '-1': '已解约',
+        '0': '审核未通过',
+        '-2': '已删除'
+      },
       bars: [{
         label: 'CMK酒吧',
         value: 10
@@ -123,29 +132,34 @@ export default {
         status: ''
       },
       dialogVisible: false,
-      tableData: [{
-        logo: '',
-        name: 'CMK酒吧',
-        area: '浙江省宁波市',
-        join_at: '2016-05-02',
-        agent: '鲜花',
-        status: 1
-      }, {
-        logo: '',
-        name: 'CMK酒吧',
-        area: '浙江省宁波市',
-        join_at: '2016-05-02',
-        agent: '鲜花',
-        status: 2
-      }]
+      params: {
+        page: 1,
+        pageSize: 10,
+        name: '',
+        status: '',
+        area: ''
+      },
+      tableData: [],
+      total: 0
     }
   },
+  created() {
+    this.getData()
+  },
   mounted() {
-    setTimeout(() => {
-      this.loading = false
-    }, 2000)
   },
   methods: {
+    getData () {
+      this.loading = true
+      getBars(this.params).then((response) => {
+        let result = response.data.result
+        this.tableData = result.data
+        this.total = result.total
+        this.loading = false
+      }).catch((error) => {
+        this.loading = false
+      })
+    },
     onSubmit() {
       console.log('submit!')
       var city, erae, minerae
@@ -193,8 +207,14 @@ export default {
       this.form.erae = this.form.selectedOptions[1]
       this.form.minerae = this.form.selectedOptions[2]
     },
-    pageChange(currentPage) {
-      console.log(currentPage)
+    handleSizeChange(val) {
+      this.params.pageSize = val
+      this.getData()
+    },
+    handleCurrentChange(val) {
+      this.params.page = val
+      this.getData()
+      console.log(`当前页: ${val}`)
     }
   }
 }

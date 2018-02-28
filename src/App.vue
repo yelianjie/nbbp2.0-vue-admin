@@ -26,5 +26,9 @@
   flex: 1;
   overflow: auto;
 } */
+.avatar {
+  width: 80px;
+  height: 80px;
+}
 </style>
 

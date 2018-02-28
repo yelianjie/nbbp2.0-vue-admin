@@ -1,9 +1,13 @@
 import request from '@/utils/request'
 
-export function example(query) {
+/**
+ * 获取系统用户列表
+ * @param {*} data
+ */
+export function getSysUsers(data) {
   return request({
-    url: '/article/list',
-    method: 'get',
-    params: query
+    url: '/admin/users/getSysUserList',
+    method: 'POST',
+    data
   })
 }

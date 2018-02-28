@@ -1,10 +1,18 @@
 <template>
   <div class="container" v-loading="loading">
-    <el-row>
+    <!-- <el-row>
       <el-col :span="24">
         <el-button type="primary" @click.native="showEmptyDiaLog">添加酒吧管理</el-button>
       </el-col>
-    </el-row>
+    </el-row> -->
+    <el-form :inline="true" :model="formInline" class="demo-form-inline">
+      <el-form-item label="用户名">
+        <el-input v-model="formInline.nickname" placeholder="请输入昵称"></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="onSubmit">搜索</el-button>
+      </el-form-item>
+    </el-form>
     <div style="height:24px;"></div>
     <el-table
       v-loading="tableLoading"
@@ -16,33 +24,35 @@
         width="220">
       </el-table-column>
       <el-table-column
-        prop="img"
         label="头像"
         width="150">
+        <template slot-scope="scope">
+          <img class="avatar" :src="scope.row.headimgurl | uploadPrefixUrl"/>
+        </template>
       </el-table-column>
       <el-table-column
-        prop="mobile"
+        prop="phone"
         label="联系电话"
         width="180">
       </el-table-column>
       <el-table-column
-        prop="create_at"
-        label="创建时间"
-        width="160">
+        prop="create_time"
+        label="创建时间">
       </el-table-column>
-      <el-table-column
+      <!-- <el-table-column
       label="操作">
       <template slot-scope="scope">
         <el-button @click="handleDelete(scope.row, scope.$index)" type="text" size="small">删除</el-button>
       </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
     <div class="pagination-container">
       <el-pagination
       background
-      @current-change="pageChange"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="100">
+      :total="total">
       </el-pagination>
       <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible" @close="clearForm">
         <el-tabs v-model="activeName">
@@ -59,8 +69,8 @@
                 <el-input v-model="barManagerForm.img" auto-complete="off" type="hidden" class="hidden-input" :disabled="true"></el-input>
                 <img src="http://nb.siweiquanjing.com/attachment/bar/20171227191747_227.png" class="wx_avatar" />
               </el-form-item>
-              <el-form-item label="联系电话" prop="mobile">
-                <el-input v-model="barManagerForm.mobile" auto-complete="off" type="number"></el-input>
+              <el-form-item label="联系电话" prop="phone">
+                <el-input v-model="barManagerForm.phone" auto-complete="off" type="number"></el-input>
               </el-form-item>
             </el-form>
           </el-tab-pane>
@@ -76,6 +86,7 @@
 </template>
 
 <script>
+import { getBarManager, deleteBarManager } from '@/api/userManage'
 export default {
   name: 'barManager',
   data() {
@@ -89,35 +100,58 @@ export default {
       barManagerForm: {
         nickname: '',
         img: '',
-        mobile: ''
+        phone: ''
       },
       barManagerFormRules: {
         nickname: [{ required: true, trigger: 'blur', message: '请输入微信昵称' }],
         img: [{ required: true, trigger: 'blur', message: '头像不能为空' }],
-        mobile: [
+        phone: [
           { required: true, trigger: 'blur', message: '请输入联系电话' },
           { min: 11, max: 11, trigger: 'blur', message: '请输入正确的电话号码' },
         ]
       },
-      tableData: [{
-        nickname: '鲜花',
-        img: '',
-        mobile: 15869598745,
-        create_at: '2017-05-05 14:00:00'
-      }]
+      formInline: {
+        nickname: ''
+      },
+      params: {
+        page: 1,
+        pageSize: 10
+      },
+      tableData: [],
+      total: 0
     }
   },
+  created() {
+    this.getData()
+  },
   mounted() {
-    setTimeout(() => {
-      this.loading = false
-    }, 2000)
   },
   methods: {
+    getData () {
+      this.loading = true
+      getBarManager(this.params).then((response) => {
+        let result = response.data.result
+        this.tableData = result.data
+        this.total = result.total
+        this.loading = false
+      }).catch((error) => {
+        this.loading = false
+      })
+    },
     onSubmit() {
+      this.resetParams()
+      this.params.name = this.formInline.nickname
+      this.getData()
       console.log('submit')
     },
-    pageChange(currentPage) {
-      console.log(currentPage)
+    handleSizeChange(val) {
+      this.params.pageSize = val
+      this.getData()
+    },
+    handleCurrentChange(val) {
+      this.params.page = val
+      this.getData()
+      console.log(`当前页: ${val}`)
     },
     addBarManager() {
 
@@ -126,33 +160,49 @@ export default {
 
     },
     showEmptyDiaLog() {
-      this.dialogTitle = '添加酒吧管理员'
+      this.dialogTitle = '添加酒吧管理'
       this.dialogFormVisible = true
     },
     handleEdit() {
-      this.dialogTitle = '编辑酒吧管理员'
+      this.dialogTitle = '编辑酒吧管理'
       this.dialogFormVisible = true
     },
-    handleDelete() {
-      this.$confirm('是否确定删除该酒吧管理员?', '提示', {
+    handleDelete(row, index) {
+      this.$confirm('是否确定删除该酒吧管理?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        deleteBarManager({id: row.id}).then(() => {
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+          this.getData()
+        }).catch((error) => {
+          this.$message({
+            type: 'error',
+            message: error.msg
+          })
+        })
+
         this.$message({
           type: 'success',
           message: '删除成功!'
         })
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        })      
+      }).catch(() => {    
       })
     },
     clearForm() {
       this.$refs.barManagerForm.clearValidate()
       this.$refs.barManagerForm.resetFields()
+    },
+    resetParams() {
+      this.params = {
+        page: 1,
+        pageSize: 10,
+        name: ''
+      }
     }
   }
 }

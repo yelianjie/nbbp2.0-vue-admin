@@ -12,7 +12,8 @@
           type="daterange"
           range-separator="至"
           start-placeholder="开始日期"
-          end-placeholder="结束日期">
+          end-placeholder="结束日期"
+          value-format="yyyy-MM-dd">
         </el-date-picker>
       </el-form-item>
       <el-form-item>
@@ -26,8 +27,10 @@
       style="width: 100%">
       <el-table-column
         width="160px"
-        prop="avatar"
         label="用户头像">
+        <template slot-scope="scope">
+          <img class="avatar" :src="scope.row.headimgurl | uploadPrefixUrl"/>
+        </template>
       </el-table-column>
       <el-table-column
         width="160px"
@@ -35,12 +38,14 @@
         label="微信昵称">
       </el-table-column>
       <el-table-column
-        prop="area"
         label="地区"
-        width="120px">
+        width="200px">
+        <template slot-scope="scope">
+          {{scope.row.province}}-{{scope.row.city}}
+        </template>
       </el-table-column>
       <el-table-column
-        prop="last_time_at"
+        prop="time"
         label="上次活跃时间">
       </el-table-column>
     </el-table>
@@ -49,7 +54,7 @@
       background
       @current-change="pageChange"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="100">
+      :total="total">
       </el-pagination>
     </div>
   </div>
@@ -57,6 +62,7 @@
 
 <script>
 import panelNumber from '../components/panelNumber'
+import { getMembers, getMemberNum } from '@/api/userManage'
 export default {
   name: 'wxManager',
   data() {
@@ -65,34 +71,59 @@ export default {
       tableLoading: false,
       panelData: [{
         label: '用户总数',
-        number: 5000
+        number: 0
       }, {
         label: '昨日新增用户数',
-        numer: 400
+        number: 0
       }, {
         label: '昨日活跃用户数',
-        number: 3000
+        number: 0
       }],
       formInline: {
         nickname: '',
         dateValue: ''
       },
-      tableData: [{
-        avatar: '',
-        nickname: '我是一个机器人',
-        area: '江苏 南京',
-        last_time_at: '2017-12-31 15:00:30'
-      }]
+      params: {
+        page: 1,
+        pageSize: 10,
+        name: ''
+      },
+      tableData: [],
+      total: 0
     }
   },
+  created() {
+    this.getData()
+    getMemberNum().then((response) => {
+      let result = response.data.result
+      this.panelData[0].number = result.tNum
+      this.panelData[1].number = result.yIncNum
+      this.panelData[2].number = result.acNum
+    }).catch((error) => {
+    })
+  },
   mounted() {
-    console.log('wxmanager mounted!')
-    setTimeout(() => {
-      this.loading = false
-    }, 2000)
   },
   methods: {
+    getData () {
+      this.loading = true
+      getMembers(this.params).then((response) => {
+        let result = response.data.result
+        this.tableData = result.data
+        this.total = result.total
+        this.loading = false
+      }).catch((error) => {
+        this.loading = false
+      })
+    },
     onSubmit() {
+      this.resetParams()
+      this.params.name = this.formInline.nickname
+      if (Array.isArray(this.formInline.dateValue) && this.formInline.dateValue.length > 0) {
+        this.params.beginT = this.formInline.dateValue[0]
+        this.params.endT = this.formInline.dateValue[1]
+      }
+      this.getData()
       console.log('submit')
     },
     pageChange(currentPage) {
@@ -100,6 +131,15 @@ export default {
     },
     dateChange(value) {
 
+    },
+    resetParams() {
+      this.params = {
+        page: 1,
+        pageSize: 10,
+        name: '',
+        beginT: '',
+        endT: ''
+      }
     }
   },
   components: {

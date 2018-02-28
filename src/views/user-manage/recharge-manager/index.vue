@@ -16,8 +16,10 @@
       style="width: 100%">
       <el-table-column
         width="160px"
-        prop="avatar"
         label="用户头像">
+        <template slot-scope="scope">
+          <img class="avatar" :src="scope.row.headimgurl | uploadPrefixUrl"/>
+        </template>
       </el-table-column>
       <el-table-column
         width="160px"
@@ -27,23 +29,27 @@
       <el-table-column
         prop="area"
         label="地区"
-        width="120px">
+        width="200px">
+        <template slot-scope="scope">
+          {{scope.row.province}}-{{scope.row.city}}
+        </template>
       </el-table-column>
       <el-table-column
-        prop="count"
+        prop="recharge_money"
         label="充值总金额">
       </el-table-column>
       <el-table-column
-        prop="rest"
+        prop="balance"
         label="账户余额">
       </el-table-column>
     </el-table>
     <div class="pagination-container">
       <el-pagination
       background
-      @current-change="pageChange"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="100">
+      :total="total">
       </el-pagination>
     </div>
   </div>
@@ -51,6 +57,7 @@
 
 <script>
 import panelNumber from '../components/panelNumber'
+import { getRecharges, getMemberNum } from '@/api/userManage'
 export default {
   name: 'rechargeManager',
   data() {
@@ -59,38 +66,73 @@ export default {
       tableLoading: false,
       panelData: [{
         label: '会员总数',
-        number: 5000
+        number: 0
       }, {
         label: '昨日新增会员数',
-        numer: 400
+        numer: 0
       }, {
         label: '账户余额',
-        number: 3000
+        number: 0
       }],
       formInline: {
         nickname: ''
       },
-      tableData: [{
-        avatar: '',
-        nickname: '我是一个机器人',
-        area: '江苏 南京',
-        count: 5000,
-        rest: 500
-      }]
+      params: {
+        page: 1,
+        pageSize: 10
+      },
+      tableData: [],
+      total: 0
     }
   },
+  created() {
+    this.getData()
+    getMemberNum().then((response) => {
+      let result = response.data.result
+      this.panelData[0].number = result.tNum
+      this.panelData[1].number = result.yIncNum
+      this.panelData[2].number = result.acNum
+    }).catch((error) => {
+    })
+  },
   mounted() {
-    console.log('rechargemanager mounted!')
-    setTimeout(() => {
-      this.loading = false
-    }, 2000)
   },
   methods: {
+    getData () {
+      this.loading = true
+      getRecharges(this.params).then((response) => {
+        let result = response.data.result
+        this.tableData = result.data
+        this.total = result.total
+        this.loading = false
+      }).catch((error) => {
+        this.loading = false
+      })
+    },
+    handleSizeChange(val) {
+      this.params.pageSize = val
+      this.getData()
+    },
+    handleCurrentChange(val) {
+      this.params.page = val
+      this.getData()
+      console.log(`当前页: ${val}`)
+    },
     onSubmit() {
+      this.resetParams()
+      this.params.name = this.formInline.nickname
+      this.getData()
       console.log('submit')
     },
     pageChange(currentPage) {
       console.log(currentPage)
+    },
+    resetParams() {
+      this.params = {
+        page: 1,
+        pageSize: 10,
+        name: ''
+      }
     }
   },
   components: {

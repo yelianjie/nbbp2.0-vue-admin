@@ -11,7 +11,7 @@
       :data="tableData"
       style="width: 100%">
       <el-table-column
-        prop="username"
+        prop="sign_in_name"
         label="用户名"
         width="220">
       </el-table-column>
@@ -19,6 +19,9 @@
         prop="img"
         label="头像"
         width="150">
+        <template slot-scope="scope">
+          <img class="avatar" :src="scope.row.head_img | uploadPrefixUrl"/>
+        </template>
       </el-table-column>
       <el-table-column
         prop="role"
@@ -26,12 +29,12 @@
         width="120">
       </el-table-column>
       <el-table-column
-        prop="name"
+        prop="real_name"
         label="真实姓名"
         width="140">
       </el-table-column>
       <el-table-column
-        prop="create_at"
+        prop="create_time"
         label="创建时间"
         width="160">
       </el-table-column>
@@ -86,6 +89,7 @@
 </template>
 
 <script>
+import { getSysUsers } from '@/api/systemManage'
 export default {
   name: 'systemUser',
   data() {
@@ -106,21 +110,30 @@ export default {
         role: [{ required: true, trigger: 'blur', message: '请选择角色' }],
         name: [{ required: true, trigger: 'blur', message: '请填写真实姓名' }]
       },
-      tableData: [{
-        username: 'pigye009',
-        img: '',
-        role: 1,
-        name: '叶连杰',
-        create_at: '2018-01-15 16:00:00'
-      }]
+      params: {
+        page: 1,
+        pageSize: 10
+      },
+      tableData: []
     }
   },
+  created() {
+    this.getData()
+  },
   mounted() {
-    setTimeout(() => {
-      this.loading = false
-    }, 2000)
   },
   methods: {
+    getData () {
+      this.loading = true
+      getSysUsers(this.params).then((response) => {
+        let result = response.data.result
+        this.tableData = result.data
+        this.total = result.total
+        this.loading = false
+      }).catch((error) => {
+        this.loading = false
+      })
+    },
     clearForm() {
       this.$refs.systemUserForm.clearValidate()
       this.$refs.systemUserForm.resetFields()

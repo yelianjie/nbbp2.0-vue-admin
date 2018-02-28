@@ -1,9 +1,13 @@
 import request from '@/utils/request'
 
-export function example(query) {
+/**
+ * 酒吧列表
+ * @param {*} data
+ */
+export function getBars(data) {
   return request({
-    url: '/article/list',
-    method: 'get',
-    params: query
+    url: '/admin/hotel/getHotelList',
+    method: 'post',
+    data
   })
 }

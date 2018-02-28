@@ -15,21 +15,23 @@
       style="width: 100%">
       <el-table-column
         width="160px"
-        prop="nickname"
+        prop="name"
         label="用户名">
       </el-table-column>
       <el-table-column
         width="160px"
-        prop="imgurl"
         label="头像">
+        <template slot-scope="scope">
+          <img class="avatar" :src="scope.row.headimgurl | uploadPrefixUrl"/>
+        </template>
       </el-table-column>
       <el-table-column
-        prop="mobile"
+        prop="phone"
         label="联系电话"
         width="200px">
       </el-table-column>
       <el-table-column
-        prop="create_at"
+        prop="create_time"
         label="注册时间">
       </el-table-column>
       <el-table-column
@@ -43,15 +45,17 @@
     <div class="pagination-container">
       <el-pagination
       background
-      @current-change="pageChange"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="100">
+      :total="total">
       </el-pagination>
     </div>
   </div>
 </template>
 
 <script>
+import { getAgents, deleteAgent } from '@/api/userManage'
 export default {
   name: 'agentManager',
   data() {
@@ -61,25 +65,44 @@ export default {
       formInline: {
         nickname: ''
       },
-      tableData: [{
-        nickname: '鲜花',
-        imgurl: '',
-        mobile: '15869598979',
-        create_at: '2017-05-06 14:00:00'
-      }]
+      params: {
+        page: 1,
+        pageSize: 10,
+        name: ''
+      },
+      tableData: [],
+      total: 0
     }
   },
   mounted() {
-    setTimeout(() => {
-      this.loading = false
-    }, 2000)
+    this.getData()
   },
   methods: {
-    onSubmit() {
-      console.log('submit!')
+    getData () {
+      this.loading = true
+      getAgents(this.params).then((response) => {
+        let result = response.data.result
+        this.tableData = result.data
+        this.total = result.total
+        this.loading = false
+      }).catch((error) => {
+        this.loading = false
+      })
     },
-    pageChange(currentPage) {
-      console.log(currentPage)
+    handleSizeChange(val) {
+      this.params.pageSize = val
+      this.getData()
+    },
+    handleCurrentChange(val) {
+      this.params.page = val
+      this.getData()
+      console.log(`当前页: ${val}`)
+    },
+    onSubmit() {
+      this.resetParams()
+      this.params.name = this.formInline.nickname
+      this.getData()
+      console.log('submit!')
     },
     handleDelete(row, index) {
       this.$confirm('是否确定删除该代理?', '提示', {
@@ -87,16 +110,22 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
+        deleteAgent({id: row.id}).then((res) => {
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+          this.getData()
         })
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        })      
+      }).catch(() => {   
       })
+    },
+    resetParams() {
+      this.params = {
+        page: 1,
+        pageSize: 10,
+        name: ''
+      }
     }
   }
 }

@@ -1,9 +1,84 @@
 import request from '@/utils/request'
 
-export function example(query) {
+/**
+ * 酒吧管理列表（参与分成的）
+ * @param {*} data
+ */
+export function getBarManager(data) {
   return request({
-    url: '/article/list',
-    method: 'get',
-    params: query
+    url: '/admin/supervise/getSuperviseList',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 删除酒吧管理
+ * @param {*} data
+ */
+export function deleteBarManager(data) {
+  return request({
+    url: '/admin/supervise/getSuperviseList',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 获取会员总数
+ * @param {*} data
+ */
+export function getMemberNum() {
+  return request({
+    url: '/admin/members/getMembersNum',
+    method: 'POST'
+  })
+}
+
+/**
+ * 获取会员列表
+ * @param {*} data
+ */
+export function getMembers(data) {
+  return request({
+    url: '/admin/members/getAcUserList',
+    method: 'POST',
+    data
+  })
+}
+
+/**
+ * 获取充值会员列表
+ * @param {*} data
+ */
+export function getRecharges(data) {
+  return request({
+    url: '/admin/recharge/getRechargeList',
+    method: 'POST',
+    data
+  })
+}
+
+/**
+ * 获取代理用户列表
+ * @param {*} data
+ */
+export function getAgents(data) {
+  return request({
+    url: '/admin/agent/getGridData',
+    method: 'POST',
+    data
+  })
+}
+
+/**
+ * 删除代理
+ * @param {*} data
+ */
+export function deleteAgent(data) {
+  return request({
+    url: '/admin/agent/del',
+    method: 'POST',
+    data
   })
 }
