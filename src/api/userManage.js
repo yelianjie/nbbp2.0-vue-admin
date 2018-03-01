@@ -31,7 +31,7 @@ export function deleteBarManager(data) {
 export function getMemberNum() {
   return request({
     url: '/admin/members/getMembersNum',
-    method: 'POST'
+    method: 'post'
   })
 }
 
@@ -42,7 +42,7 @@ export function getMemberNum() {
 export function getMembers(data) {
   return request({
     url: '/admin/members/getAcUserList',
-    method: 'POST',
+    method: 'post',
     data
   })
 }
@@ -54,7 +54,7 @@ export function getMembers(data) {
 export function getRecharges(data) {
   return request({
     url: '/admin/recharge/getRechargeList',
-    method: 'POST',
+    method: 'post',
     data
   })
 }
@@ -66,7 +66,7 @@ export function getRecharges(data) {
 export function getAgents(data) {
   return request({
     url: '/admin/agent/getGridData',
-    method: 'POST',
+    method: 'post',
     data
   })
 }
@@ -78,7 +78,7 @@ export function getAgents(data) {
 export function deleteAgent(data) {
   return request({
     url: '/admin/agent/del',
-    method: 'POST',
+    method: 'post',
     data
   })
 }

@@ -2,7 +2,7 @@
   <div class="container" v-loading="loading">
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
       <el-form-item label="酒吧名称">
-        <el-input v-model="formInline.nickname" placeholder="请输入酒吧名称"></el-input>
+        <el-input v-model="formInline.barName" placeholder="请输入酒吧名称" clearable></el-input>
       </el-form-item>
       <el-form-item label="状态">
         <el-select v-model="formInline.status" placeholder="状态选择">
@@ -10,13 +10,13 @@
           <el-option label="审核通过" value="1"></el-option>
           <el-option label="审核未通过" value="0"></el-option>
           <el-option label="已解约" value="-1"></el-option>
-          <el-option label="已删除" value="-2"></el-option>
+          <!-- <el-option label="已删除" value="-2"></el-option> -->
         </el-select>
       </el-form-item>
       <el-form-item  label="地区">
         <el-cascader
           :options="CityInfo"
-          v-model="form.selectedOptions"
+          v-model="formInline.selectedOptions"
           :change-on-select="false"
           :clearable="true"
           :filterable="true"
@@ -72,7 +72,7 @@
       width="150">
       <template slot-scope="scope">
         <el-button type="text" size="small" @click="handleEdit(scope.row, scope.$index)">审核&编辑</el-button>
-        <el-button @click="handleDelete(scope.row, scope.$index)" type="text" size="small">删除</el-button>
+        <el-button @click="handleDelete(scope.row, scope.$index)" type="text" size="small" v-if="scope.row.status == -1">删除</el-button>
       </template>
       </el-table-column>
     </el-table>
@@ -100,7 +100,7 @@
 
 <script>
 import CityInfo from '@/vendor/city-data.js'
-import { getBars } from '@/api/barManage'
+import { getBars, deleteBar } from '@/api/barManage'
 export default {
   name: 'barManage',
   data() {
@@ -108,12 +108,6 @@ export default {
       loading: true,
       tableLoading: false,
       CityInfo: CityInfo,
-      form: {
-        city: '',
-        erae: '',
-        minerae: '',
-        selectedOptions: []
-      },
       status: {
         '1': '审核通过',
         '-1': '已解约',
@@ -129,7 +123,11 @@ export default {
       }],
       formInline: {
         barName: '',
-        status: ''
+        status: '',
+        city: '',
+        erae: '',
+        minerae: '',
+        selectedOptions: []
       },
       dialogVisible: false,
       params: {
@@ -140,7 +138,8 @@ export default {
         area: ''
       },
       tableData: [],
-      total: 0
+      total: 0,
+      deleteData: {}
     }
   },
   created() {
@@ -162,8 +161,8 @@ export default {
     },
     onSubmit() {
       console.log('submit!')
-      var city, erae, minerae
-      for (var y in this.CityInfo) {
+      /*var city, erae, minerae
+       for (var y in this.CityInfo) {
         if (this.CityInfo[y].value === this.form.city) {
           city = this.CityInfo[y].label
         }
@@ -183,29 +182,40 @@ export default {
 						}
 					}
 				}
-      }
-      console.log(city, erae, minerae)
+      } */
+      this.params.name = this.formInline.barName
+      this.params.status = this.formInline.status
+      this.params.area = this.formInline.minerae
+      console.log(this.params)
+      this.getData()
     },
     handleDelete(row, index) {
       console.log(row)
       this.dialogVisible = true
+      this.deleteData = row
     },
     DeleteBar() {
-      alert('delete')
-      this.dialogVisible = false
+      deleteBar({id: this.deleteData.id}).then((response) => {
+        this.$message({
+          message: '删除成功',
+          type: 'success'
+        })
+        this.getData()
+      })
+      this.dialogVisible = false  
     },
     handleEdit(row, index) {
       this.$router.push({
-        path: '/barManageDo/edit',
+        path: `/barManageDo/edit/${row.id}`,
         query: {
           edit: Math.random()
         }
       })
     },
     handleChange(value) {
-      this.form.city = this.form.selectedOptions[0]
-      this.form.erae = this.form.selectedOptions[1]
-      this.form.minerae = this.form.selectedOptions[2]
+      this.formInline.city = this.formInline.selectedOptions[0]
+      this.formInline.erae = this.formInline.selectedOptions[1]
+      this.formInline.minerae = this.formInline.selectedOptions[2]
     },
     handleSizeChange(val) {
       this.params.pageSize = val
@@ -215,6 +225,15 @@ export default {
       this.params.page = val
       this.getData()
       console.log(`当前页: ${val}`)
+    },
+    resetParams() {
+      this.params = {
+        page: 1,
+        pageSize: 10,
+        name: '',
+        status: '',
+        area: ''
+      }
     }
   }
 }

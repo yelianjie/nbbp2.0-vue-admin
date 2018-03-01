@@ -85,7 +85,7 @@ export const asyncRouterMap = [
     redirect: '/barManageDo/edit',
     meta: { roles: ['admin'] }, // you can set roles in root nav
     children: [{
-      path: 'edit',
+      path: 'edit/:id',
       component: _import('bar-manage-do/edit/index'),
       name: 'barManageEdit',
       meta: {

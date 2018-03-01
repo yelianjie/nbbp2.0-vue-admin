@@ -3,7 +3,7 @@
     <panel-number :paneldata="panelData"></panel-number>
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
       <el-form-item label="昵称">
-        <el-input v-model="formInline.nickname" placeholder="请输入昵称"></el-input>
+        <el-input v-model="formInline.nickname" placeholder="请输入昵称" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">搜索</el-button>

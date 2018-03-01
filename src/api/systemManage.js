@@ -7,7 +7,7 @@ import request from '@/utils/request'
 export function getSysUsers(data) {
   return request({
     url: '/admin/users/getSysUserList',
-    method: 'POST',
+    method: 'post',
     data
   })
 }
