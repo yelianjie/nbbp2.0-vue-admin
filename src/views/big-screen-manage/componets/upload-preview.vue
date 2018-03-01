@@ -2,7 +2,8 @@
     <transition-group name="upload-item" tag="div" class="el-upload-list el-upload-list--picture-card" style="display:block;">
       <div tabindex="0" class="el-upload-list__item is-success" v-for="(v, i) in list" :key="i">
         <img src="../../../assets/pixel.gif" class="el-upload-list__item-thumbnail thumb-placeholder" :style="{'background-image': 'url('+ v.url + ')'}" v-if="type == 'image'" :id="'image_file_'+i"/>
-        <img src="../../../assets/pixel.gif" class="el-upload-list__item-thumbnail thumb-placeholder" :style="{'background-image':'url('+ placeHolder +')'}" v-if="type == 'video'" :id="'video_file_'+i">
+        <!-- <img src="../../../assets/pixel.gif" class="el-upload-list__item-thumbnail thumb-placeholder" :style="{'background-image':'url('+ placeHolder +')'}" v-if="type == 'video'" :id="'video_file_'+i"> -->
+        <video style="object-fit: cover;" :src="v.url | uploadPrefixUrl" class="el-upload-list__item-thumbnail thumb-placeholder" v-if="type == 'video'" :id="'video_file_'+i"></video>
         <a class="el-upload-list__item-name"><i class="el-icon-document"></i>timg.jpg</a>
         <label class="el-upload-list__item-status-label">
           <i class="el-icon-upload-success el-icon-check"></i>
