@@ -26,37 +26,40 @@
       style="width: 100%">
       <el-table-column 
       label="代理用户名"
-      prop="nickname"
+      prop="name"
       width="360">
       </el-table-column>
       <el-table-column min-width="300px" label="默认分成比例（%）">
         <template slot-scope="scope">
           <template v-if="scope.row.edit">
-            <el-input class="edit-input" size="small" v-model="scope.row.percent"></el-input>
-            <el-button class='cancel-btn' size="small" icon="el-icon-refresh" type="warning" @click="cancelEdit(scope.row)">cancel</el-button>
+            <el-input class="edit-input" size="small" v-model="scope.row.default_divide_into"></el-input>
+            <el-button class='cancel-btn' size="small" icon="el-icon-refresh" type="warning" @click="cancelEdit(scope.row)">取消</el-button>
           </template>
-          <span v-else>{{ scope.row.percent }}</span>
+          <span v-else>{{ scope.row.default_divide_into }}</span>
         </template>
       </el-table-column>
       <el-table-column align="center" label="操作" width="120">
         <template slot-scope="scope">
-          <el-button v-if="scope.row.edit" type="success" @click="confirmEdit(scope.row)" size="small" icon="el-icon-circle-check-outline">Ok</el-button>
-          <el-button v-else type="primary" @click='scope.row.edit=!scope.row.edit' size="small" icon="el-icon-edit">Edit</el-button>
+          <el-button v-if="scope.row.edit" type="success" @click="confirmEdit(scope.row)" size="small" icon="el-icon-circle-check-outline">确定</el-button>
+          <el-button v-else type="primary" @click='scope.row.edit=!scope.row.edit' size="small" icon="el-icon-edit">编辑</el-button>
         </template>
       </el-table-column>
     </el-table>
     <div class="pagination-container">
       <el-pagination
       background
-      @current-change="pageChange"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="100">
+      :total="total">
       </el-pagination>
     </div>
   </div> 
 </template>
 
 <script>
+import { getAgents } from '@/api/userManage'
+import { setDefaultRate } from '@/api/finance'
 export default {
   name: 'defaultDivide',
   data() {
@@ -68,32 +71,57 @@ export default {
       formInline: {
         username: ''
       },
-      tableData: [{
-        nickname: '鲜花',
-        percent: 25,
-        edit: false
-      }, {
-        nickname: '牛霸',
-        percent: 20,
-        edit: false
-      }]
+      params: {
+        page: 1,
+        pageSize: 10,
+        name: ''
+      },
+      tableData: [],
+      total: 0
     }
   },
-  mounted() {
-    console.log('ggg')
-    setTimeout(() => {
-      this.loading = false
-    }, 2000)
+  created() {
+    this.getData()
   },
   methods: {
+    getData () {
+      this.loading = true
+      getAgents(this.params).then((response) => {
+        let result = response.data.result
+        result.data.map((v) => {
+          v.edit = false
+        })
+        this.tableData = result.data
+        this.total = result.total
+        this.loading = false
+      }).catch((error) => {
+        this.loading = false
+      })
+    },
+    resetParams() {
+      this.params = {
+        page: 1,
+        pageSize: 10,
+        name: ''
+      }
+    },
     setRate() {
       console.log(this.platform_percent, this.user_percent)
     },
     onSubmit() {
+      this.resetParams()
+      this.params.name = this.formInline.nickname
+      this.getData()
       console.log('submit!')
     },
-    pageChange(currentPage) {
-      console.log(currentPage)
+    handleSizeChange(val) {
+      this.params.pageSize = val
+      this.getData()
+    },
+    handleCurrentChange(val) {
+      this.params.page = val
+      this.getData()
+      console.log(`当前页: ${val}`)
     },
     cancelEdit(row) {
       row.title = row.originalTitle

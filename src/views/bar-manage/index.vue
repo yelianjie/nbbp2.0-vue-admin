@@ -35,7 +35,7 @@
         label="酒吧logo"
         width="120">
         <template slot-scope="scope">
-          <img class="avatar" :src="scope.row.logo | uploadPrefixUrl"/>
+          <img class="avatar-user-img" :src="scope.row.logo | uploadPrefixUrl"/>
         </template>
       </el-table-column>
       <el-table-column

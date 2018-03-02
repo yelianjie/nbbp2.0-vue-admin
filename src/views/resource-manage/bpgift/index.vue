@@ -49,7 +49,8 @@
     <div class="pagination-container">
       <el-pagination
       background
-      @current-change="pageChange"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
       layout="total, sizes, prev, pager, next, jumper"
       :total="total">
       </el-pagination>
@@ -188,8 +189,14 @@ export default {
       this.$refs.bpGiftForm.resetFields()
       this.bpGiftForm = Object.assign({}, this.bpGiftFormReset)
     },
-    pageChange(currentPage) {
-
+    handleSizeChange(val) {
+      this.params.pageSize = val
+      this.getData()
+    },
+    handleCurrentChange(val) {
+      this.params.page = val
+      this.getData()
+      console.log(`当前页: ${val}`)
     },
     showEmptyDiaLog() {
       this.dialogTitle = '添加礼物'

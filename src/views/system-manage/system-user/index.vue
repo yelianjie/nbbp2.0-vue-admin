@@ -49,7 +49,8 @@
     <div class="pagination-container">
       <el-pagination
       background
-      @current-change="pageChange"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
       layout="total, sizes, prev, pager, next, jumper"
       :total="100">
       </el-pagination>
@@ -138,8 +139,14 @@ export default {
       this.$refs.systemUserForm.clearValidate()
       this.$refs.systemUserForm.resetFields()
     },
-    pageChange(currentPage) {
-
+    handleSizeChange(val) {
+      this.params.pageSize = val
+      this.getData()
+    },
+    handleCurrentChange(val) {
+      this.params.page = val
+      this.getData()
+      console.log(`当前页: ${val}`)
     },
     showEmptyDiaLog() {
       this.dialogTitle = '添加系统用户'

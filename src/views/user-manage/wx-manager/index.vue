@@ -29,7 +29,7 @@
         width="160px"
         label="用户头像">
         <template slot-scope="scope">
-          <img class="avatar" :src="scope.row.headimgurl | uploadPrefixUrl"/>
+          <img class="avatar-user-img" :src="scope.row.headimgurl | uploadPrefixUrl"/>
         </template>
       </el-table-column>
       <el-table-column
@@ -52,7 +52,8 @@
     <div class="pagination-container">
       <el-pagination
       background
-      @current-change="pageChange"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
       layout="total, sizes, prev, pager, next, jumper"
       :total="total">
       </el-pagination>
@@ -86,7 +87,9 @@ export default {
       params: {
         page: 1,
         pageSize: 10,
-        name: ''
+        name: '',
+        beginT: '',
+        endT: ''
       },
       tableData: [],
       total: 0
@@ -126,11 +129,17 @@ export default {
       this.getData()
       console.log('submit')
     },
-    pageChange(currentPage) {
-      console.log(currentPage)
-    },
     dateChange(value) {
 
+    },
+    handleSizeChange(val) {
+      this.params.pageSize = val
+      this.getData()
+    },
+    handleCurrentChange(val) {
+      this.params.page = val
+      this.getData()
+      console.log(`当前页: ${val}`)
     },
     resetParams() {
       this.params = {

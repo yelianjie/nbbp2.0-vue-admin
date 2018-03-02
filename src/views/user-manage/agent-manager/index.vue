@@ -22,7 +22,7 @@
         width="160px"
         label="头像">
         <template slot-scope="scope">
-          <img class="avatar" :src="scope.row.headimgurl | uploadPrefixUrl"/>
+          <img class="avatar-user-img" :src="scope.row.headimgurl | uploadPrefixUrl"/>
         </template>
       </el-table-column>
       <el-table-column
@@ -74,7 +74,7 @@ export default {
       total: 0
     }
   },
-  mounted() {
+  created() {
     this.getData()
   },
   methods: {

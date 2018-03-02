@@ -6,22 +6,22 @@
       <div slot="header" class="clearfix">
         <span>基本信息</span>
       </div>
-      <el-form ref="form" :model="form" label-width="80px">
+      <el-form ref="form" :model="form" :rules="formRules" label-width="80px">
         <el-row>
           <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
-            <el-form-item label="酒吧名称">
+            <el-form-item label="酒吧名称" prop="name">
               <el-input v-model="form.name" placeholder="请填写酒吧名称"></el-input>
             </el-form-item>
-            <el-form-item label="联系方式">
-              <el-input v-model="form.contact_tel" placeholder="请填写联系方式"></el-input>
+            <el-form-item label="联系方式" prop="contact_tel">
+              <el-input type="number" v-model.number="form.contact_tel" placeholder="请填写联系方式"></el-input>
             </el-form-item>
             <el-form-item label="代理选择">
               <el-select v-model="selectAgent" placeholder="请选择代理选择">
                 <el-option
                   v-for="item in agents"
-                  :key="item.mc_id"
+                  :key="item.id"
                   :label="item.name"
-                  :value="item.mc_id">
+                  :value="item.id">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -29,9 +29,9 @@
               <el-select v-model="selectManager" placeholder="请选择酒吧管理">
                 <el-option
                   v-for="item in managers"
-                  :key="item.mc_id"
-                  :label="item.nickname"
-                  :value="item.mc_id">
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -46,9 +46,9 @@
                 <el-upload
                   class="avatar-uploader"
                   accept="image/*"
-                  action="https://jsonplaceholder.typicode.com/posts/"
+                  action=""
+                  :http-request="uploadLogo"
                   :show-file-list="false"
-                  :on-success="handleLogoSuccess"
                   :before-upload="beforeLogoUpload">
                   <img v-if="form.logo" :src="form.logo | uploadPrefixUrl" class="avatar">
                   <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -77,19 +77,19 @@
         <el-row class="rate-row">
           <el-col>
             <span class="percent-tip">酒吧用户</span>
-            <el-input-number v-model="form.users_separate" controls-position="right" @change="handleChange" size="small" :min="1" :max="25" class="input-number-percent"></el-input-number>%
+            <el-input-number v-model="form.users_separate" controls-position="right" @change="handleChange" size="small" :min="1" :max="100" class="input-number-percent"></el-input-number>%
           </el-col>
         </el-row>
         <el-row class="rate-row">
           <el-col>
             <span class="percent-tip">酒吧商户</span>
-            <el-input-number v-model.number="form.ht_separate" controls-position="right" @change="handleChange" size="small" :min="1" :max="25" class="input-number-percent"></el-input-number>%
+            <el-input-number v-model.number="form.ht_separate" controls-position="right" @change="handleChange" size="small" :min="1" :max="100" class="input-number-percent"></el-input-number>%
             <span class="percent-tip">酒吧管理</span>
-            <el-input-number v-model.number="form.manage_separate" controls-position="right" @change="handleChange" size="small" :min="1" :max="70" class="input-number-percent"></el-input-number>%
+            <el-input-number v-model.number="form.manage_separate" controls-position="right" @change="handleChange" size="small" :min="1" :max="100" class="input-number-percent"></el-input-number>%
             <span class="percent-tip">代理</span>
-            <el-input-number v-model.number="form.yewu_separate" controls-position="right" @change="handleChange" size="small" :min="1" :max="70" class="input-number-percent"></el-input-number>%
+            <el-input-number v-model.number="form.yewu_separate" controls-position="right" @change="handleChange" size="small" :min="1" :max="100" class="input-number-percent"></el-input-number>%
             <span class="percent-tip">牛霸平台</span>
-            <el-input-number :disabled="true" v-model.number="form.company_separate" controls-position="right" size="small" :min="1" :max="70" class="input-number-percent"></el-input-number>%
+            <el-input-number :disabled="true" v-model.number="form.company_separate" controls-position="right" size="small" :min="1" :max="100" class="input-number-percent"></el-input-number>%
           </el-col>
         </el-row>
         <p class="tip">酒吧用户参与分成：酒吧用户+商户+酒吧管理+代理 +牛霸平台=100%</p>
@@ -107,7 +107,7 @@
           <p>手机端URL：{{url}}<el-button type="primary" plain v-clipboard:copy='url' v-clipboard:success='clipboardSuccess'>复制</el-button></p>
         </div>
         <div class="qrcode-img">
-          <img src="http://nb.siweiquanjing.com/attachment/bar/20171227191747_227.png">
+          <img :src="form.phone_er_url | uploadPrefixUrl" v-if="form.phone_er_url">
         </div>
       </div>
     </el-card>
@@ -120,8 +120,8 @@
 import FixBottomBtns from '@/components/FixBottomBtns/index'
 import BaiduMap from '../components/map'
 import clipboard from '@/directive/clipboard/index.js'
-import { getBarInfo } from '@/api/barManage'
-import { getAgents, getBarManager } from '@/api/userManage'
+import { getBarInfo, updateBarInfo } from '@/api/barManage'
+import { uploadImg } from '@/api/resource' 
 export default {
   name: 'barManageEdit',
   directives: {
@@ -136,41 +136,64 @@ export default {
         type: 'primary'
       }],
       form: {},
+      formRules: {
+        name: [
+          { required: true, trigger: 'blur', message: '请输入酒吧名字' }
+        ],
+        contact_tel: [
+          { required: true, trigger: 'blur', message: '请输入联系电话' },
+          { min: 11, max: 11, message: '手机号码应该是11位', trigger: 'blur' }
+        ]
+      },
       agents: [],
       managers: [],
-      selectAgent: '1',
-      selectManager: '1'
+      selectAgent: '',
+      selectManager: ''
     }
   },
   created () {
     getBarInfo({ht_id: this.$route.params.id}).then((response) => {
       this.form = response.data.result.hotel
-    })
-    getBarManager({page: 1, pageSize: 99999999}).then((response) => {
-      let result = response.data.result.data
-      this.managers = result
-      console.log(this.managers)
-    })
-    getAgents({page: 1, pageSize: 99999999}).then((response) => {
-      let result = response.data.result.data
-      this.agents = result
-      console.log(this.agents)
-    }).catch((error) => {
+      this.managers = response.data.result.superviseList
+      this.agents = response.data.result.agentList
+      this.selectAgent =  response.data.result.agent ? response.data.result.agent : ''
+      this.selectManager =  response.data.result.supervise ? response.data.result.supervise : ''
     })
   },
   methods: {
     handleBtnClick(index, cb) {
-      console.log(index, cb)
-      console.log(this.selectAgent, this.selectManager)
-      setTimeout(() => {
+      this.form.ht_id = this.$route.params.id
+      this.form.agent_id = this.selectAgent
+      this.form.supervise_id = this.selectManager
+      updateBarInfo(this.form).then((response) => {
+        this.$message.success('修改成功')
         cb && cb()
-      }, 2000)
+      })
     },
     handleChange(value) {
       console.log(value)
     },
     handleLogoSuccess(res, file) {
       this.form.logoUrl = URL.createObjectURL(file.raw);
+    },
+    uploadLogo(item) {
+      if (!this.beforeLogoUpload(item.file))
+        return
+      let formData = new FormData()
+      formData.append('file', item.file)
+      uploadImg(formData).catch(err => {
+        this.$message.error('上传失败，请重新上传')
+      }).then(res => {
+        this.$message.success('上传成功')
+        this.form.logo = res.data.result
+      })
+    },
+    beforeLogoUpload(file) {
+      const isLt50K= file.size / 1024 < 50;
+      if (!isLt50K) {
+        this.$message.error('上传图片大小不能超过 50K!');
+      }
+      return isLt50K
     },
     beforeLogoUpload(file) {
       const isLt100K= file.size / 1024 < 100;
@@ -181,7 +204,15 @@ export default {
     },
     closeDialog(data) {
       if (data != null) {
-        console.log(data)
+        var o = {
+          address: data.addressComponents.street + data.addressComponents.streetNumber,
+          locationLng: data.point.lat,
+          locationLat: data.point.lng,
+          province_name: data.addressComponents.province,
+          city_name: data.addressComponents.city,
+          area_name: data.addressComponents.district
+        }
+        this.form = Object.assign({}, this.form, o)
       }
       this.visibleMap = false
     },
@@ -232,6 +263,7 @@ $color: #606266;
   .avatar {
     width: 100px;
     height: 100px;
+    display: block;
   }
   .format-tip {
     color: $color;

@@ -27,7 +27,7 @@
         label="头像"
         width="150">
         <template slot-scope="scope">
-          <img class="avatar" :src="scope.row.headimgurl | uploadPrefixUrl"/>
+          <img class="avatar-user-img" :src="scope.row.headimgurl | uploadPrefixUrl"/>
         </template>
       </el-table-column>
       <el-table-column

@@ -2,23 +2,17 @@
   <div class="container" v-loading="loading">
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
       <el-form-item label="酒吧名称">
-        <el-select v-model="formInline.barName" placeholder="请选择" clearable @clear="clearBar">
-          <el-option
-            v-for="item in bars"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
+        <el-input v-model="formInline.barName" placeholder="请输入酒吧名称" clearable></el-input>
       </el-form-item>
       <el-form-item label="时间">
         <el-date-picker
           @change="dateChange"
-          v-model="dateValue"
+          v-model="formInline.dateValue"
           type="daterange"
           range-separator="至"
           start-placeholder="开始日期"
-          end-placeholder="结束日期">
+          end-placeholder="结束日期"
+          value-format="yyyy-MM-dd">
         </el-date-picker>
       </el-form-item>
       <el-form-item>
@@ -35,57 +29,56 @@
         label="酒吧名称">
       </el-table-column>
       <el-table-column
-        prop="total"
+        prop="t0"
         label="总收益">
       </el-table-column>
       <el-table-column
-        prop="agent_count"
+        prop="t1"
         label="代理收益">
       </el-table-column>
       <el-table-column
-        prop="business_count"
+        prop="t2"
         label="商户收益">
       </el-table-column>
       <el-table-column
-        prop="bar_count"
+        prop="t3"
         label="酒吧管理">
       </el-table-column>
       <el-table-column
-        prop="user_count"
+        prop="t4"
         label="用户收益">
       </el-table-column>
       <el-table-column
-        prop="all_deposit_count"
-        label="需提现金额">
+        label="非平台收益之和">
+        <template slot-scope="scope">
+          {{scope.row | calNotSysMoney}}
+        </template>
       </el-table-column>
       <el-table-column
-        prop="can_deposit_count"
-        label="待提现金额">
-      </el-table-column>
-      <el-table-column
-        prop="platform_count"
+        prop="t5"
         label="平台收益">
       </el-table-column>
     </el-table>
     <div class="pagination-container">
       <el-pagination
       background
-      @current-change="pageChange"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="100">
+      :total="total">
       </el-pagination>
     </div>
  </div>
 </template>
 
 <script>
+import { getHtFinanceList } from '@/api/finance'
 export default {
   name: 'statistics',
   data() {
     return {
       loading: true,
       tableLoading: false,
-      dateValue: '',
       bars: [{
         label: 'CMK酒吧',
         value: 10
@@ -95,35 +88,68 @@ export default {
       }],
       formInline: {
         barName: '',
-        status: ''
+        dateValue: ''
       },
       dialogVisible: false,
-      tableData: [{
-        name: 'CMK酒吧',
-        total: 100,
-        agent_count: 50,
-        business_count: 50,
-        bar_count: 50,
-        user_count: 50,
-        all_deposit_count: 10,
-        can_deposit_count: 5,
-        platform_count: 10
-      }]
+      params: {
+        page: 1,
+        pageSize: 10,
+        name: '',
+        beginT: '',
+        endT: ''
+      },
+      tableData: [],
+      total: 0
     }
   },
+  created() {
+    this.getData()
+  },
   mounted() {
-    console.log('statistics mounted!')
-    setTimeout(() => {
-      this.loading = false
-    }, 2000)
   },
   methods: {
+    getData () {
+      this.loading = true
+      getHtFinanceList(this.params).then((response) => {
+        let result = response.data.result
+        this.tableData = result.data
+        this.total = result.total
+        this.loading = false
+      }).catch((error) => {
+        this.loading = false
+      })
+    },
+    resetParams() {
+      this.params = {
+        page: 1,
+        pageSize: 10,
+        name: '',
+        beginT: '',
+        endT: ''
+      }
+    },
     onSubmit() {
+      this.resetParams()
+      this.params.name = this.formInline.barName
+      if (Array.isArray(this.formInline.dateValue) && this.formInline.dateValue.length > 0) {
+        this.params.beginT = this.formInline.dateValue[0]
+        this.params.endT = this.formInline.dateValue[1]
+      }
+      this.getData()
       console.log('submit!')
     },
     handleDelete(row, index) {
       console.log(row)
       this.dialogVisible = true
+    },
+    handleSizeChange(val) {
+      this.params.pageSize = val
+      this.getData()
+    },
+    handleCurrentChange(val) {
+      this.params.page = val
+      this.getData()
+      console.log(`当前页: ${val}`)
     },
     DeleteBar() {
       alert('delete')
@@ -137,9 +163,6 @@ export default {
         }
       })
     },
-    pageChange(currentPage) {
-      console.log(currentPage)
-    },
     clearBar() {
 
     },
@@ -149,6 +172,12 @@ export default {
       } else {
 
       }
+    }
+  },
+  filters: {
+    calNotSysMoney (value) {
+      var sum = value.t0 == null ? 0 : value.t0
+      return sum - value.t5
     }
   }
 }

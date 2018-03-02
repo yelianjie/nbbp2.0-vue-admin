@@ -35,3 +35,15 @@ export function getBarInfo(data) {
     data
   })
 }
+
+/**
+ * 更新酒吧信息
+ * @param {*} data
+ */
+export function updateBarInfo(data) {
+  return request({
+    url: '/admin/hotel/updateHtInfo',
+    method: 'post',
+    data
+  })
+}

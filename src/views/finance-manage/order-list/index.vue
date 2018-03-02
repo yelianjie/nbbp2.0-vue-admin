@@ -28,7 +28,8 @@
           type="daterange"
           range-separator="至"
           start-placeholder="开始日期"
-          end-placeholder="结束日期">
+          end-placeholder="结束日期"
+          value-format="yyyy-MM-dd">
         </el-date-picker>
       </el-form-item>
       <el-form-item>
@@ -46,48 +47,54 @@
         label="订单编号">
       </el-table-column>
       <el-table-column
-        width="120px"
-        prop="order_nickname"
+        width="220px"
+        prop="name"
         label="消费者昵称">
       </el-table-column>
       <el-table-column
-        prop="order_at"
+        prop="create_time"
         label="订单时间"
         width="200px">
       </el-table-column>
       <el-table-column
-        prop="order_time"
+        prop="show_time"
         label="霸屏时长">
       </el-table-column>
       <el-table-column
         prop="order_type"
-        label="霸屏类型">
+        label="类型">
+        <template slot-scope="scope">
+          <el-tag type="danger" v-if="scope.row.odr_type == 1">{{scope.row.odr_type | filterText(types)}}</el-tag>
+          <el-tag v-if="scope.row.odr_type == 2">{{scope.row.odr_type | filterText(types)}}</el-tag>
+        </template>
       </el-table-column>
       <el-table-column
         prop="order_money"
         label="订单金额">
       </el-table-column>
       <el-table-column
-        prop="order_divide"
+        prop="u_money"
         label="分成金额">
       </el-table-column>
       <el-table-column
-        prop="order_barname"
+        prop="name"
         label="酒吧名称">
       </el-table-column>
     </el-table>
     <div class="pagination-container">
       <el-pagination
       background
-      @current-change="pageChange"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="100">
+      :total="total">
       </el-pagination>
     </div>
   </div> 
 </template>
 
 <script>
+import { getOrderList } from '@/api/finance'
 export default {
   name: 'orderList',
   data() {
@@ -103,40 +110,68 @@ export default {
       }],
       types: [{
         label: '主题霸屏',
-        value: 1
+        value: '2'
       }, {
-        label: '礼物霸屏',
-        value: 2
+        label: '礼物打赏',
+        value: '1'
       }],
       formInline: {
         barName: '',
         dateValue: '',
         type: ''
       },
-      tableData: [{
-        order_no: 123456789,
-        order_at: '2017-09-08 14:00:00',
-        order_money: 50,
-        order_nickname: '鲜花',
-        order_type: 1,
-        order_divide: 10,
-        order_time: 60,
-        order_barname: 'CMK酒吧'
-      }]
+      params: {
+        page: 1,
+        pageSize: 10,
+        name: '',
+        type: '',
+        beginT: '',
+        endT: '',
+      },
+      tableData: [],
+      total: 0
     }
   },
-  mounted() {
-    console.log('ggg')
-    setTimeout(() => {
-      this.loading = false
-    }, 2000)
+  created() {
+    this.getData()
   },
   methods: {
+    getData () {
+      this.loading = true
+      getOrderList(this.params).then((response) => {
+        let result = response.data.result
+        this.tableData = result.data
+        this.total = result.total
+        this.loading = false
+      }).catch((error) => {
+        this.loading = false
+      })
+    },
+    resetParams() {
+      this.params = {
+        page: 1,
+        pageSize: 10,
+        name: '',
+        beginT: '',
+        endT: '',
+        type: ''
+      }
+    },
     onSubmit() {
+      this.resetParams()
+      this.params.name = this.formInline.nickname
+      this.params.type = this.formInline.identity
+      this.getData()
       console.log('submit!')
     },
-    pageChange(currentPage) {
-      console.log(currentPage)
+    handleSizeChange(val) {
+      this.params.pageSize = val
+      this.getData()
+    },
+    handleCurrentChange(val) {
+      this.params.page = val
+      this.getData()
+      console.log(`当前页: ${val}`)
     },
     clearBar() {
 
@@ -150,6 +185,12 @@ export default {
     },
     clearType() {
       
+    }
+  },
+  filters: {
+    filterText (value, arr) {
+      var find = arr.find((v) => v.value === value)
+      return find.label
     }
   }
 }

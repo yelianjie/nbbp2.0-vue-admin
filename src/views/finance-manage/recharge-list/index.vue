@@ -2,7 +2,7 @@
   <div class="container" v-loading="loading">
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
       <el-form-item label="昵称">
-        <el-input v-model="formInline.nickname" placeholder="请输入昵称"></el-input>
+        <el-input v-model="formInline.nickname" placeholder="请输入昵称" clearable></el-input>
       </el-form-item>
       <el-form-item label="时间">
         <el-date-picker
@@ -11,7 +11,8 @@
           type="daterange"
           range-separator="至"
           start-placeholder="开始日期"
-          end-placeholder="结束日期">
+          end-placeholder="结束日期"
+          value-format="yyyy-MM-dd">
         </el-date-picker>
       </el-form-item>
       <el-form-item>
@@ -24,37 +25,39 @@
       :data="tableData"
       style="width: 100%">
       <el-table-column
-        width="160px"
-        prop="order_no"
+        width="360px"
+        prop="recharge_order_no"
         label="订单编号">
       </el-table-column>
       <el-table-column
         width="120px"
-        prop="order_nickname"
+        prop="nickname"
         label="消费者昵称">
       </el-table-column>
       <el-table-column
-        prop="order_at"
+        prop="create_time"
         label="充值时间"
         width="200px">
       </el-table-column>
       <el-table-column
-        prop="order_money"
+        prop="money"
         label="充值金额">
       </el-table-column>
     </el-table>
     <div class="pagination-container">
       <el-pagination
       background
-      @current-change="pageChange"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="100">
+      :total="total">
       </el-pagination>
     </div>
   </div> 
 </template>
 
 <script>
+import { getRechargeList } from '@/api/finance'
 export default {
   name: 'rechargeList',
   data() {
@@ -65,26 +68,50 @@ export default {
         nickname: '',
         dateValue: ''
       },
-      tableData: [{
-        order_no: 123456789,
-        order_at: '2017-09-08 14:00:00',
-        order_money: 50,
-        order_nickname: '鲜花'
-      }]
+      params: {
+        page: 1,
+        pageSize: 10,
+        name: '',
+        beginT: '',
+        endT: ''
+      },
+      tableData: [],
+      total: 0
     }
   },
-  mounted() {
-    console.log('recharge mounted!')
-    setTimeout(() => {
-      this.loading = false
-    }, 2000)
+  created() {
+    this.getData()
   },
   methods: {
-    onSubmit() {
-      console.log('submit!')
+    getData () {
+      this.loading = true
+      getRechargeList(this.params).then((response) => {
+        let result = response.data.result
+        this.tableData = result.data
+        this.total = result.total
+        this.loading = false
+      }).catch((error) => {
+        this.loading = false
+      })
     },
-    pageChange(currentPage) {
-      console.log(currentPage)
+    resetParams() {
+      this.params = {
+        page: 1,
+        pageSize: 10,
+        name: '',
+        beginT: '',
+        endT: ''
+      }
+    },
+    onSubmit() {
+      this.resetParams()
+      this.params.name = this.formInline.nickname
+      if (Array.isArray(this.formInline.dateValue) && this.formInline.dateValue.length > 0) {
+        this.params.beginT = this.formInline.dateValue[0]
+        this.params.endT = this.formInline.dateValue[1]
+      }
+      this.getData()
+      console.log('submit!')
     },
     dateChange(value) {
       if (value == null) {
@@ -92,6 +119,15 @@ export default {
       } else {
         
       }
+    },
+    handleSizeChange(val) {
+      this.params.pageSize = val
+      this.getData()
+    },
+    handleCurrentChange(val) {
+      this.params.page = val
+      this.getData()
+      console.log(`当前页: ${val}`)
     },
   }
 }

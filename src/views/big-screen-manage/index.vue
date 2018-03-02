@@ -52,6 +52,13 @@
       <el-row class="row-flex">
         <upload-preview :list="videoBgs" type="video" :on-remove="handleRemove"></upload-preview>
       </el-row>
+      <div class="row-flex flex-align-center">
+        <h3 class="bg-title flex-1">手机视频背景</h3>
+        <el-button size="small" type="primary" @click.native="dialogFormVisible = true">添加视频</el-button>
+      </div>
+      <el-row class="row-flex">
+        <upload-preview :list="dialogMp4s" type="video" :on-remove="handleMp4Remove"></upload-preview>
+      </el-row>
     </el-card>
     <el-card class="box-card">
       <div slot="header" class="clearfix">
@@ -96,6 +103,38 @@
        </el-col>
      </el-row>
     </el-card>
+    <el-dialog title="添加手机视频" :visible.sync="dialogFormVisible" width="80%">
+      <el-form :model="formMp4" label-width="120px">
+        <el-form-item label="选择关联的视频">
+          <el-row :gutter="20" style="margin-left:0;font-size:0;">
+            <div class="video-preivew" v-for="(v, i) in videoBgs" :key="i" @click="choseParentId(i)">
+              <label class="status-label" v-show="selectedMp4 === i">
+                <i class="el-icon-upload-success el-icon-check"></i>
+              </label>
+              <video class="video" :src="v.url"></video>
+            </div>
+          </el-row>
+        </el-form-item>
+        <el-form-item label="MP4视频">
+          <upload-preview :list="dialogMp4s" type="video" :on-remove="handleMp4Remove"></upload-preview>
+          <el-upload
+            accept="video/*"
+            :headers="headers"
+            :data="{type: 2}"
+            :action="'/admin/file_upload/uploadBg'| uploadPrefixUrl"
+            :show-file-list="false"
+            :before-upload="beforeVideoUpload"
+            :on-progress="handleProgress"
+            :on-success="handleVideoMp4Success">
+            <el-button size="small" type="primary">点击上传</el-button>
+          </el-upload>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addMp4">确 定</el-button>
+      </div>
+    </el-dialog>
   </div> 
 </template>
 
@@ -113,6 +152,7 @@ export default {
   },
   data() {
     return {
+      dialogFormVisible: false,
       loading: true,
       textarea: '',
       ad: {
@@ -121,7 +161,16 @@ export default {
       },
       picBgs: [],
       videoBgs: [],
-      headers: {}
+      headers: {},
+      form: {
+        
+      },
+      formMp4: {
+        fid: '',
+        id: ''
+      },
+      selectedMp4: -1,
+      dialogMp4s: []
     }
   },
   created() {
@@ -129,11 +178,13 @@ export default {
     const getBpImages = Api.getBpImages()
     const getBpVideos = Api.getBpVideos()
     const getAdImages = Api.getAdImages()
-    Promise.all([getNotice, getBpImages, getBpVideos, getAdImages]).then((result) => {
+    const getBpVideoMp4 = Api.getBpVideoMp4()
+    Promise.all([getNotice, getBpImages, getBpVideos, getAdImages, getBpVideoMp4]).then((result) => {
       const noticeResult = result[0].data
       const bpImagesResult = result[1].data
       const bpVideosResult = result[2].data
       const adImagesResult = result[3].data
+      const bpVideoMp4Result = result[4].data
       console.log(adImagesResult)
       if (Array.isArray(noticeResult.result)) {
         this.textarea = noticeResult.result[0].content
@@ -164,6 +215,13 @@ export default {
         })
       }
 
+      if (Array.isArray(bpVideoMp4Result.result)) {
+        bpVideoMp4Result.result.forEach((v) => {
+          v.url = uploadPrefixUrl(v.url)
+        })
+        this.dialogMp4s = bpVideoMp4Result.result
+      }
+
       this.loading = false
     }).catch((error) => {
       this.loading = false
@@ -185,16 +243,17 @@ export default {
       console.log(event, file)
     },
     beforeVideoUpload(file) {
-      const isWebm = file.type === 'video/webm'
+     /*  const isWebm = file.type === 'video/webm'
       const isLt10M = file.size / 1024 / 1024 < 10
       if (!isWebm) {
         this.$message.error('上传视频只能是 Webm 格式')
         return isWebm
-      }
+      } */
+      const isLt10M = file.size / 1024 / 1024 < 10
       if (!isLt10M) {
         this.$message.error('上传视频大小不能超过 10MB')
       }
-      return isWebm && isLt10M
+      return isLt10M
     },
     beforeImageUpload(file) {
       const isLt2M = file.size / 1024 / 1024 < 2
@@ -202,6 +261,27 @@ export default {
         this.$message.error('上传视频大小不能超过 2MB');
       }
       return isLt2M
+    },
+    handleMp4Remove(index, type) {
+      this.$confirm('确定删除该资源吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const id = this.dialogMp4s[index].id
+        Api.removeResource({id: id}).then((response) => {
+          this.dialogMp4s.splice(index, 1)
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+        }).catch((error) => {    
+          this.$message({
+            type: 'error',
+            message: error.msg
+          })
+        })
+      })
     },
     handleRemove(index, type) {
       console.log(index)
@@ -249,6 +329,14 @@ export default {
         type: 2
       })
     },
+    handleVideoMp4Success(response, file, fileList) {
+      this.formMp4.id = response.result   
+      this.dialogMp4s.push({
+        url: file.url,
+        id: response.result,
+        type: 2
+      })
+    },
     handleBigImgSuccess(res, file) {
       this.ad.bigImgUrl = URL.createObjectURL(file.raw)
       this.$message({
@@ -276,6 +364,29 @@ export default {
         this.$message.error('上传图片大小不能超过 100K!');
       }
       return isLt100K
+    },
+    choseParentId(index) {
+      console.log(index)
+      if (this.selectedMp4 === index) {
+        this.selectedMp4 = -1
+      } else {
+        this.selectedMp4 = index
+      }
+    },
+    addMp4() {
+      if (this.selectedMp4 === -1) {
+        this.$message.error('请选择关联视频')
+        return false
+      }
+      this.formMp4.fid = this.videoBgs[this.selectedMp4].id
+      Api.addMp4Url(this.formMp4).then((response) => {
+        console.log(response)
+        this.$message({
+          type: 'success',
+          message: '添加成功!'
+        })
+        this.dialogFormVisible = false
+      })
     }
   },
   components: {
@@ -333,5 +444,45 @@ export default {
   font-weight: normal;
   font-size: 15px;
   color: #6c6c6c;
+}
+.video-preivew {
+  position: relative;
+  width: 148px;
+  height: 148px;
+  overflow: hidden;
+  margin-right: 20px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  display: inline-block;
+  .status-label {
+    position: absolute;
+    right: -15px;
+    top: -6px;
+    width: 40px;
+    height: 24px;
+    background: #13ce66;
+    text-align: center;
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
+    -webkit-box-shadow: 0 0 1pc 1px rgba(0,0,0,.2);
+    box-shadow: 0 0 1pc 1px rgba(0,0,0,.2);
+    z-index: 1;
+    i {
+      font-size: 12px;
+      margin-top: 11px;
+      -webkit-transform: rotate(-45deg);
+      transform: rotate(-45deg);
+      color: #fff;
+    }
+  }
+}
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
 }
 </style>

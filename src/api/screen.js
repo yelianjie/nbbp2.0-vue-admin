@@ -63,3 +63,25 @@ export function getAdImages() {
     method: 'post'
   })
 }
+
+/**
+ * 添加手机上的MP4URL
+*/
+export function addMp4Url(data) {
+  return request({
+    url: '/admin/file_upload/updatePhoneBg',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 获取手机上的视频
+*/
+export function getBpVideoMp4(data) {
+  return request({
+    url: '/admin/file_upload/getPhoneBgVideo',
+    method: 'post',
+    data
+  })
+}

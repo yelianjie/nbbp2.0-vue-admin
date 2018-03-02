@@ -26,7 +26,7 @@
   flex: 1;
   overflow: auto;
 } */
-.avatar {
+.avatar-user-img {
   width: 80px;
   height: 80px;
 }
