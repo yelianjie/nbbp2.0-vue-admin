@@ -11,7 +11,7 @@
    </el-row>
    <el-form :inline="true" :model="formInline" class="divide-form-inline">
       <el-form-item label="用户名">
-        <el-input v-model="formInline.nickname" placeholder="用户名"></el-input>
+        <el-input v-model="formInline.nickname" placeholder="用户名" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">搜索</el-button>
@@ -59,7 +59,7 @@
 
 <script>
 import { getAgents } from '@/api/userManage'
-import { setDefaultRate } from '@/api/finance'
+import { setDefaultRate, getDefaultRate } from '@/api/finance'
 export default {
   name: 'defaultDivide',
   data() {
@@ -82,6 +82,9 @@ export default {
   },
   created() {
     this.getData()
+    getDefaultRate().then((response) => {
+
+    })
   },
   methods: {
     getData () {

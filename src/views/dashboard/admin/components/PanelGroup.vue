@@ -7,9 +7,9 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">用户总数</div>
-          <count-to class="card-panel-num" :startVal="0" :endVal="1000" :duration="2000"></count-to>
+          <count-to class="card-panel-num" :startVal="0" :endVal="counts.tNum" :duration="2000"></count-to>
           <div class="card-panel-text">昨日新增用户</div>
-          <count-to class="card-panel-num" :startVal="0" :endVal="200" :duration="2000"></count-to>
+          <count-to class="card-panel-num" :startVal="0" :endVal="counts.yIncNum" :duration="2000"></count-to>
         </div>
       </div>
     </el-col>
@@ -20,9 +20,9 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">消费总额</div>
-          <count-to class="card-panel-num" :startVal="0" :endVal="9280" :duration="3200"></count-to>
+          <count-to class="card-panel-num" :startVal="0" :endVal="counts.cMoney" :duration="3200"></count-to>
           <div class="card-panel-text">昨日新增消费额</div>
-          <count-to class="card-panel-num" :startVal="0" :endVal="9280" :duration="3200"></count-to>
+          <count-to class="card-panel-num" :startVal="0" :endVal="counts.yMoney" :duration="3200"></count-to>
         </div>
       </div>
     </el-col>
@@ -33,7 +33,7 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">平台收益</div>
-          <count-to class="card-panel-num" :startVal="0" :endVal="13600" :duration="3600"></count-to>
+          <count-to class="card-panel-num" :startVal="0" :endVal="counts.balance" :duration="3600"></count-to>
           <div class="card-panel-text">未提现</div>
           <count-to class="card-panel-num" :startVal="0" :endVal="13600" :duration="3600"></count-to>
         </div>
@@ -44,8 +44,13 @@
 
 <script>
 import CountTo from 'vue-count-to'
-
+import { getFinance } from '@/api/finance'
 export default {
+  data() {
+    return {
+      counts: {}
+    }
+  },
   components: {
     CountTo
   },
@@ -53,6 +58,11 @@ export default {
     handleSetLineChartData(type) {
       this.$emit('handleSetLineChartData', type)
     }
+  },
+  created() {
+    getFinance().then((response) => {
+      this.counts = response.data.result
+    })
   }
 }
 </script>

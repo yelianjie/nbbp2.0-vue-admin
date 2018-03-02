@@ -48,7 +48,7 @@
       </el-table-column>
       <el-table-column
         width="220px"
-        prop="name"
+        prop="nickname"
         label="消费者昵称">
       </el-table-column>
       <el-table-column

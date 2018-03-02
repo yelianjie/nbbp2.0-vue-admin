@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-editor-container">
-    <panel-group @handleSetLineChartData="handleSetLineChartData"></panel-group>
-
+    <!-- <panel-group @handleSetLineChartData="handleSetLineChartData"></panel-group> -->
+    <panel-group></panel-group>
     <el-row :gutter="24" style="margin-bottom:32px;">
       <el-col :xs="24" :sm="24" :lg="12">
         <div class="chart-wrapper">
@@ -67,7 +67,7 @@ import BarChart from './components/BarChart'
 import TransactionTable from './components/TransactionTable'
 import TodoList from './components/TodoList'
 import BoxCard from './components/BoxCard' */
-
+import { getWeeklyFinance } from '@/api/finance'
 const lineChartData = {
   newVisitis: {
     expectedData: [100, 120, 161, 134, 105, 160, 165],
@@ -330,7 +330,43 @@ export default {
   methods: {
     handleSetLineChartData(type) {
       this.lineChartData = lineChartData[type]
+    },
+    filterData (data, labelField, valueField) {
+      var labels = []
+      var values = []
+      for(var i in data) {
+        if (valueField === 'money') {
+          labels.push(data[i][labelField])
+          values.push(data[i][valueField])
+        } else {
+          labels.push(data[i][0][labelField])
+          values.push(data[i][0][valueField])
+        }
+      }
+      return {
+        labels: labels,
+        values: values
+      }
     }
+  },
+  created() {
+    getWeeklyFinance().then((response) => {
+      console.log(response)
+      var result = response.data.result
+      var line1Data = this.filterData(result.dMoney, 'day', 'money')
+      var line2Data = this.filterData(result.dIncNum, 'day', 'num')
+      var line3Data = this.filterData(result.tMoney, 'day', 'money')
+      var line4Data = this.filterData(result.dIncAcNum, 'day', 'num')
+
+      this.lineChartData1.xAxis.data = line1Data.labels
+      this.lineChartData1.series[0].data = line1Data.values
+      this.lineChartData2.xAxis.data = line2Data.labels
+      this.lineChartData2.series[0].data = line2Data.values
+      this.lineChartData3.xAxis.data = line3Data.labels
+      this.lineChartData3.series[0].data = line3Data.values
+      this.lineChartData4.xAxis.data = line4Data.labels
+      this.lineChartData4.series[0].data = line4Data.values
+    })
   }
 }
 </script>

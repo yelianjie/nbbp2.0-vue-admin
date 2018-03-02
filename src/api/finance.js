@@ -25,6 +25,18 @@ export function setDefaultRate(data) {
 }
 
 /**
+ * 获取默认比例
+ * @param {*} data
+ */
+export function getDefaultRate(data) {
+  return request({
+    url: '/admin/finance/getDefaultRate',
+    method: 'post',
+    data
+  })
+}
+
+/**
  * 获取订单列表
  * @param {*} data
  */
@@ -57,5 +69,25 @@ export function getRechargeList(data) {
     url: '/admin/recharge/getRechargeList',
     method: 'post',
     data
+  })
+}
+
+/**
+ * 获取各收益数字
+ */
+export function getFinance() {
+  return request({
+    url: '/admin/finance/getFinance',
+    method: 'post'
+  })
+}
+
+/**
+ * 获取最近一周的数据
+ */
+export function getWeeklyFinance() {
+  return request({
+    url: '/admin/finance/getWeeklyFinance',
+    method: 'post'
   })
 }

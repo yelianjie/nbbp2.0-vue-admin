@@ -1,10 +1,10 @@
 <template>
   <el-form :model="modifyForm" status-icon :rules="rules" ref="modifyForm" class="modifyForm" label-width="140px">
-    <el-form-item label="旧密码" prop="oldPass">
-      <el-input v-model="modifyForm.oldPass" type="password"></el-input>
+    <el-form-item label="旧密码" prop="sign_in_pwd">
+      <el-input v-model="modifyForm.sign_in_pwd" type="password"></el-input>
     </el-form-item>
-    <el-form-item label="新密码" prop="newPass">
-      <el-input v-model="modifyForm.newPass" type="password"></el-input>
+    <el-form-item label="新密码" prop="new_pwd">
+      <el-input v-model="modifyForm.new_pwd" type="password"></el-input>
     </el-form-item>
     <el-form-item label="确认新密码" prop="confirmNewPass">
       <el-input v-model="modifyForm.confirmNewPass" type="password"></el-input>
@@ -16,6 +16,7 @@
 </template>
 
 <script>
+import { modifyPassword } from '@/api/systemManage'
 export default {
   name: 'modifyPassword',
   data() {
@@ -23,7 +24,7 @@ export default {
       if (!value) {
         return callback(new Error('确认密码不能为空'));
       }
-      if (value != this.modifyForm.newPass) {
+      if (value != this.modifyForm.new_pwd) {
         return callback(new Error('两次密码输入不一致'));
       }
       callback()
@@ -31,15 +32,15 @@ export default {
 
     return {
       modifyForm: {
-        oldPass: '',
-        newPass: '',
+        sign_in_pwd: '',
+        new_pwd: '',
         confirmNewPass: ''
       },
       rules: {
-        oldPass: [
+        sign_in_pwd: [
           { required: true, message: '请输入旧密码', trigger: 'blur' }
         ],
-        newPass: [
+        new_pwd: [
           { required: true, message: '请输入新密码', trigger: 'blur' }
         ],
         confirmNewPass: [
@@ -52,7 +53,12 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          alert('submit!')
+          modifyPassword(this.modifyForm).then((response) => {
+            this.$message({
+              type: 'success',
+              message: '修改成功!'
+            })
+          })
         } else {
           console.log('error submit!!')
           return false

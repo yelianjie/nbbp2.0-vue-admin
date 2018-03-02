@@ -57,7 +57,7 @@
         <el-button size="small" type="primary" @click.native="dialogFormVisible = true">添加视频</el-button>
       </div>
       <el-row class="row-flex">
-        <upload-preview :list="dialogMp4s" type="video" :on-remove="handleMp4Remove"></upload-preview>
+        <upload-preview :list="mp4s" type="video" :on-remove="handleMp4sRemove"></upload-preview>
       </el-row>
     </el-card>
     <el-card class="box-card">
@@ -103,7 +103,7 @@
        </el-col>
      </el-row>
     </el-card>
-    <el-dialog title="添加手机视频" :visible.sync="dialogFormVisible" width="80%">
+    <el-dialog title="添加手机视频" :visible.sync="dialogFormVisible" width="80%" @close="onDialogClose">
       <el-form :model="formMp4" label-width="120px">
         <el-form-item label="选择关联的视频">
           <el-row :gutter="20" style="margin-left:0;font-size:0;">
@@ -170,7 +170,8 @@ export default {
         id: ''
       },
       selectedMp4: -1,
-      dialogMp4s: []
+      dialogMp4s: [],
+      mp4s: []
     }
   },
   created() {
@@ -219,7 +220,7 @@ export default {
         bpVideoMp4Result.result.forEach((v) => {
           v.url = uploadPrefixUrl(v.url)
         })
-        this.dialogMp4s = bpVideoMp4Result.result
+        this.mp4s = bpVideoMp4Result.result
       }
 
       this.loading = false
@@ -283,6 +284,27 @@ export default {
         })
       })
     },
+    handleMp4sRemove(index, type) {
+      this.$confirm('确定删除该资源吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const id = this.mp4s[index].id
+        Api.removeResource({id: id}).then((response) => {
+          this.mp4s.splice(index, 1)
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+        }).catch((error) => {    
+          this.$message({
+            type: 'error',
+            message: error.msg
+          })
+        })
+      })
+    },
     handleRemove(index, type) {
       console.log(index)
       this.$confirm('确定删除该资源吗?', '提示', {
@@ -330,7 +352,8 @@ export default {
       })
     },
     handleVideoMp4Success(response, file, fileList) {
-      this.formMp4.id = response.result   
+      this.formMp4.id = response.result
+      this.dialogMp4s = []
       this.dialogMp4s.push({
         url: file.url,
         id: response.result,
@@ -366,7 +389,6 @@ export default {
       return isLt100K
     },
     choseParentId(index) {
-      console.log(index)
       if (this.selectedMp4 === index) {
         this.selectedMp4 = -1
       } else {
@@ -380,13 +402,16 @@ export default {
       }
       this.formMp4.fid = this.videoBgs[this.selectedMp4].id
       Api.addMp4Url(this.formMp4).then((response) => {
-        console.log(response)
+        this.mp4s.push(this.dialogMp4s[0])
         this.$message({
           type: 'success',
           message: '添加成功!'
         })
         this.dialogFormVisible = false
       })
+    },
+    onDialogClose() {
+      this.dialogMp4s = []
     }
   },
   components: {

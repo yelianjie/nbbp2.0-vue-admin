@@ -11,3 +11,15 @@ export function getSysUsers(data) {
     data
   })
 }
+
+/**
+ * 修改系统用户密码
+ * @param {*} data
+ */
+export function modifyPassword(data) {
+  return request({
+    url: '/admin/users/updatePwd',
+    method: 'post',
+    data
+  })
+}
