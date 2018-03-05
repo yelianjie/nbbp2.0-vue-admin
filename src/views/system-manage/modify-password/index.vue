@@ -53,7 +53,9 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          modifyPassword(this.modifyForm).then((response) => {
+          var form = Object.assign({}, this.modifyForm)
+          delete form.confirmNewPass
+          modifyPassword(form).then((response) => {
             this.$message({
               type: 'success',
               message: '修改成功!'

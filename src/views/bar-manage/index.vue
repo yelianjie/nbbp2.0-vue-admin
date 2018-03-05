@@ -64,7 +64,9 @@
         label="状态"
         width="120">
         <template slot-scope="scope">
-          {{status[scope.row.status]}}
+          <el-tag type="success" v-if="scope.row.status == 1">{{status[scope.row.status]}}</el-tag>
+          <el-tag type="warning" v-if="scope.row.status == 0">{{status[scope.row.status]}}</el-tag>
+          <el-tag type="danger" v-if="scope.row.status == -1">{{status[scope.row.status]}}</el-tag>
         </template>
       </el-table-column>
       <el-table-column

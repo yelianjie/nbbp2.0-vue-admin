@@ -117,8 +117,8 @@ export default {
   data() {
     var reg = /^\d+(?=\.{0,1}\d+$|$)/
     var isPositive = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('请输入' + rule.label));
+      if (value === '' || value === undefined || value === null) {
+        return callback(new Error('请输入' + rule.label))
       }
       if (!reg.test(value)) {
         callback(new Error('请输入正数'))

@@ -126,7 +126,7 @@
             :before-upload="beforeVideoUpload"
             :on-progress="handleProgress"
             :on-success="handleVideoMp4Success">
-            <el-button size="small" type="primary">点击上传</el-button>
+            <el-button size="small" type="primary" v-if="dialogMp4s.length == 0">点击上传</el-button>
           </el-upload>
         </el-form-item>
       </el-form>
@@ -208,9 +208,9 @@ export default {
       if (Array.isArray(adImagesResult.result)) {
         adImagesResult.result.forEach((v) => {
           v.url = uploadPrefixUrl(v.url)
-          if (v.type == 1) {
+          if (v.type == 1 && v.ht_id === '0') {
             this.ad.mobileImgUrl = v.url
-          } else if (v.type == 2) {
+          } else if (v.type == 2 && v.ht_id === '0') {
             this.ad.bigImgUrl = v.url
           }
         })

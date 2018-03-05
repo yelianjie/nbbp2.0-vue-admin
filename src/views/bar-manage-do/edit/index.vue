@@ -16,7 +16,7 @@
               <el-input type="number" v-model.number="form.contact_tel" placeholder="请填写联系方式"></el-input>
             </el-form-item>
             <el-form-item label="代理选择">
-              <el-select v-model="selectAgent" placeholder="请选择代理选择">
+              <el-select v-model="selectAgent" placeholder="请选择代理选择" clearable>
                 <el-option
                   v-for="item in agents"
                   :key="item.id"
@@ -26,7 +26,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="酒吧管理">
-              <el-select v-model="selectManager" placeholder="请选择酒吧管理">
+              <el-select v-model="selectManager" placeholder="请选择酒吧管理" clearable>
                 <el-option
                   v-for="item in managers"
                   :key="item.id"
@@ -78,6 +78,7 @@
           <el-col>
             <span class="percent-tip">酒吧用户</span>
             <el-input-number v-model="form.users_separate" controls-position="right" @change="handleChange" size="small" :min="1" :max="100" class="input-number-percent"></el-input-number>%
+            <span style="font-size:13px;margin-left:15px;">当前修改不高于{{rate.user_divide_into}}%</span>
           </el-col>
         </el-row>
         <el-row class="rate-row">
@@ -85,11 +86,13 @@
             <span class="percent-tip">酒吧商户</span>
             <el-input-number v-model.number="form.ht_separate" controls-position="right" @change="handleChange" size="small" :min="1" :max="100" class="input-number-percent"></el-input-number>%
             <span class="percent-tip">酒吧管理</span>
-            <el-input-number v-model.number="form.manage_separate" controls-position="right" @change="handleChange" size="small" :min="1" :max="100" class="input-number-percent"></el-input-number>%
+            <el-input-number :disabled="disableManagers" v-model.number="form.manage_separate" controls-position="right" @change="handleChange" size="small" :min="0" :max="100" class="input-number-percent"></el-input-number>%
             <span class="percent-tip">代理</span>
-            <el-input-number v-model.number="form.yewu_separate" controls-position="right" @change="handleChange" size="small" :min="1" :max="100" class="input-number-percent"></el-input-number>%
+            <el-input-number :disabled="disableAgent" v-model.number="form.yewu_separate" controls-position="right" @change="handleChange" size="small" :min="0" :max="100" class="input-number-percent"></el-input-number>%
+            <span style="font-size:13px;margin-left:15px;">当前修改不高于{{agentCal}}%</span>
             <span class="percent-tip">牛霸平台</span>
             <el-input-number :disabled="true" v-model.number="form.company_separate" controls-position="right" size="small" :min="1" :max="100" class="input-number-percent"></el-input-number>%
+            <span style="font-size:13px;margin-left:15px;">当前修改不高于{{rate.platform_divide_into}}%</span>
           </el-col>
         </el-row>
         <p class="tip">酒吧用户参与分成：酒吧用户+商户+酒吧管理+代理 +牛霸平台=100%</p>
@@ -103,8 +106,8 @@
       </div>
       <div class="url-wrap">
         <div class="url-item">
-          <p>&emsp;大屏URL：{{url}}<el-button type="primary" plain v-clipboard:copy='url' v-clipboard:success='clipboardSuccess'>复制</el-button><el-button type="primary" plain @click.native="openNewWindow">打开</el-button></p>
-          <p>手机端URL：{{url}}<el-button type="primary" plain v-clipboard:copy='url' v-clipboard:success='clipboardSuccess'>复制</el-button></p>
+          <p>&emsp;大屏URL：{{$route.params.id | filterUrl('screen')}}<el-button type="primary" plain v-clipboard:copy='$options.filters.filterUrl($route.params.id, "screen")' v-clipboard:success='clipboardSuccess'>复制</el-button><el-button type="primary" plain @click.native="openNewWindow">打开</el-button></p>
+          <p>手机端URL：{{$route.params.id | filterUrl}}<el-button type="primary" plain v-clipboard:copy='$options.filters.filterUrl($route.params.id)' v-clipboard:success='clipboardSuccess'>复制</el-button></p>
         </div>
         <div class="qrcode-img">
           <img :src="form.phone_er_url | uploadPrefixUrl" v-if="form.phone_er_url">
@@ -129,13 +132,13 @@ export default {
   },
   data() {
     return {
-      url: 'http://nb.siweiquanjing.com/app/index.php?i=15&c=entry&do=BigScreen&m=bl_wx_wall&jiubaid=130',
       visibleMap: false,
       actionBtns: [{
         text: '确定',
         type: 'primary'
       }],
       form: {},
+      rate: {},
       formRules: {
         name: [
           { required: true, trigger: 'blur', message: '请输入酒吧名字' }
@@ -148,27 +151,64 @@ export default {
       agents: [],
       managers: [],
       selectAgent: '',
-      selectManager: ''
+      selectManager: '',
+      disableManagers: true,
+      disableAgent: true
     }
   },
   created () {
     getBarInfo({ht_id: this.$route.params.id}).then((response) => {
       this.form = response.data.result.hotel
+      this.rate = response.data.result.rate
       this.managers = response.data.result.superviseList
       this.agents = response.data.result.agentList
       this.selectAgent =  response.data.result.agent ? response.data.result.agent : ''
       this.selectManager =  response.data.result.supervise ? response.data.result.supervise : ''
     })
   },
+  watch: {
+    selectManager (newVal, oldVal) {
+      if (newVal) {
+        this.disableManagers = false
+        this.form.agent_id = newVal
+      } else {
+        this.disableManagers = true
+        this.form.agent_id = ''
+        this.form.manage_separate = 0
+      }
+    },
+    selectAgent (newVal, oldVal) {
+      if (newVal) {
+        this.disableAgent = false
+        this.form.supervise_id = newVal
+      } else {
+        this.disableAgent = true
+        this.form.supervise_id = ''
+        this.form.yewu_separate = 0
+      }
+    }
+  },
   methods: {
     handleBtnClick(index, cb) {
-      this.form.ht_id = this.$route.params.id
-      this.form.agent_id = this.selectAgent
-      this.form.supervise_id = this.selectManager
-      updateBarInfo(this.form).then((response) => {
-        this.$message.success('修改成功')
+      var isPass = this.calPercent()
+      console.log(isPass)
+      if (!isPass) {
         cb && cb()
-      })
+      } else {
+        this.form.ht_id = this.$route.params.id
+        updateBarInfo(this.form).then((response) => {
+          this.$message.success('修改成功')
+          cb && cb()
+        })
+      }
+    },
+    calPercent () {
+      if (this.form.ht_separate + this.form.manage_separate + this.form.yewu_separate + this.form.company_separate > 100) {
+        this.$message.error('商户、代理和酒吧管理比例之和不能超过' + (100 - this.form.company_separate) + '%')
+        return false
+      } else {
+        return true
+      }
     },
     handleChange(value) {
       console.log(value)
@@ -224,12 +264,33 @@ export default {
       })
     },
     openNewWindow() {
-      window.open(this.url)
+      window.open(this.$options.filters.filterUrl(this.$route.params.id, 'screen'))
     }
   },
   components: {
     FixBottomBtns,
     BaiduMap
+  },
+  filters: {
+    filterUrl (value, type) {
+      if (type === 'screen') {
+        return 'http://xnb.siweiquanjing.com/screen/?ht_id=' + value
+      } else {
+        return 'http://xnb.siweiquanjing.com/dist/#/Main/' + value
+      }
+    }
+  },
+  computed: {
+    agentCal () {
+      if (this.selectAgent) {
+        var find = this.agents.find((v) => v.id === this.selectAgent)
+        if (find !== -1) {
+          return find.default_divide_into
+        }
+      } else {
+        return 0
+      }
+    }
   }
 }
 </script>

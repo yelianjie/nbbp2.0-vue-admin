@@ -209,11 +209,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.container {
-  /deep/ .el-form {
-    margin-top: 30px;
-  }
-}
+
 .wx_avatar {
   width: 100px;
   height: 100px;
