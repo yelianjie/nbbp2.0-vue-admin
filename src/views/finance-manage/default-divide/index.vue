@@ -3,9 +3,9 @@
    <el-row>
      <el-col>
        <span class="percent-tip">平台分成：不低于</span>
-       <el-input-number v-model="platform_percent" controls-position="right" size="small" :min="25" :max="100" class="input-number-percent"></el-input-number>%
+       <el-input-number v-model="form.platform_divide_into" controls-position="right" size="small" :min="Number(form.platform_divide_into)" :max="100" class="input-number-percent"></el-input-number>%
        <span class="percent-tip">用户分成：不高于</span>
-       <el-input-number v-model="user_percent" controls-position="right" size="small" :min="1" :max="50" class="input-number-percent"></el-input-number>%
+       <el-input-number v-model="form.user_divide_into" controls-position="right" size="small" :min="0" :max="Number(form.user_divide_into)" class="input-number-percent"></el-input-number>%
        <el-button type="primary" @click="setRate" style="margin-left:10px;">设置</el-button>
      </el-col>
    </el-row>
@@ -66,8 +66,6 @@ export default {
     return {
       loading: true,
       tableLoading: false,
-      platform_percent: 25,
-      user_percent: 40,
       formInline: {
         username: ''
       },
@@ -77,13 +75,14 @@ export default {
         name: ''
       },
       tableData: [],
-      total: 0
+      total: 0,
+      form: {}
     }
   },
   created() {
     this.getData()
     getDefaultRate().then((response) => {
-
+      this.form = response.data.result
     })
   },
   methods: {
@@ -109,7 +108,9 @@ export default {
       }
     },
     setRate() {
-      console.log(this.platform_percent, this.user_percent)
+      setDefaultRate({c_rate: this.form.platform_divide_into, u_rate: this.form.user_divide_into}).then((response) => {
+        this.$message.success('修改成功')
+      })
     },
     onSubmit() {
       this.resetParams()
