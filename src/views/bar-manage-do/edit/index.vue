@@ -77,22 +77,22 @@
         <el-row class="rate-row">
           <el-col>
             <span class="percent-tip">酒吧用户</span>
-            <el-input-number v-model="form.users_separate" controls-position="right" @change="handleChange" size="small" :min="1" :max="100" class="input-number-percent"></el-input-number>%
+            <el-input-number v-model="form.users_separate" controls-position="right" @change="handleChangeUser" size="small" :min="1" :max="100" class="input-number-percent"></el-input-number>%
             <span style="font-size:13px;margin-left:15px;">当前修改不高于{{rate.user_divide_into}}%</span>
           </el-col>
         </el-row>
         <el-row class="rate-row">
           <el-col>
             <span class="percent-tip">酒吧商户</span>
-            <el-input-number v-model.number="form.ht_separate" controls-position="right" @change="handleChange" size="small" :min="1" :max="100" class="input-number-percent"></el-input-number>%
+            <el-input-number v-model.number="form.ht_separate" controls-position="right" @change="handleChange1" size="small" :min="minBar" :max="maxBar" class="input-number-percent"></el-input-number>%
             <span class="percent-tip">酒吧管理</span>
-            <el-input-number :disabled="disableManagers" v-model.number="form.manage_separate" controls-position="right" @change="handleChange" size="small" :min="0" :max="100" class="input-number-percent"></el-input-number>%
+            <el-input-number :disabled="disableManagers" v-model.number="form.manage_separate" controls-position="right" @change="handleChange2" size="small" :min="0" :max="100" class="input-number-percent"></el-input-number>%
             <span class="percent-tip">代理</span>
-            <el-input-number :disabled="disableAgent" v-model.number="form.yewu_separate" controls-position="right" @change="handleChange" size="small" :min="0" :max="100" class="input-number-percent"></el-input-number>%
+            <el-input-number :disabled="disableAgent" v-model.number="form.yewu_separate" controls-position="right" @change="handleChange3" size="small" :min="0" :max="agentCal" class="input-number-percent"></el-input-number>%
             <span style="font-size:13px;margin-left:15px;">当前修改不高于{{agentCal}}%</span>
             <span class="percent-tip">牛霸平台</span>
             <el-input-number :disabled="true" v-model.number="form.company_separate" controls-position="right" size="small" :min="1" :max="100" class="input-number-percent"></el-input-number>%
-            <span style="font-size:13px;margin-left:15px;">当前修改不高于{{rate.platform_divide_into}}%</span>
+            <span style="font-size:13px;margin-left:15px;">当前修改不低于{{rate.platform_divide_into}}%</span>
           </el-col>
         </el-row>
         <p class="tip">酒吧用户参与分成：酒吧用户+商户+酒吧管理+代理 +牛霸平台=100%</p>
@@ -162,7 +162,7 @@ export default {
       this.rate = response.data.result.rate
       this.managers = response.data.result.superviseList
       this.agents = response.data.result.agentList
-      this.selectAgent =  response.data.result.agent ? response.data.result.agent : ''
+      this.selectAgent =  response.data.result.agent ? response.data.result.agent.agent_id : ''
       this.selectManager =  response.data.result.supervise ? response.data.result.supervise : ''
     })
   },
@@ -170,21 +170,19 @@ export default {
     selectManager (newVal, oldVal) {
       if (newVal) {
         this.disableManagers = false
-        this.form.agent_id = newVal
+        this.form.supervise_id = newVal
       } else {
         this.disableManagers = true
-        this.form.agent_id = ''
-        this.form.manage_separate = 0
+        this.form.supervise_id = ''
       }
     },
     selectAgent (newVal, oldVal) {
       if (newVal) {
-        this.disableAgent = false
-        this.form.supervise_id = newVal
+        this.disableAgent = false   
+        this.form.agent_id = newVal
       } else {
         this.disableAgent = true
-        this.form.supervise_id = ''
-        this.form.yewu_separate = 0
+        this.form.agent_id = ''
       }
     }
   },
@@ -210,8 +208,29 @@ export default {
         return true
       }
     },
-    handleChange(value) {
-      console.log(value)
+    handleChangeUser(value) {
+    },
+    handleChange1(value) {
+      this.form.ht_separate = value
+      this.calAgent()
+    },
+    handleChange2(value) {
+      this.form.manage_separate = value
+      this.calBar()
+    },
+    handleChange3(value) {
+      this.form.yewu_separate = value
+      this.calBar()
+    },
+    calBar() {
+      var v = 100 - this.form.company_separate - this.form.manage_separate - this.form.yewu_separate
+      this.form.ht_separate = v
+    },
+    calAgent() {
+      var v = 100 - this.form.company_separate - this.form.manage_separate - this.form.ht_separate
+      if (Number(v) <= this.agentCal) {
+        this.form.yewu_separate = v
+      }
     },
     handleLogoSuccess(res, file) {
       this.form.logoUrl = URL.createObjectURL(file.raw);
@@ -284,11 +303,32 @@ export default {
     agentCal () {
       if (this.selectAgent) {
         var find = this.agents.find((v) => v.id === this.selectAgent)
-        if (find !== -1) {
-          return find.default_divide_into
+        if (find > -1) {
+          return Number(find.default_divide_into)
         }
       } else {
         return 0
+      }
+    },
+    maxBar () {
+      if (this.form.company_separate) {
+        if (this.disableAgent && this.disableManagers) {
+          var v = 100 - this.form.company_separate - this.form.manage_separate - this.form.yewu_separate
+          return Number(v)
+        } else {
+          var v = 100 - this.form.company_separate
+          return Number(v)
+        }
+      }
+    },
+    minBar () {
+      if (this.form.company_separate) {
+        if (this.disableAgent && this.disableManagers) {
+          var v = 100 - this.form.company_separate - this.form.manage_separate - this.form.yewu_separate
+          return Number(v)
+        } else {
+          return 1
+        } 
       }
     }
   }

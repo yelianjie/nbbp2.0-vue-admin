@@ -91,3 +91,15 @@ export function getWeeklyFinance() {
     method: 'post'
   })
 }
+
+/**
+ * 修改代理比例
+ * @param {*} data
+ */
+export function setAgentRate(data) {
+  return request({
+    url: '/admin/agent/setAgentRate',
+    method: 'post',
+    data
+  })
+}

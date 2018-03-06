@@ -32,7 +32,7 @@
       <el-table-column min-width="300px" label="默认分成比例（%）">
         <template slot-scope="scope">
           <template v-if="scope.row.edit">
-            <el-input class="edit-input" size="small" v-model="scope.row.default_divide_into"></el-input>
+            <el-input type="number" class="edit-input" size="small" v-model.number="scope.row.default_divide_into"></el-input>
             <el-button class='cancel-btn' size="small" icon="el-icon-refresh" type="warning" @click="cancelEdit(scope.row)">取消</el-button>
           </template>
           <span v-else>{{ scope.row.default_divide_into }}</span>
@@ -59,7 +59,7 @@
 
 <script>
 import { getAgents } from '@/api/userManage'
-import { setDefaultRate, getDefaultRate } from '@/api/finance'
+import { setDefaultRate, getDefaultRate, setAgentRate } from '@/api/finance'
 export default {
   name: 'defaultDivide',
   data() {
@@ -137,10 +137,12 @@ export default {
     },
     confirmEdit(row) {
       row.edit = false
-      row.originalTitle = row.title
-      this.$message({
-        message: 'The title has been edited',
-        type: 'success'
+      setAgentRate({id: row.id, a_rate: row.default_divide_into}).then((response) => {
+        row.originalTitle = row.title
+        this.$message({
+          message: '修改成功',
+          type: 'success'
+        })
       })
     }
   }
