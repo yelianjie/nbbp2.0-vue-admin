@@ -3,9 +3,9 @@
    <el-row>
      <el-col>
        <span class="percent-tip">平台分成：不低于</span>
-       <el-input-number v-model="form.platform_divide_into" controls-position="right" size="small" :min="Number(form.platform_divide_into)" :max="100" class="input-number-percent"></el-input-number>%
+       <el-input-number v-model="form.platform_divide_into" controls-position="right" size="small" :min="25" :max="100" class="input-number-percent"></el-input-number>%
        <span class="percent-tip">用户分成：不高于</span>
-       <el-input-number v-model="form.user_divide_into" controls-position="right" size="small" :min="0" :max="Number(form.user_divide_into)" class="input-number-percent"></el-input-number>%
+       <el-input-number v-model="form.user_divide_into" controls-position="right" size="small" :min="0" :max="100" class="input-number-percent"></el-input-number>%
        <el-button type="primary" @click="setRate" style="margin-left:10px;">设置</el-button>
      </el-col>
    </el-row>

@@ -35,7 +35,7 @@
           <div class="card-panel-text">平台收益</div>
           <count-to class="card-panel-num" :decimals="2" :startVal="0" :endVal="counts.cMoney" :duration="2800"></count-to>
           <div class="card-panel-text">未提现金额（除平台收益）</div>
-          <count-to class="card-panel-num" :decimals="2" :startVal="0" :endVal="counts.tMoney - counts.cMoney" :duration="2800"></count-to>
+          <count-to class="card-panel-num" :decimals="2" :startVal="0" :endVal="Number(counts.nWithdraw)" :duration="2800"></count-to>
         </div>
       </div>
     </el-col>

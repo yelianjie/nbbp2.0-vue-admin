@@ -21,7 +21,7 @@
                   v-for="item in agents"
                   :key="item.id"
                   :label="item.name"
-                  :value="item.id">
+                  :value="item.mc_id">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -66,6 +66,10 @@
             <el-radio label="-1">解约</el-radio>
           </el-radio-group>
         </el-form-item>
+        <el-row style="text-align: right;">
+          <el-button type="primary" @click.native="updateBarAction">确定</el-button>
+        </el-row>
+        
       </el-form>
     </el-card>
 
@@ -98,6 +102,9 @@
         <p class="tip">酒吧用户参与分成：酒吧用户+商户+酒吧管理+代理 +牛霸平台=100%</p>
         <p class="tip">酒吧用户不参与分成：商户+酒吧管理+代理 +牛霸平台=100%</p>
       </el-form>
+      <el-row style="text-align: right;">
+          <el-button type="primary" @click.native="updateRateAction">确定</el-button>
+        </el-row>
     </el-card>
 
     <el-card class="box-card">
@@ -114,16 +121,14 @@
         </div>
       </div>
     </el-card>
-    <fix-bottom-btns :btns="actionBtns" @FixBtnClick="handleBtnClick"></fix-bottom-btns> 
     <BaiduMap v-if="visibleMap" @closeDialog="closeDialog"></BaiduMap>
   </div>
 </template>
 
 <script>
-import FixBottomBtns from '@/components/FixBottomBtns/index'
 import BaiduMap from '../components/map'
 import clipboard from '@/directive/clipboard/index.js'
-import { getBarInfo, updateBarInfo } from '@/api/barManage'
+import { getBarInfo, updateBarInfo, updateRateInfo } from '@/api/barManage'
 import { uploadImg } from '@/api/resource' 
 export default {
   name: 'barManageEdit',
@@ -162,7 +167,7 @@ export default {
       this.rate = response.data.result.rate
       this.managers = response.data.result.superviseList
       this.agents = response.data.result.agentList
-      this.selectAgent =  response.data.result.agent ? response.data.result.agent.agent_id : ''
+      this.selectAgent =  response.data.result.agent ? response.data.result.agent.mc_id : ''
       this.selectManager =  response.data.result.supervise ? response.data.result.supervise : ''
     })
   },
@@ -187,18 +192,21 @@ export default {
     }
   },
   methods: {
-    handleBtnClick(index, cb) {
+    updateBarAction() {
       var isPass = this.calPercent()
       console.log(isPass)
-      if (!isPass) {
-        cb && cb()
-      } else {
+      if (isPass) {
         this.form.ht_id = this.$route.params.id
         updateBarInfo(this.form).then((response) => {
           this.$message.success('修改成功')
-          cb && cb()
         })
       }
+    },
+    updateRateAction () {
+      this.form.ht_id = this.$route.params.id
+      updateRateInfo(this.form).then((response) => {
+        this.$message.success('修改成功')
+      })
     },
     calPercent () {
       if (this.form.ht_separate + this.form.manage_separate + this.form.yewu_separate + this.form.company_separate > 100) {
@@ -287,7 +295,6 @@ export default {
     }
   },
   components: {
-    FixBottomBtns,
     BaiduMap
   },
   filters: {
@@ -302,8 +309,8 @@ export default {
   computed: {
     agentCal () {
       if (this.selectAgent) {
-        var find = this.agents.find((v) => v.id === this.selectAgent)
-        if (find > -1) {
+        var find = this.agents.find((v) => v.mc_id === this.selectAgent)
+        if (find) {
           return Number(find.default_divide_into)
         }
       } else {

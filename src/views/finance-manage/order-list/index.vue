@@ -64,8 +64,8 @@
         prop="order_type"
         label="类型">
         <template slot-scope="scope">
-          <el-tag type="danger" v-if="scope.row.odr_type == 1">{{scope.row.odr_type | filterText(types)}}</el-tag>
-          <el-tag v-if="scope.row.odr_type == 2">{{scope.row.odr_type | filterText(types)}}</el-tag>
+          <el-tag type="danger" v-if="scope.row.odr_type == 1">{{scope.row.title}}</el-tag>
+          <el-tag v-if="scope.row.odr_type == 2">{{scope.row.title}}</el-tag>
         </template>
       </el-table-column>
       <el-table-column
@@ -75,6 +75,13 @@
       <el-table-column
         prop="u_money"
         label="分成金额">
+        <template slot-scope="scope">
+          <el-tag class="tag">平台：{{scope.row.company_money | filtetMoney}}</el-tag>
+          <el-tag class="tag" type="success">代理：{{scope.row.agent_money | filtetMoney}}</el-tag>
+          <el-tag class="tag" type="info">商户：{{scope.row.merchant_money | filtetMoney}}</el-tag>
+          <el-tag class="tag" type="warning">管理：{{scope.row.supervise_money | filtetMoney}}</el-tag>
+          <el-tag class="tag" type="danger">用户：{{scope.row.user_money | filtetMoney}}</el-tag>
+        </template>
       </el-table-column>
       <el-table-column
         prop="name"
@@ -191,7 +198,20 @@ export default {
     filterText (value, arr) {
       var find = arr.find((v) => v.value === value)
       return find.label
+    },
+    filtetMoney (value) {
+      if (value) {
+        return value
+      } else {
+        return '0.00'
+      }
     }
   }
 }
 </script>
+
+<style lang="scss">
+.tag {
+  margin-bottom: 4px;
+}
+</style>

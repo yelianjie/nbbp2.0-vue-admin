@@ -47,3 +47,15 @@ export function updateBarInfo(data) {
     data
   })
 }
+
+/**
+ * 更新酒吧分成
+ * @param {*} data
+ */
+export function updateRateInfo(data) {
+  return request({
+    url: '/admin/hotel/updateHtRate',
+    method: 'post',
+    data
+  })
+}
