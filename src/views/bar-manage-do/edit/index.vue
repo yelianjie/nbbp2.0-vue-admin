@@ -88,9 +88,9 @@
         <el-row class="rate-row">
           <el-col>
             <span class="percent-tip">酒吧商户</span>
-            <el-input-number v-model.number="form.ht_separate" controls-position="right" @change="handleChange1" size="small" :min="minBar" :max="maxBar" class="input-number-percent"></el-input-number>%
+            <el-input-number v-model.number="form.ht_separate" controls-position="right" @change="handleChange1" size="small" :min="1" :max="maxBar" class="input-number-percent"></el-input-number>%
             <span class="percent-tip">酒吧管理</span>
-            <el-input-number :disabled="disableManagers" v-model.number="form.manage_separate" controls-position="right" @change="handleChange2" size="small" :min="0" :max="100" class="input-number-percent"></el-input-number>%
+            <el-input-number :disabled="disableManagers" v-model.number="form.manage_separate" controls-position="right" @change="handleChange2" size="small" :min="0" :max="maxBar" class="input-number-percent"></el-input-number>%
             <span class="percent-tip">代理</span>
             <el-input-number :disabled="disableAgent" v-model.number="form.yewu_separate" controls-position="right" @change="handleChange3" size="small" :min="0" :max="agentCal" class="input-number-percent"></el-input-number>%
             <span style="font-size:13px;margin-left:15px;">当前修改不高于{{agentCal}}%</span>
@@ -138,6 +138,7 @@ export default {
   data() {
     return {
       visibleMap: false,
+      isEdit: false,
       actionBtns: [{
         text: '确定',
         type: 'primary'
@@ -158,18 +159,12 @@ export default {
       selectAgent: '',
       selectManager: '',
       disableManagers: true,
-      disableAgent: true
+      disableAgent: true,
+      oldSelectAgent: ''
     }
   },
   created () {
-    getBarInfo({ht_id: this.$route.params.id}).then((response) => {
-      this.form = response.data.result.hotel
-      this.rate = response.data.result.rate
-      this.managers = response.data.result.superviseList
-      this.agents = response.data.result.agentList
-      this.selectAgent =  response.data.result.agent ? response.data.result.agent.mc_id : ''
-      this.selectManager =  response.data.result.supervise ? response.data.result.supervise : ''
-    })
+    this.getData()
   },
   watch: {
     selectManager (newVal, oldVal) {
@@ -192,21 +187,39 @@ export default {
     }
   },
   methods: {
+    getData () {
+      getBarInfo({ht_id: this.$route.params.id}).then((response) => {
+        this.form = response.data.result.hotel
+        this.rate = response.data.result.rate
+        this.managers = response.data.result.superviseList
+        this.agents = response.data.result.agentList
+        this.selectAgent =  response.data.result.agent ? response.data.result.agent.mc_id : ''
+        this.oldSelectAgent = this.selectAgent
+        this.selectManager =  response.data.result.supervise ? response.data.result.supervise.id : ''
+      })
+    },
     updateBarAction() {
-      var isPass = this.calPercent()
-      console.log(isPass)
-      if (isPass) {
-        this.form.ht_id = this.$route.params.id
-        updateBarInfo(this.form).then((response) => {
-          this.$message.success('修改成功')
-        })
-      }
+      this.form.ht_id = this.$route.params.id
+      //this.form.supervise_id = this.selectManager
+      updateBarInfo(this.form).then((response) => {
+        this.$message.success('修改成功')
+        this.getData()
+        /*if (this.oldSelectAgent != this.selectAgent) {
+          this.isEdit = true
+          if (!this.selectAgent) {
+            this.form.yewu_separate = 0
+          }
+        }*/
+      })
     },
     updateRateAction () {
       this.form.ht_id = this.$route.params.id
-      updateRateInfo(this.form).then((response) => {
-        this.$message.success('修改成功')
-      })
+      var isPass = this.calPercent()
+      if (isPass) {
+        updateRateInfo(this.form).then((response) => {
+          this.$message.success('修改成功')
+        })
+      }  
     },
     calPercent () {
       if (this.form.ht_separate + this.form.manage_separate + this.form.yewu_separate + this.form.company_separate > 100) {
@@ -220,15 +233,24 @@ export default {
     },
     handleChange1(value) {
       this.form.ht_separate = value
-      this.calAgent()
+      this.calCompany()
     },
     handleChange2(value) {
       this.form.manage_separate = value
-      this.calBar()
+      this.calCompany()
     },
     handleChange3(value) {
       this.form.yewu_separate = value
-      this.calBar()
+      this.calCompany()
+    },
+    calCompany () {
+      var v = 100 - this.form.ht_separate - this.form.manage_separate - this.form.yewu_separate
+      if (v < Number(this.rate.platform_divide_into)) {
+        this.form.company_separate = Number(this.rate.platform_divide_into)
+      } else {
+        this.form.company_separate = v
+      }
+      
     },
     calBar() {
       var v = 100 - this.form.company_separate - this.form.manage_separate - this.form.yewu_separate
@@ -308,17 +330,21 @@ export default {
   },
   computed: {
     agentCal () {
-      if (this.selectAgent) {
+      if (this.selectAgent && this.isEdit) {
         var find = this.agents.find((v) => v.mc_id === this.selectAgent)
         if (find) {
           return Number(find.default_divide_into)
         }
       } else {
-        return 0
+        if (this.form.agent_o_separate) {
+          return Number(this.form.agent_o_separate)
+        } else {
+          return 0
+        }
       }
     },
     maxBar () {
-      if (this.form.company_separate) {
+      /*if (this.form.company_separate) {
         if (this.disableAgent && this.disableManagers) {
           var v = 100 - this.form.company_separate - this.form.manage_separate - this.form.yewu_separate
           return Number(v)
@@ -326,6 +352,10 @@ export default {
           var v = 100 - this.form.company_separate
           return Number(v)
         }
+      }*/
+      if (this.form.company_separate) {
+        var v = 100 - this.rate.platform_divide_into
+        return v
       }
     },
     minBar () {
