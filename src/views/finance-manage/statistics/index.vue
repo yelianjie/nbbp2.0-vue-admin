@@ -29,7 +29,7 @@
         label="酒吧名称">
       </el-table-column>
       <el-table-column
-        prop="t0"
+        prop="total"
         label="总收益">
       </el-table-column>
       <el-table-column
@@ -176,7 +176,7 @@ export default {
   },
   filters: {
     calNotSysMoney (value) {
-      var sum = value.t0 == null ? 0 : value.t0
+      var sum = value.total == null ? 0 : value.total
       return sum - value.t5
     }
   }

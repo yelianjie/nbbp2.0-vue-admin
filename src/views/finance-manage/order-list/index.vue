@@ -2,14 +2,7 @@
   <div class="container" v-loading="loading">
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
       <el-form-item label="酒吧名称">
-        <el-select v-model="formInline.barName" placeholder="请选择" clearable @clear="clearBar">
-          <el-option
-            v-for="item in bars"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
+        <el-input v-model="formInline.barName" clearable></el-input>
       </el-form-item>
       <el-form-item label="类型">
         <el-select v-model="formInline.type" placeholder="请选择" clearable @clear="clearType">
@@ -166,8 +159,12 @@ export default {
     },
     onSubmit() {
       this.resetParams()
-      this.params.name = this.formInline.nickname
-      this.params.type = this.formInline.identity
+      this.params.name = this.formInline.barName
+      this.params.type = this.formInline.type
+      if (Array.isArray(this.formInline.dateValue) && this.formInline.dateValue.length > 0) {
+        this.params.beginT = this.formInline.dateValue[0]
+        this.params.endT = this.formInline.dateValue[1]
+      }
       this.getData()
       console.log('submit!')
     },
