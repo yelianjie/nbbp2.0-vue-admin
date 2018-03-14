@@ -164,8 +164,11 @@ export default {
   },
   filters: {
     filterText (value, arr) {
-      var find = arr.find((v) => v.value === value)
-      return find.label
+      var find = arr.find((v) => v.value == value)
+      if (find)
+       return find.label
+      else
+        return ''
     }
   }
 }

@@ -50,14 +50,18 @@
         </template>
       </el-table-column>
       <el-table-column
-        prop="join_at"
+        prop="add_time"
         label="入驻时间"
         width="150">
       </el-table-column>
       <el-table-column
-        prop="agent"
+        prop="agent_name"
         label="代理"
         width="100">
+        <template slot-scope="scope">
+          <span v-if="scope.row.agent_name">{{scope.row.agent_name}}</span>
+          <span v-else>无</span>
+        </template>
       </el-table-column>
       <el-table-column
         prop="status"

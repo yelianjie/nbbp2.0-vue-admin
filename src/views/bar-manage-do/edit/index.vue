@@ -130,6 +130,7 @@ import BaiduMap from '../components/map'
 import clipboard from '@/directive/clipboard/index.js'
 import { getBarInfo, updateBarInfo, updateRateInfo } from '@/api/barManage'
 import { uploadImg } from '@/api/resource' 
+import { BASE_API } from '../../../../config/prod.env.js'
 export default {
   name: 'barManageEdit',
   directives: {
@@ -190,6 +191,8 @@ export default {
     getData () {
       getBarInfo({ht_id: this.$route.params.id}).then((response) => {
         this.form = response.data.result.hotel
+        this.form.status = this.form.status.toString()
+        console.log(this.form.status)
         this.rate = response.data.result.rate
         this.managers = response.data.result.superviseList
         this.agents = response.data.result.agentList
@@ -322,9 +325,9 @@ export default {
   filters: {
     filterUrl (value, type) {
       if (type === 'screen') {
-        return 'http://xnb.siweiquanjing.com/screen/?ht_id=' + value
+        return BASE_API.replace(/\"/g, '') + '/screen/?ht_id=' + value
       } else {
-        return 'http://xnb.siweiquanjing.com/dist/#/Main/' + value
+        return BASE_API.replace(/\"/g, '') + '/dist/#/Main/' + value
       }
     }
   },

@@ -73,6 +73,7 @@
 
 <script>
 import { getHtFinanceList } from '@/api/finance'
+import { Subtr } from '@/utils/index'
 export default {
   name: 'statistics',
   data() {
@@ -177,7 +178,7 @@ export default {
   filters: {
     calNotSysMoney (value) {
       var sum = value.total == null ? 0 : value.total
-      return sum - value.t5
+      return Subtr(sum, value.t5)
     }
   }
 }

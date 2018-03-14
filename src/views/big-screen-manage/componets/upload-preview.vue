@@ -30,6 +30,7 @@ export default {
   props: ['list', 'onRemove', 'type'],
   methods: {
     previewFile(index) {
+      console.log(this.list)
       if (this.type === 'image') {
         BigPicture({
           el: document.getElementById(this.type+ '_file_' + index),

@@ -208,9 +208,11 @@ export default {
       if (Array.isArray(adImagesResult.result)) {
         adImagesResult.result.forEach((v) => {
           v.url = uploadPrefixUrl(v.url)
-          if (v.type == 1 && v.ht_id === '0') {
+
+          console.log(v.url)
+          if (v.type == 1 && ~~(v.ht_id) == 0) {
             this.ad.mobileImgUrl = v.url
-          } else if (v.type == 2 && v.ht_id === '0') {
+          } else if (v.type == 2 && ~~(v.ht_id) == 0) {
             this.ad.bigImgUrl = v.url
           }
         })
