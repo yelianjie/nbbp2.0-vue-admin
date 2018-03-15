@@ -53,7 +53,7 @@ export function getMembers(data) {
  */
 export function getRecharges(data) {
   return request({
-    url: '/admin/recharge/getRechargeList',
+    url: '/admin/recharge/getRechargeUserList',
     method: 'post',
     data
   })

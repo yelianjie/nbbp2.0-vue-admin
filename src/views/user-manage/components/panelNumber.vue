@@ -4,7 +4,8 @@
       <div class='card-panel'>
         <div class="card-panel-description">
           <div class="card-panel-text">{{v.label}}</div>
-          <count-to class="card-panel-num" :startVal="0" :endVal="v.number" :duration="2000"></count-to>
+          <count-to class="card-panel-num" :startVal="0" :endVal="v.number" :duration="2000" :decimals="v.decimals" v-if="v.decimals"></count-to>
+          <count-to class="card-panel-num" :startVal="0" :endVal="v.number" :duration="2000" v-else></count-to>
         </div>
       </div>
     </el-col>

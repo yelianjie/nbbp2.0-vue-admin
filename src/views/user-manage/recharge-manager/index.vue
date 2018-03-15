@@ -66,18 +66,20 @@ export default {
       tableLoading: false,
       panelData: [{
         label: '会员总数',
-        number: 0
+        number: 0,
       }, {
         label: '昨日新增会员数',
-        numer: 0
+        numer: 0,
       }, {
         label: '账户余额',
-        number: 0
+        number: 0,
+        decimals: 2
       }],
       formInline: {
         nickname: ''
       },
       params: {
+        name: '',
         page: 1,
         pageSize: 10
       },
@@ -91,7 +93,7 @@ export default {
       let result = response.data.result
       this.panelData[0].number = result.tNum
       this.panelData[1].number = result.yIncNum
-      this.panelData[2].number = result.acNum
+      this.panelData[2].number = result.balance
     }).catch((error) => {
     })
   },

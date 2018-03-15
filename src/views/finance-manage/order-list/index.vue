@@ -66,6 +66,10 @@
         label="订单金额">
       </el-table-column>
       <el-table-column
+        prop="platform_sxfei"
+        label="手续费">
+      </el-table-column>
+      <el-table-column
         prop="u_money"
         label="分成金额">
         <template slot-scope="scope">
