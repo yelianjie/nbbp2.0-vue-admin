@@ -13,30 +13,6 @@ export function getHtFinanceList(data) {
 }
 
 /**
- * 设置默认比例
- * @param {*} data
- */
-export function setDefaultRate(data) {
-  return request({
-    url: '/admin/finance/setDefaultRate',
-    method: 'post',
-    data
-  })
-}
-
-/**
- * 获取默认比例
- * @param {*} data
- */
-export function getDefaultRate(data) {
-  return request({
-    url: '/admin/finance/getDefaultRate',
-    method: 'post',
-    data
-  })
-}
-
-/**
  * 获取订单列表
  * @param {*} data
  */

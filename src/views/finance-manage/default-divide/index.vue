@@ -1,14 +1,5 @@
 <template>
  <div class="container" v-loading="loading">
-   <el-row>
-     <el-col>
-       <span class="percent-tip">平台分成：不低于</span>
-       <el-input-number v-model="form.platform_divide_into" controls-position="right" size="small" :min="25" :max="100" class="input-number-percent"></el-input-number>%
-       <span class="percent-tip">用户分成：不高于</span>
-       <el-input-number v-model="form.user_divide_into" controls-position="right" size="small" :min="0" :max="100" class="input-number-percent"></el-input-number>%
-       <el-button type="primary" @click="setRate" style="margin-left:10px;">设置</el-button>
-     </el-col>
-   </el-row>
    <el-form :inline="true" :model="formInline" class="divide-form-inline">
       <el-form-item label="用户名">
         <el-input v-model="formInline.nickname" placeholder="用户名" clearable></el-input>
@@ -59,7 +50,7 @@
 
 <script>
 import { getAgents } from '@/api/userManage'
-import { setDefaultRate, getDefaultRate, setAgentRate } from '@/api/finance'
+import { setAgentRate } from '@/api/finance'
 export default {
   name: 'defaultDivide',
   data() {
@@ -76,14 +67,10 @@ export default {
       },
       tableData: [],
       total: 0,
-      form: {}
     }
   },
   created() {
     this.getData()
-    getDefaultRate().then((response) => {
-      this.form = response.data.result
-    })
   },
   methods: {
     getData () {
@@ -106,11 +93,6 @@ export default {
         pageSize: 10,
         name: ''
       }
-    },
-    setRate() {
-      setDefaultRate({c_rate: this.form.platform_divide_into, u_rate: this.form.user_divide_into}).then((response) => {
-        this.$message.success('修改成功')
-      })
     },
     onSubmit() {
       this.resetParams()

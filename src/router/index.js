@@ -278,6 +278,16 @@ export const asyncRouterMap = [
         icon: 'modifypassword',
         roles: ['admin'] // or you can only set roles in sub nav
       }
+    }, {
+      path: 'systemSetting',
+      component: _import('system-manage/system-setting/index'),
+      name: 'systemSetting',
+      meta: {
+        noCache: true,
+        title: 'systemSetting',
+        icon: 'system',
+        roles: ['admin'] // or you can only set roles in sub nav
+      }
     }]
   },
   /* {
