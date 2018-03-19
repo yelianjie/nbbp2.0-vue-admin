@@ -40,10 +40,10 @@
   <el-dialog :title="dialogTitle"  :visible.sync="dialogFormVisible" @close="clearForm">
     <el-form :model="bpTimeForm" status-icon :rules="bpTimeFormRules" label-width="140px" ref="bpTimeForm">
       <el-form-item label="霸屏时间" prop="time">
-        <el-input v-model.number="bpTimeForm.time" auto-complete="off"></el-input>
+        <el-input v-model.number="bpTimeForm.time" auto-complete="off" type="number"></el-input>
       </el-form-item>
       <el-form-item label="价格" prop="default_price">
-        <el-input v-model.number="bpTimeForm.default_price" auto-complete="off"></el-input>
+        <el-input v-model.number="bpTimeForm.default_price" auto-complete="off" type="number"></el-input>
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
@@ -64,8 +64,8 @@ export default {
       if (!value) {
         return callback(new Error('请输入' + rule.label));
       }
-      if (!reg.test(value)) {
-        callback(new Error('请输入正数'))
+      if (!Number.isInteger(value)) {
+        callback(new Error('请输入整数'))
       } else {
         callback()
       }

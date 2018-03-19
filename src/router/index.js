@@ -155,6 +155,16 @@ export const asyncRouterMap = [
         roles: ['admin'] // or you can only set roles in sub nav
       }
     }, {
+      path: 'statisticsUser',
+      component: _import('finance-manage/statistics-user/index'),
+      name: 'statisticsUser',
+      meta: {
+        noCache: true,
+        title: 'statisticsUser',
+        icon: 'statistics',
+        roles: ['admin'] // or you can only set roles in sub nav
+      }
+    }, {
       path: 'defaultDivide',
       component: _import('finance-manage/default-divide/index'),
       name: 'defaultDivide',
@@ -192,6 +202,16 @@ export const asyncRouterMap = [
         noCache: true,
         title: 'depositList',
         icon: 'deposit',
+        roles: ['admin'] // or you can only set roles in sub nav
+      }
+    }, {
+      path: 'exchangeList',
+      component: _import('finance-manage/exchange-list/index'),
+      name: 'exchangeList',
+      meta: {
+        noCache: true,
+        title: 'exchangeList',
+        icon: 'exchange',
         roles: ['admin'] // or you can only set roles in sub nav
       }
     }]
@@ -237,12 +257,12 @@ export const asyncRouterMap = [
         roles: ['admin'] // or you can only set roles in sub nav
       }
     }, {
-      path: 'rechargeManager',
-      component: _import('user-manage/recharge-manager/index'),
-      name: 'rechargeManager',
+      path: 'business',
+      component: _import('user-manage/business/index'),
+      name: 'business',
       meta: {
         noCache: true,
-        title: 'rechargeManager',
+        title: 'business',
         icon: 'member',
         roles: ['admin'] // or you can only set roles in sub nav
       }
@@ -286,6 +306,16 @@ export const asyncRouterMap = [
         noCache: true,
         title: 'systemSetting',
         icon: 'system',
+        roles: ['admin'] // or you can only set roles in sub nav
+      }
+    }, {
+      path: 'systemVersion',
+      component: _import('system-manage/system-version/index'),
+      name: 'systemVersion',
+      meta: {
+        noCache: true,
+        title: 'systemVersion',
+        icon: 'version',
         roles: ['admin'] // or you can only set roles in sub nav
       }
     }]

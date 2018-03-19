@@ -4,9 +4,13 @@
       <el-form-item label="用户名">
         <el-input v-model="formInline.nickname" placeholder="用户名" clearable></el-input>
       </el-form-item>
+      <el-form-item label="ID">
+        <el-input v-model="formInline.id" placeholder="请输入ID" clearable></el-input>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">搜索</el-button>
       </el-form-item>
+      <el-button style="float:right;" type="info" icon="el-icon-edit" @click.native="dialogTableVisible = true">修改日志</el-button>
     </el-form>
 
     <el-table
@@ -15,6 +19,10 @@
       fit
       highlight-current-row
       style="width: 100%">
+      <el-table-column
+        prop="mc_id"
+        label="ID">
+      </el-table-column>
       <el-table-column 
       label="代理用户名"
       prop="name"
@@ -36,6 +44,12 @@
         </template>
       </el-table-column>
     </el-table>
+    <el-dialog title="修改日志" :visible.sync="dialogTableVisible">
+      <el-table>
+        <el-table-column property="" label="操作时间" width="150"></el-table-column>
+        <el-table-column property="" label="内容"></el-table-column>
+      </el-table>
+    </el-dialog>
     <div class="pagination-container">
       <el-pagination
       background
@@ -58,15 +72,18 @@ export default {
       loading: true,
       tableLoading: false,
       formInline: {
-        username: ''
+        username: '',
+        id: ''
       },
       params: {
         page: 1,
         pageSize: 10,
-        name: ''
+        name: '',
+        id: ''
       },
       tableData: [],
       total: 0,
+      dialogTableVisible: false
     }
   },
   created() {
@@ -91,12 +108,14 @@ export default {
       this.params = {
         page: 1,
         pageSize: 10,
-        name: ''
+        name: '',
+        id: ''
       }
     },
     onSubmit() {
       this.resetParams()
       this.params.name = this.formInline.nickname
+      this.params.id = this.formInline.id
       this.getData()
       console.log('submit!')
     },

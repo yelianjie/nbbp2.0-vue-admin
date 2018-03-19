@@ -46,7 +46,7 @@
       <el-table-column
         label="地区">
         <template slot-scope="scope">
-          {{scope.row.province_name}}{{scope.row.city_name}}{{scope.row.area_name}}{{scope.row.address}}
+          {{scope.row.province_name}}{{scope.row.city_name}}
         </template>
       </el-table-column>
       <el-table-column

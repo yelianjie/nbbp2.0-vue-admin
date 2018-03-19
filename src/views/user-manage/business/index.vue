@@ -1,9 +1,11 @@
 <template>
   <div class="container" v-loading="loading">
-    <panel-number :paneldata="panelData"></panel-number>
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
       <el-form-item label="昵称">
         <el-input v-model="formInline.nickname" placeholder="请输入昵称" clearable></el-input>
+      </el-form-item>
+      <el-form-item label="ID">
+        <el-input v-model="formInline.id" placeholder="请输入ID" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">搜索</el-button>
@@ -14,6 +16,10 @@
       fit
       :data="tableData"
       style="width: 100%">
+      <el-table-column
+        prop="mc_id"
+        label="ID">
+      </el-table-column>
       <el-table-column
         width="160px"
         label="用户头像">
@@ -27,20 +33,21 @@
         label="微信昵称">
       </el-table-column>
       <el-table-column
-        prop="area"
-        label="地区"
+        prop=""
+        label="联系电话"
         width="200px">
-        <template slot-scope="scope">
-          {{scope.row.province}}-{{scope.row.city}}
-        </template>
       </el-table-column>
       <el-table-column
-        prop="recharge_money"
-        label="充值总金额">
+        prop=""
+        label="注册时间">
       </el-table-column>
       <el-table-column
-        prop="balance"
-        label="账户余额">
+        prop=""
+        label="总收益">
+      </el-table-column>
+      <el-table-column
+        prop=""
+        label="当前收益">
       </el-table-column>
     </el-table>
     <div class="pagination-container">
@@ -56,7 +63,6 @@
 </template>
 
 <script>
-import panelNumber from '../components/panelNumber'
 import { getRecharges, getMemberNum } from '@/api/userManage'
 export default {
   name: 'rechargeManager',
@@ -76,10 +82,12 @@ export default {
         decimals: 2
       }],
       formInline: {
-        nickname: ''
+        nickname: '',
+        id: ''
       },
       params: {
         name: '',
+        id: '',
         page: 1,
         pageSize: 10
       },
@@ -89,13 +97,6 @@ export default {
   },
   created() {
     this.getData()
-    getMemberNum().then((response) => {
-      let result = response.data.result
-      this.panelData[0].number = result.tNum
-      this.panelData[1].number = result.yIncNum
-      this.panelData[2].number = result.balance
-    }).catch((error) => {
-    })
   },
   mounted() {
   },
@@ -123,6 +124,7 @@ export default {
     onSubmit() {
       this.resetParams()
       this.params.name = this.formInline.nickname
+      this.params.id = this.formInline.id
       this.getData()
       console.log('submit')
     },
@@ -139,12 +141,10 @@ export default {
       this.params = {
         page: 1,
         pageSize: 10,
-        name: ''
+        name: '',
+        id: ''
       }
     }
-  },
-  components: {
-    panelNumber
   }
 }
 </script>

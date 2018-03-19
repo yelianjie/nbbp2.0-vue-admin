@@ -4,6 +4,9 @@
       <el-form-item label="昵称">
         <el-input v-model="formInline.nickname" placeholder="请输入昵称" clearable></el-input>
       </el-form-item>
+      <el-form-item label="ID">
+        <el-input v-model="formInline.id" placeholder="请输入ID" clearable></el-input>
+      </el-form-item>
       <el-form-item label="身份">
         <el-select v-model="formInline.identity" placeholder="请选择" clearable @close="clearIdentity">
           <el-option
@@ -23,6 +26,10 @@
       fit
       :data="tableData"
       style="width: 100%">
+      <el-table-column
+        prop="mc_id"
+        label="提现人ID">
+      </el-table-column>
       <el-table-column
         width="160px"
         prop="nickname"
@@ -76,7 +83,8 @@ export default {
       tableLoading: false,
       formInline: {
         nickname: '',
-        identity: ''
+        identity: '',
+        id: ''
       },
       identitys: [
         {
@@ -139,13 +147,15 @@ export default {
         name: '',
         beginT: '',
         endT: '',
-        type: ''
+        type: '',
+        id: ''
       }
     },
     onSubmit() {
       this.resetParams()
       this.params.name = this.formInline.nickname
       this.params.type = this.formInline.identity
+      this.params.id = this.formInline.id
       this.getData()
       console.log('submit!')
     },

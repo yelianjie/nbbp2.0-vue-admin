@@ -1,6 +1,5 @@
 <template>
   <div class="container" v-loading="loading">
-    <panel-number :paneldata="panelData"></panel-number>
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
       <el-form-item label="昵称">
         <el-input v-model="formInline.nickname" placeholder="请输入昵称" clearable></el-input>
@@ -33,52 +32,23 @@
         label="ID">
       </el-table-column>
       <el-table-column
-        width="160px"
+        width="220px"
+        prop=""
         label="用户头像">
-        <template slot-scope="scope">
-          <img class="avatar-user-img" :src="scope.row.headimgurl | uploadPrefixUrl"/>
-        </template>
       </el-table-column>
       <el-table-column
-        width="160px"
-        prop="nickname"
-        label="微信昵称">
-      </el-table-column>
-      <el-table-column
-        width="160px"
+        width="120px"
         prop=""
-        label="牛角余额">
+        label="用户昵称">
       </el-table-column>
       <el-table-column
-        width="160px"
         prop=""
-        label="收益余额">
-      </el-table-column>
-      <el-table-column
-        width="160px"
-        prop=""
-        label="贵族等级">
-      </el-table-column>
-      <el-table-column
-        width="160px"
-        prop=""
-        label="总消费">
-      </el-table-column>
-      <el-table-column
-        width="160px"
-        prop=""
-        label="总收益">
-      </el-table-column>
-      <el-table-column
-        label="地区"
+        label="兑换牛角数"
         width="200px">
-        <template slot-scope="scope">
-          {{scope.row.province}}-{{scope.row.city}}
-        </template>
       </el-table-column>
       <el-table-column
-        prop="time"
-        label="上次活跃时间">
+        prop=""
+        label="兑换时间">
       </el-table-column>
     </el-table>
     <div class="pagination-container">
@@ -90,46 +60,17 @@
       :total="total">
       </el-pagination>
     </div>
-  </div>
+  </div> 
 </template>
 
 <script>
-import panelNumber from '../components/panelNumber'
-import { getMembers, getMemberNum } from '@/api/userManage'
+import { getRechargeList } from '@/api/finance'
 export default {
-  name: 'wxManager',
+  name: 'rechargeList',
   data() {
     return {
       loading: true,
       tableLoading: false,
-      panelData: [[{
-        label: '用户总数',
-        number: 0
-      }, {
-        label: '关注用户',
-        number: 0
-      }, {
-        label: '会员用户',
-        number: 0
-      }], [{
-        label: '昨日新增用户数',
-        number: 0
-      }, {
-        label: '昨日新增关注',
-        number: 0
-      }, {
-        label: '昨日新增会员用户',
-        number: 0
-      }, {
-        label: '昨日活跃用户',
-        number: 0
-      }], [{
-        label: '牛角余额',
-        number: 0
-      }, {
-        label: '收益余额',
-        number: 0
-      }]],
       formInline: {
         nickname: '',
         dateValue: ''
@@ -138,9 +79,9 @@ export default {
         page: 1,
         pageSize: 10,
         name: '',
-        id: '',
         beginT: '',
-        endT: ''
+        endT: '',
+        id: ''
       },
       tableData: [],
       total: 0
@@ -148,20 +89,11 @@ export default {
   },
   created() {
     this.getData()
-    getMemberNum().then((response) => {
-      let result = response.data.result
-      this.panelData[0].number = result.tNum
-      this.panelData[1].number = result.yIncNum
-      this.panelData[2].number = result.acNum
-    }).catch((error) => {
-    })
-  },
-  mounted() {
   },
   methods: {
     getData () {
       this.loading = true
-      getMembers(this.params).then((response) => {
+      getRechargeList(this.params).then((response) => {
         let result = response.data.result
         this.tableData = result.data
         this.total = result.total
@@ -169,6 +101,16 @@ export default {
       }).catch((error) => {
         this.loading = false
       })
+    },
+    resetParams() {
+      this.params = {
+        page: 1,
+        pageSize: 10,
+        name: '',
+        beginT: '',
+        endT: '',
+        id: ''
+      }
     },
     onSubmit() {
       this.resetParams()
@@ -179,10 +121,14 @@ export default {
         this.params.endT = this.formInline.dateValue[1]
       }
       this.getData()
-      console.log('submit')
+      console.log('submit!')
     },
     dateChange(value) {
+      if (value == null) {
 
+      } else {
+        
+      }
     },
     handleSizeChange(val) {
       this.params.pageSize = val
@@ -193,19 +139,6 @@ export default {
       this.getData()
       console.log(`当前页: ${val}`)
     },
-    resetParams() {
-      this.params = {
-        page: 1,
-        pageSize: 10,
-        name: '',
-        id: '',
-        beginT: '',
-        endT: ''
-      }
-    }
-  },
-  components: {
-    panelNumber
   }
 }
 </script>

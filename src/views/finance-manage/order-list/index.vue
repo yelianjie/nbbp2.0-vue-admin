@@ -1,6 +1,9 @@
 <template>
   <div class="container" v-loading="loading">
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
+      <el-form-item label="ID">
+        <el-input v-model="formInline.id" placeholder="请输入ID" clearable></el-input>
+      </el-form-item>
       <el-form-item label="酒吧名称">
         <el-input v-model="formInline.barName" clearable></el-input>
       </el-form-item>
@@ -43,6 +46,10 @@
         width="220px"
         prop="nickname"
         label="消费者昵称">
+      </el-table-column>
+      <el-table-column
+        prop="buy_uid"
+        label="消费者ID">
       </el-table-column>
       <el-table-column
         prop="create_time"
@@ -122,7 +129,8 @@ export default {
       formInline: {
         barName: '',
         dateValue: '',
-        type: ''
+        type: '',
+        id: ''
       },
       params: {
         page: 1,
@@ -131,6 +139,7 @@ export default {
         type: '',
         beginT: '',
         endT: '',
+        id: ''
       },
       tableData: [],
       total: 0
@@ -158,13 +167,15 @@ export default {
         name: '',
         beginT: '',
         endT: '',
-        type: ''
+        type: '',
+        id: ''
       }
     },
     onSubmit() {
       this.resetParams()
       this.params.name = this.formInline.barName
       this.params.type = this.formInline.type
+      this.params.id = this.formInline.id
       if (Array.isArray(this.formInline.dateValue) && this.formInline.dateValue.length > 0) {
         this.params.beginT = this.formInline.dateValue[0]
         this.params.endT = this.formInline.dateValue[1]

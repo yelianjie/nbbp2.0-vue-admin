@@ -118,8 +118,8 @@ export default {
       if (!value) {
         return callback(new Error('请输入' + rule.label));
       }
-      if (!reg.test(value)) {
-        callback(new Error('请输入正数'))
+      if (!Number.isInteger(value)) {
+        callback(new Error('请输入整数'))
       } else {
         callback()
       }

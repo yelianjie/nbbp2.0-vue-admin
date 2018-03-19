@@ -1,6 +1,5 @@
 <template>
   <div class="container" v-loading="loading">
-    <panel-number :paneldata="panelData"></panel-number>
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
       <el-form-item label="昵称">
         <el-input v-model="formInline.nickname" placeholder="请输入昵称" clearable></el-input>
@@ -27,6 +26,7 @@
       v-loading="tableLoading"
       fit
       :data="tableData"
+      show-summary
       style="width: 100%">
       <el-table-column
         prop="mc_id"
@@ -45,40 +45,41 @@
         label="微信昵称">
       </el-table-column>
       <el-table-column
-        width="160px"
         prop=""
-        label="牛角余额">
+        label="新增牛角数"
+        width="">
       </el-table-column>
       <el-table-column
-        width="160px"
         prop=""
-        label="收益余额">
+        label="充值牛角数">
       </el-table-column>
       <el-table-column
-        width="160px"
         prop=""
-        label="贵族等级">
+        label="兑换牛角数">
       </el-table-column>
       <el-table-column
-        width="160px"
         prop=""
         label="总消费">
       </el-table-column>
       <el-table-column
-        width="160px"
         prop=""
         label="总收益">
       </el-table-column>
       <el-table-column
-        label="地区"
-        width="200px">
-        <template slot-scope="scope">
-          {{scope.row.province}}-{{scope.row.city}}
-        </template>
+        prop=""
+        label="提现总额">
       </el-table-column>
       <el-table-column
-        prop="time"
-        label="上次活跃时间">
+        prop=""
+        label="收益余额">
+      </el-table-column>
+      <el-table-column
+        prop=""
+        label="当前收益总额">
+      </el-table-column>
+      <el-table-column
+        prop=""
+        label="当前牛角总数">
       </el-table-column>
     </el-table>
     <div class="pagination-container">
@@ -94,42 +95,13 @@
 </template>
 
 <script>
-import panelNumber from '../components/panelNumber'
-import { getMembers, getMemberNum } from '@/api/userManage'
+import { getMembers } from '@/api/userManage'
 export default {
-  name: 'wxManager',
+  name: 'statisticsUser',
   data() {
     return {
       loading: true,
       tableLoading: false,
-      panelData: [[{
-        label: '用户总数',
-        number: 0
-      }, {
-        label: '关注用户',
-        number: 0
-      }, {
-        label: '会员用户',
-        number: 0
-      }], [{
-        label: '昨日新增用户数',
-        number: 0
-      }, {
-        label: '昨日新增关注',
-        number: 0
-      }, {
-        label: '昨日新增会员用户',
-        number: 0
-      }, {
-        label: '昨日活跃用户',
-        number: 0
-      }], [{
-        label: '牛角余额',
-        number: 0
-      }, {
-        label: '收益余额',
-        number: 0
-      }]],
       formInline: {
         nickname: '',
         dateValue: ''
@@ -147,14 +119,7 @@ export default {
     }
   },
   created() {
-    this.getData()
-    getMemberNum().then((response) => {
-      let result = response.data.result
-      this.panelData[0].number = result.tNum
-      this.panelData[1].number = result.yIncNum
-      this.panelData[2].number = result.acNum
-    }).catch((error) => {
-    })
+    // this.getData()
   },
   mounted() {
   },
@@ -203,9 +168,6 @@ export default {
         endT: ''
       }
     }
-  },
-  components: {
-    panelNumber
   }
 }
 </script>

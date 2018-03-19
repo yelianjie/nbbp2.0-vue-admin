@@ -9,6 +9,9 @@
       <el-form-item label="用户名">
         <el-input v-model="formInline.nickname" placeholder="请输入昵称" clearable></el-input>
       </el-form-item>
+      <el-form-item label="ID">
+        <el-input v-model="formInline.id" placeholder="请输入ID" clearable></el-input>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">搜索</el-button>
       </el-form-item>
@@ -18,6 +21,10 @@
       v-loading="tableLoading"
       :data="tableData"
       style="width: 100%">
+      <el-table-column
+        prop="mc_id"
+        label="ID">
+      </el-table-column>
       <el-table-column
         prop="nickname"
         label="微信昵称"
@@ -111,11 +118,14 @@ export default {
         ]
       },
       formInline: {
-        nickname: ''
+        nickname: '',
+        id: '',
       },
       params: {
         page: 1,
-        pageSize: 10
+        pageSize: 10,
+        id: '',
+        name: ''
       },
       tableData: [],
       total: 0
@@ -141,6 +151,7 @@ export default {
     onSubmit() {
       this.resetParams()
       this.params.name = this.formInline.nickname
+      this.params.id = this.formInline.id
       this.getData()
       console.log('submit')
     },
@@ -201,7 +212,8 @@ export default {
       this.params = {
         page: 1,
         pageSize: 10,
-        name: ''
+        name: '',
+        id: ''
       }
     }
   }

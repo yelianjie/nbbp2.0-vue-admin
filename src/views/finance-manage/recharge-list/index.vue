@@ -4,6 +4,9 @@
       <el-form-item label="昵称">
         <el-input v-model="formInline.nickname" placeholder="请输入昵称" clearable></el-input>
       </el-form-item>
+      <el-form-item label="ID">
+        <el-input v-model="formInline.id" placeholder="请输入ID" clearable></el-input>
+      </el-form-item>
       <el-form-item label="时间">
         <el-date-picker
           @change="dateChange"
@@ -33,6 +36,10 @@
         width="120px"
         prop="nickname"
         label="消费者昵称">
+      </el-table-column>
+      <el-table-column
+        prop="uid"
+        label="消费者ID">
       </el-table-column>
       <el-table-column
         prop="create_time"
@@ -66,14 +73,16 @@ export default {
       tableLoading: false,
       formInline: {
         nickname: '',
-        dateValue: ''
+        dateValue: '',
+        id: ''
       },
       params: {
         page: 1,
         pageSize: 10,
         name: '',
         beginT: '',
-        endT: ''
+        endT: '',
+        id: ''
       },
       tableData: [],
       total: 0
@@ -100,12 +109,14 @@ export default {
         pageSize: 10,
         name: '',
         beginT: '',
-        endT: ''
+        endT: '',
+        id: ''
       }
     },
     onSubmit() {
       this.resetParams()
       this.params.name = this.formInline.nickname
+      this.params.id = this.formInline.id
       if (Array.isArray(this.formInline.dateValue) && this.formInline.dateValue.length > 0) {
         this.params.beginT = this.formInline.dateValue[0]
         this.params.endT = this.formInline.dateValue[1]
