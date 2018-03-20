@@ -118,6 +118,8 @@
         </div>
         <div class="qrcode-img">
           <img :src="form.phone_er_url | uploadPrefixUrl" v-if="form.phone_er_url">
+          <canvas id="qrcode-zhuotie" style="display:none;"></canvas>
+          <img v-if="zhuotieUrl" :src="zhuotieUrl" @click="showLargeQrcode" id="zhuotie" style="cursor:pointer;"/>
         </div>
       </div>
     </el-card>
@@ -128,6 +130,8 @@
 <script>
 import BaiduMap from '../components/map'
 import clipboard from '@/directive/clipboard/index.js'
+import QRious from 'qrious'
+import BigPicture from '../../../vendor/BigPicture'
 import { getBarInfo, updateBarInfo, updateRateInfo } from '@/api/barManage'
 import { uploadImg } from '@/api/resource' 
 import { BASE_API } from '../../../../config/prod.env.js'
@@ -161,11 +165,43 @@ export default {
       selectManager: '',
       disableManagers: true,
       disableAgent: true,
-      oldSelectAgent: ''
+      oldSelectAgent: '',
+      zhuotieUrl: ''
     }
   },
   created () {
     this.getData()
+  },
+  mounted () {
+    this.$nextTick(() => {
+      var zhuotieImg = new Image()
+      zhuotieImg.src = './static/zhuotie.png'
+      zhuotieImg.onload = () => {
+        this.qr = new QRious({
+          element: document.getElementById('qrcode-zhuotie'),
+          value: BASE_API.replace(/"/g, '') + '/dist/#/Main/' + this.$route.params.id,
+          size: 400,
+          padding: 20
+        })
+        var dataUrl = this.qr.toDataURL('image/png')
+        var qrcodeImg = new Image()
+        qrcodeImg.onload = () => {
+          var canvas = document.createElement('canvas')
+          canvas.width = zhuotieImg.width
+          canvas.height = zhuotieImg.height
+          var ctx = canvas.getContext('2d')
+          ctx.drawImage(zhuotieImg, 0, 0)
+          ctx.save()
+          ctx.fillStyle = 'rgba(0,0,0,.2)'
+          ctx.fillRect(325, 285, 230, 230)
+          ctx.restore()
+          ctx.globalCompositeOperation = 'source-over'
+          ctx.drawImage(qrcodeImg, 0, 0, 400, 400, 340, 300, 200, 200)
+          this.zhuotieUrl = canvas.toDataURL('image/png')
+        }
+        qrcodeImg.src = dataUrl
+      }
+    })
   },
   watch: {
     selectManager (newVal, oldVal) {
@@ -317,6 +353,13 @@ export default {
     },
     openNewWindow() {
       window.open(this.$options.filters.filterUrl(this.$route.params.id, 'screen'))
+    },
+    showLargeQrcode() {
+      var target = event.target
+      BigPicture({
+        el: target,
+        imgSrc: this.zhuotieUrl
+      })
     }
   },
   components: {
