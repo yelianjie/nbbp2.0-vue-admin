@@ -99,8 +99,16 @@
             <span style="font-size:13px;margin-left:15px;">当前修改不低于{{rate.platform_divide_into}}%</span>
           </el-col>
         </el-row>
-        <p class="tip">酒吧用户参与分成：酒吧用户+商户+酒吧管理+代理 +牛霸平台=100%</p>
-        <p class="tip">酒吧用户不参与分成：商户+酒吧管理+代理 +牛霸平台=100%</p>
+        <div class="explain-tip">
+          <div>分成说明：</div>
+          <div class="tip-main">
+            <p class="tip">酒吧用户参与分成：酒吧用户+商户+酒吧管理+代理 +牛霸平台=100%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;酒吧用户不参与分成：商户+酒吧管理+代理 +牛霸平台=100%</p>
+            <p class="tip">若A用户花100元，打赏给B用户，100元收益如何分成？</p>
+            <p class="tip">由于礼物打赏为后台设置的用户参与分成产品，假设用户分成设置为50%，则B用户收益为：100X50%=50元，商户、管理、代理、平台等按各自的分成比例分成。</p>
+            <p class="tip">若A用户花100元，为B用户主题霸屏，100元收益如何分成？</p>
+            <p class="tip">由于主题霸屏为后台设置的用户不参与分成产品，即用户不参与分成，该订单的100元由商户、管理、代理、平台按照各自的比例分成。</p>
+          </div>
+        </div>
       </el-form>
       <el-row style="text-align: right;">
           <el-button type="primary" @click.native="updateRateAction">确定</el-button>
@@ -135,6 +143,7 @@ import BigPicture from '../../../vendor/BigPicture'
 import { getBarInfo, updateBarInfo, updateRateInfo } from '@/api/barManage'
 import { uploadImg } from '@/api/resource' 
 import { BASE_API } from '../../../../config/prod.env.js'
+import Logo from '@/assets/logo.png'
 export default {
   name: 'barManageEdit',
   directives: {
@@ -186,18 +195,23 @@ export default {
         var dataUrl = this.qr.toDataURL('image/png')
         var qrcodeImg = new Image()
         qrcodeImg.onload = () => {
-          var canvas = document.createElement('canvas')
-          canvas.width = zhuotieImg.width
-          canvas.height = zhuotieImg.height
-          var ctx = canvas.getContext('2d')
-          ctx.drawImage(zhuotieImg, 0, 0)
-          ctx.save()
-          ctx.fillStyle = 'rgba(0,0,0,.2)'
-          ctx.fillRect(325, 285, 230, 230)
-          ctx.restore()
-          ctx.globalCompositeOperation = 'source-over'
-          ctx.drawImage(qrcodeImg, 0, 0, 400, 400, 340, 300, 200, 200)
-          this.zhuotieUrl = canvas.toDataURL('image/png')
+          var logo = new Image()
+          logo.src = Logo
+          logo.onload = () => {
+            var canvas = document.createElement('canvas')
+            canvas.width = zhuotieImg.width
+            canvas.height = zhuotieImg.height
+            var ctx = canvas.getContext('2d')
+            ctx.drawImage(zhuotieImg, 0, 0)
+            ctx.save()
+            ctx.fillStyle = 'rgba(0,0,0,.2)'
+            ctx.fillRect(325, 285, 230, 230)
+            ctx.restore()
+            ctx.globalCompositeOperation = 'source-over'
+            ctx.drawImage(qrcodeImg, 0, 0, 400, 400, 340, 300, 200, 200)
+            ctx.drawImage(logo, 0, 0, 300, 300, 420, 380, 40, 40)
+            this.zhuotieUrl = canvas.toDataURL('image/png')
+          }
         }
         qrcodeImg.src = dataUrl
       }
@@ -483,14 +497,20 @@ $color: #606266;
 .input-number-percent {
   margin: 0 5px;
 }
+.explain-tip {
+  display: flex;
+  margin-top: 20px;
+  font-size: 14px;
+}
+.tip-main {
+  flex: 1;
+}
 .tip {
   color: $color;
   font-size: 14px;
   line-height: 16px;
-  padding-left: 60px;
-  &:first-of-type {
-    margin-top: 30px;
-  }
+  margin: 0;
+  margin-bottom: 10px;
 }
 .url-wrap {
   padding: 0 20px;
