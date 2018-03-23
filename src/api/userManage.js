@@ -82,3 +82,15 @@ export function deleteAgent(data) {
     data
   })
 }
+
+/**
+ * 获取商家列表
+ * @param {*} data
+ */
+export function getGridData(data) {
+  return request({
+    url: '/admin/Merchant/getGridData',
+    method: 'post',
+    data
+  })
+}

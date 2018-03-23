@@ -1,5 +1,5 @@
 module.exports = {
 	NODE_ENV: '"production"',
 	ENV_CONFIG: '"prod"',
-	BASE_API: '"http://niuba.siweiquanjing.com"'
+	BASE_API: '"http://xnb.siweiquanjing.com"'
 }

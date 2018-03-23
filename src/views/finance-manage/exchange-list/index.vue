@@ -26,28 +26,31 @@
       v-loading="tableLoading"
       fit
       :data="tableData"
+      show-summary
+      :summary-method="getSummaries"
       style="width: 100%">
       <el-table-column
-        prop="mc_id"
-        label="ID">
-      </el-table-column>
-      <el-table-column
-        width="220px"
-        prop=""
-        label="用户头像">
+        prop="id"
+        label="ID"
+        width="60px">
       </el-table-column>
       <el-table-column
         width="120px"
-        prop=""
+        prop="nickname"
         label="用户昵称">
       </el-table-column>
       <el-table-column
-        prop=""
+        prop="exchange_money"
+        label="兑换金额"
+        width="200px">
+      </el-table-column>
+      <el-table-column
+        prop="exchange_nj"
         label="兑换牛角数"
         width="200px">
       </el-table-column>
       <el-table-column
-        prop=""
+        prop="create_time"
         label="兑换时间">
       </el-table-column>
     </el-table>
@@ -64,7 +67,7 @@
 </template>
 
 <script>
-import { getRechargeList } from '@/api/finance'
+import { getExchangeList } from '@/api/finance'
 export default {
   name: 'rechargeList',
   data() {
@@ -84,7 +87,8 @@ export default {
         id: ''
       },
       tableData: [],
-      total: 0
+      total: 0,
+      zongji: {}
     }
   },
   created() {
@@ -93,10 +97,11 @@ export default {
   methods: {
     getData () {
       this.loading = true
-      getRechargeList(this.params).then((response) => {
+      getExchangeList(this.params).then((response) => {
         let result = response.data.result
         this.tableData = result.data
         this.total = result.total
+        this.zongji = result.zongji
         this.loading = false
       }).catch((error) => {
         this.loading = false
@@ -139,6 +144,38 @@ export default {
       this.getData()
       console.log(`当前页: ${val}`)
     },
+    getSummaries(param) {
+      const { columns, data } = param;
+      const sums = [];
+      columns.forEach((column, index) => {
+        if (index === 0) {
+          sums[index] = '总计';
+          return;
+        }
+        if (index === 1) {
+          sums[index] = this.zongji.nj_user + '人'
+        }
+        if (index === 2) {
+          sums[index] = this.zongji.nj_amount
+        }
+        /*const values = data.map(item => Number(item[column.property]));
+        if (!values.every(value => isNaN(value))) {
+          sums[index] = values.reduce((prev, curr) => {
+            const value = Number(curr);
+            if (!isNaN(value)) {
+              return prev + curr;
+            } else {
+              return prev;
+            }
+          }, 0);
+          sums[index] += ' 元';
+        } else {
+          sums[index] = 'N/A';
+        }*/
+      });
+
+      return sums;
+    }
   }
 }
 </script>

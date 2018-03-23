@@ -29,16 +29,16 @@
       </el-table-column>
       <el-table-column
         width="160px"
-        prop="nickname"
+        prop="name"
         label="微信昵称">
       </el-table-column>
       <el-table-column
-        prop=""
+        prop="phone"
         label="联系电话"
         width="200px">
       </el-table-column>
       <el-table-column
-        prop=""
+        prop="add_time"
         label="注册时间">
       </el-table-column>
       <el-table-column
@@ -63,7 +63,7 @@
 </template>
 
 <script>
-import { getRecharges, getMemberNum } from '@/api/userManage'
+import { getGridData } from '@/api/userManage'
 export default {
   name: 'rechargeManager',
   data() {
@@ -103,7 +103,7 @@ export default {
   methods: {
     getData () {
       this.loading = true
-      getRecharges(this.params).then((response) => {
+      getGridData(this.params).then((response) => {
         let result = response.data.result
         this.tableData = result.data
         this.total = result.total

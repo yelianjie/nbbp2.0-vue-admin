@@ -79,3 +79,16 @@ export function setAgentRate(data) {
     data
   })
 }
+
+
+/**
+ * 获取兑换列表
+ * @param {*} data
+ */
+export function getExchangeList(data) {
+  return request({
+    url: '/admin/recharge/getExchangeList',
+    method: 'post',
+    data
+  })
+}
