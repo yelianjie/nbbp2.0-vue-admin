@@ -26,20 +26,26 @@
       v-loading="tableLoading"
       fit
       :data="tableData"
+      show-summary
+      :summary-method="getSummaries"
       style="width: 100%">
       <el-table-column
-        width="360px"
-        prop="recharge_order_no"
-        label="订单编号">
+        prop="uid"
+        label="用户ID">
       </el-table-column>
       <el-table-column
         width="120px"
         prop="nickname"
-        label="消费者昵称">
+        label="昵称">
       </el-table-column>
       <el-table-column
-        prop="uid"
-        label="消费者ID">
+        prop="money"
+        label="充值金额">
+      </el-table-column>
+      <el-table-column
+        width="360px"
+        prop="recharge_order_no"
+        label="订单编号">
       </el-table-column>
       <el-table-column
         prop="create_time"
@@ -47,8 +53,12 @@
         width="200px">
       </el-table-column>
       <el-table-column
-        prop="money"
-        label="充值金额">
+        prop=""
+        label="微信手续费">
+      </el-table-column>
+      <el-table-column
+        prop=""
+        label="实际到账金额">
       </el-table-column>
     </el-table>
     <div class="pagination-container">
@@ -85,7 +95,8 @@ export default {
         id: ''
       },
       tableData: [],
-      total: 0
+      total: 0,
+      zongji: {}
     }
   },
   created() {
@@ -98,6 +109,7 @@ export default {
         let result = response.data.result
         this.tableData = result.data
         this.total = result.total
+        this.zongji = result.zongji
         this.loading = false
       }).catch((error) => {
         this.loading = false
@@ -140,6 +152,24 @@ export default {
       this.getData()
       console.log(`当前页: ${val}`)
     },
+    getSummaries(param) {
+      const { columns, data } = param;
+      const sums = [];
+      columns.forEach((column, index) => {
+        if (index === 0) {
+          sums[index] = '总计';
+          return;
+        }
+        if (index === 1) {
+          sums[index] = this.zongji.nj_user + '人'
+        }
+        if (index === 2) {
+          sums[index] = this.zongji.nj_amount
+        }
+      })
+
+      return sums
+    }
   }
 }
 </script>
