@@ -58,6 +58,10 @@
         prop="t5"
         label="平台收益">
       </el-table-column>
+      <el-table-column
+        prop="platform_sxf_income"
+        label="手续费">
+      </el-table-column>
     </el-table>
     <div class="pagination-container">
       <el-pagination

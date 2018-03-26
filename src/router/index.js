@@ -154,7 +154,7 @@ export const asyncRouterMap = [
         icon: 'statistics',
         roles: ['admin'] // or you can only set roles in sub nav
       }
-    }, {
+    }, /* , {
       path: 'statisticsUser',
       component: _import('finance-manage/statistics-user/index'),
       name: 'statisticsUser',
@@ -164,7 +164,7 @@ export const asyncRouterMap = [
         icon: 'statistics',
         roles: ['admin'] // or you can only set roles in sub nav
       }
-    }, {
+    }, */ {
       path: 'defaultDivide',
       component: _import('finance-manage/default-divide/index'),
       name: 'defaultDivide',

@@ -52,6 +52,13 @@
         label="消费者ID">
       </el-table-column>
       <el-table-column
+        label="支付类型">
+        <template slot-scope="scope">
+          <el-tag type="danger" v-if="scope.row.pay_type == 1">牛角消费</el-tag>
+          <el-tag type="success" v-if="scope.row.pay_type == 2">直接支付</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column
         prop="create_time"
         label="订单时间"
         width="200px">

@@ -43,6 +43,14 @@
         label="充值金额">
       </el-table-column>
       <el-table-column
+        prop=""
+        label="充值类型">
+        <template slot-scope="scope">
+          <template v-if="scope.row.pay_type == '1'">牛角消费</template>
+          <template v-if="scope.row.pay_type == '2'">直接支付</template>
+        </template>
+      </el-table-column>
+      <el-table-column
         width="360px"
         prop="recharge_order_no"
         label="订单编号">
@@ -53,11 +61,11 @@
         width="200px">
       </el-table-column>
       <el-table-column
-        prop=""
+        prop="wx_fee"
         label="微信手续费">
       </el-table-column>
       <el-table-column
-        prop=""
+        prop="wx_real"
         label="实际到账金额">
       </el-table-column>
     </el-table>

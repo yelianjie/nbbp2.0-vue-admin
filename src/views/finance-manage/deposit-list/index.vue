@@ -27,7 +27,7 @@
       :data="tableData"
       style="width: 100%">
       <el-table-column
-        prop="mc_id"
+        prop="uid"
         label="提现人ID">
       </el-table-column>
       <el-table-column
