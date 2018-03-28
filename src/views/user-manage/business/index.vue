@@ -1,11 +1,11 @@
 <template>
   <div class="container" v-loading="loading">
-    <el-form :inline="true" :model="formInline" class="demo-form-inline">
+    <el-form :inline="true" :model="params" class="demo-form-inline">
       <el-form-item label="昵称">
-        <el-input v-model="formInline.nickname" placeholder="请输入昵称" clearable></el-input>
+        <el-input v-model="params.name" placeholder="请输入昵称" clearable></el-input>
       </el-form-item>
       <el-form-item label="ID">
-        <el-input v-model="formInline.id" placeholder="请输入ID" clearable></el-input>
+        <el-input v-model="params.id" placeholder="请输入ID" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">搜索</el-button>
@@ -81,10 +81,6 @@ export default {
         number: 0,
         decimals: 2
       }],
-      formInline: {
-        nickname: '',
-        id: ''
-      },
       params: {
         name: '',
         id: '',
@@ -123,8 +119,6 @@ export default {
     },
     onSubmit() {
       this.resetParams()
-      this.params.name = this.formInline.nickname
-      this.params.id = this.formInline.id
       this.getData()
       console.log('submit')
     },
@@ -138,12 +132,7 @@ export default {
       console.log(`当前页: ${val}`)
     },
     resetParams() {
-      this.params = {
-        page: 1,
-        pageSize: 10,
-        name: '',
-        id: ''
-      }
+      this.params.page = 1
     }
   }
 }

@@ -1,13 +1,13 @@
 <template>
   <div class="container" v-loading="loading">
-    <el-form :inline="true" :model="formInline" class="demo-form-inline">
+    <el-form :inline="true" :model="params" class="demo-form-inline">
       <el-form-item label="酒吧名称">
-        <el-input v-model="formInline.barName" placeholder="请输入酒吧名称" clearable></el-input>
+        <el-input v-model="params.name" placeholder="请输入酒吧名称" clearable></el-input>
       </el-form-item>
       <el-form-item label="时间">
         <el-date-picker
           @change="dateChange"
-          v-model="formInline.dateValue"
+          v-model="params.dateValue"
           type="daterange"
           range-separator="至"
           start-placeholder="开始日期"
@@ -91,17 +91,14 @@ export default {
         label: '牛霸酒吧',
         value: 9
       }],
-      formInline: {
-        barName: '',
-        dateValue: ''
-      },
       dialogVisible: false,
       params: {
         page: 1,
         pageSize: 10,
         name: '',
         beginT: '',
-        endT: ''
+        endT: '',
+        dateValue: ''
       },
       tableData: [],
       total: 0
@@ -125,20 +122,13 @@ export default {
       })
     },
     resetParams() {
-      this.params = {
-        page: 1,
-        pageSize: 10,
-        name: '',
-        beginT: '',
-        endT: ''
-      }
+      this.params.page = 1
     },
     onSubmit() {
       this.resetParams()
-      this.params.name = this.formInline.barName
-      if (Array.isArray(this.formInline.dateValue) && this.formInline.dateValue.length > 0) {
-        this.params.beginT = this.formInline.dateValue[0]
-        this.params.endT = this.formInline.dateValue[1]
+      if (Array.isArray(this.params.dateValue) && this.params.dateValue.length > 0) {
+        this.params.beginT = this.params.dateValue[0]
+        this.params.endT = this.params.dateValue[1]
       }
       this.getData()
       console.log('submit!')
@@ -168,16 +158,14 @@ export default {
         }
       })
     },
-    clearBar() {
-
-    },
     dateChange(value) {
       if (value == null) {
-
+        this.params.beginT = ''
+        this.params.endT = ''
       } else {
-
+        
       }
-    }
+    },
   },
   filters: {
     calNotSysMoney (value) {

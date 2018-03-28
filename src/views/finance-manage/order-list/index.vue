@@ -1,14 +1,14 @@
 <template>
   <div class="container" v-loading="loading">
-    <el-form :inline="true" :model="formInline" class="demo-form-inline">
+    <el-form :inline="true" :model="params" class="demo-form-inline">
       <el-form-item label="ID">
-        <el-input v-model="formInline.id" placeholder="请输入ID" clearable></el-input>
+        <el-input v-model="params.id" placeholder="请输入ID" clearable></el-input>
       </el-form-item>
       <el-form-item label="酒吧名称">
-        <el-input v-model="formInline.barName" clearable></el-input>
+        <el-input v-model="params.name" clearable></el-input>
       </el-form-item>
       <el-form-item label="类型">
-        <el-select v-model="formInline.type" placeholder="请选择" clearable @clear="clearType">
+        <el-select v-model="params.type" placeholder="请选择" clearable @clear="clearType">
           <el-option
             v-for="item in types"
             :key="item.value"
@@ -20,7 +20,7 @@
       <el-form-item label="时间">
         <el-date-picker
           @change="dateChange"
-          v-model="formInline.dateValue"
+          v-model="params.dateValue"
           type="daterange"
           range-separator="至"
           start-placeholder="开始日期"
@@ -133,12 +133,6 @@ export default {
         label: '礼物打赏',
         value: '1'
       }],
-      formInline: {
-        barName: '',
-        dateValue: '',
-        type: '',
-        id: ''
-      },
       params: {
         page: 1,
         pageSize: 10,
@@ -146,7 +140,8 @@ export default {
         type: '',
         beginT: '',
         endT: '',
-        id: ''
+        id: '',
+        dateValue: ''
       },
       tableData: [],
       total: 0
@@ -168,24 +163,13 @@ export default {
       })
     },
     resetParams() {
-      this.params = {
-        page: 1,
-        pageSize: 10,
-        name: '',
-        beginT: '',
-        endT: '',
-        type: '',
-        id: ''
-      }
+      this.params.page = 1
     },
     onSubmit() {
       this.resetParams()
-      this.params.name = this.formInline.barName
-      this.params.type = this.formInline.type
-      this.params.id = this.formInline.id
-      if (Array.isArray(this.formInline.dateValue) && this.formInline.dateValue.length > 0) {
-        this.params.beginT = this.formInline.dateValue[0]
-        this.params.endT = this.formInline.dateValue[1]
+      if (Array.isArray(this.params.dateValue) && this.params.dateValue.length > 0) {
+        this.params.beginT = this.params.dateValue[0]
+        this.params.endT = this.params.dateValue[1]
       }
       this.getData()
       console.log('submit!')
@@ -204,7 +188,8 @@ export default {
     },
     dateChange(value) {
       if (value == null) {
-
+        this.params.beginT = ''
+        this.params.endT = ''
       } else {
         
       }

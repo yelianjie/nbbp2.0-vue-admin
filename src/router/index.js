@@ -214,6 +214,16 @@ export const asyncRouterMap = [
         icon: 'exchange',
         roles: ['admin'] // or you can only set roles in sub nav
       }
+    }, {
+      path: 'packetList',
+      component: _import('finance-manage/packet-list/index'),
+      name: 'packetList',
+      meta: {
+        noCache: true,
+        title: 'packetList',
+        icon: 'packet',
+        roles: ['admin'] // or you can only set roles in sub nav
+      }
     }]
   },
   {
@@ -308,13 +318,35 @@ export const asyncRouterMap = [
         icon: 'system',
         roles: ['admin'] // or you can only set roles in sub nav
       }
-    }, {
-      path: 'systemVersion',
-      component: _import('system-manage/system-version/index'),
-      name: 'systemVersion',
+    }]
+  },
+  {
+    path: '/systemVersion',
+    component: Layout,
+    redirect: 'noredirect',
+    name: 'systemVersion',
+    meta: {
+      title: 'systemVersion',
+      icon: 'version',
+      roles: ['admin']
+    },
+    children: [{
+      path: 'systemVersionUser',
+      component: _import('system-version/system-version-user/index'),
+      name: 'systemVersionUser',
       meta: {
         noCache: true,
-        title: 'systemVersion',
+        title: 'systemVersionUser',
+        icon: 'version',
+        roles: ['admin'] // or you can only set roles in sub nav
+      }
+    }, {
+      path: 'systemVersionClient',
+      component: _import('system-version/system-version-client/index'),
+      name: 'systemVersionClient',
+      meta: {
+        noCache: true,
+        title: 'systemVersionClient',
         icon: 'version',
         roles: ['admin'] // or you can only set roles in sub nav
       }

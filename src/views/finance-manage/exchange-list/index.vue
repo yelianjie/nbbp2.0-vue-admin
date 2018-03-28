@@ -1,16 +1,16 @@
 <template>
   <div class="container" v-loading="loading">
-    <el-form :inline="true" :model="formInline" class="demo-form-inline">
+    <el-form :inline="true" :model="params" class="demo-form-inline">
       <el-form-item label="昵称">
-        <el-input v-model="formInline.nickname" placeholder="请输入昵称" clearable></el-input>
+        <el-input v-model="params.name" placeholder="请输入昵称" clearable></el-input>
       </el-form-item>
       <el-form-item label="ID">
-        <el-input v-model="formInline.id" placeholder="请输入ID" clearable></el-input>
+        <el-input v-model="params.id" placeholder="请输入ID" clearable></el-input>
       </el-form-item>
       <el-form-item label="时间">
         <el-date-picker
           @change="dateChange"
-          v-model="formInline.dateValue"
+          v-model="params.dateValue"
           type="daterange"
           range-separator="至"
           start-placeholder="开始日期"
@@ -74,17 +74,14 @@ export default {
     return {
       loading: true,
       tableLoading: false,
-      formInline: {
-        nickname: '',
-        dateValue: ''
-      },
       params: {
         page: 1,
         pageSize: 10,
         name: '',
         beginT: '',
         endT: '',
-        id: ''
+        id: '',
+        dateValue: ''
       },
       tableData: [],
       total: 0,
@@ -108,29 +105,21 @@ export default {
       })
     },
     resetParams() {
-      this.params = {
-        page: 1,
-        pageSize: 10,
-        name: '',
-        beginT: '',
-        endT: '',
-        id: ''
-      }
+      this.params.page = 1
     },
     onSubmit() {
       this.resetParams()
-      this.params.name = this.formInline.nickname
-      this.params.id = this.formInline.id
-      if (Array.isArray(this.formInline.dateValue) && this.formInline.dateValue.length > 0) {
-        this.params.beginT = this.formInline.dateValue[0]
-        this.params.endT = this.formInline.dateValue[1]
+      if (Array.isArray(this.params.dateValue) && this.params.dateValue.length > 0) {
+        this.params.beginT = this.params.dateValue[0]
+        this.params.endT = this.params.dateValue[1]
       }
       this.getData()
       console.log('submit!')
     },
     dateChange(value) {
       if (value == null) {
-
+        this.params.beginT = ''
+        this.params.endT = ''
       } else {
         
       }

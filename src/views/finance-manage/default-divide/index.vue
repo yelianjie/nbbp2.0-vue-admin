@@ -1,11 +1,11 @@
 <template>
  <div class="container" v-loading="loading">
-   <el-form :inline="true" :model="formInline" class="divide-form-inline">
+   <el-form :inline="true" :model="params" class="divide-form-inline">
       <el-form-item label="用户名">
-        <el-input v-model="formInline.nickname" placeholder="用户名" clearable></el-input>
+        <el-input v-model="params.name" placeholder="用户名" clearable></el-input>
       </el-form-item>
       <el-form-item label="ID">
-        <el-input v-model="formInline.id" placeholder="请输入ID" clearable></el-input>
+        <el-input v-model="params.id" placeholder="请输入ID" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">搜索</el-button>
@@ -71,10 +71,6 @@ export default {
     return {
       loading: true,
       tableLoading: false,
-      formInline: {
-        username: '',
-        id: ''
-      },
       params: {
         page: 1,
         pageSize: 10,
@@ -105,17 +101,10 @@ export default {
       })
     },
     resetParams() {
-      this.params = {
-        page: 1,
-        pageSize: 10,
-        name: '',
-        id: ''
-      }
+      this.params.page = 1
     },
     onSubmit() {
       this.resetParams()
-      this.params.name = this.formInline.nickname
-      this.params.id = this.formInline.id
       this.getData()
       console.log('submit!')
     },
@@ -131,10 +120,10 @@ export default {
     cancelEdit(row) {
       row.title = row.originalTitle
       row.edit = false
-      this.$message({
+      /*this.$message({
         message: 'The title has been restored to the original value',
         type: 'warning'
-      })
+      })*/
     },
     confirmEdit(row) {
       row.edit = false

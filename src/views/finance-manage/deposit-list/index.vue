@@ -1,14 +1,14 @@
 <template>
  <div class="container" v-loading="loading">
-   <el-form :inline="true" :model="formInline" class="demo-form-inline">
+   <el-form :inline="true" :model="params" class="demo-form-inline">
       <el-form-item label="昵称">
-        <el-input v-model="formInline.nickname" placeholder="请输入昵称" clearable></el-input>
+        <el-input v-model="params.name" placeholder="请输入昵称" clearable></el-input>
       </el-form-item>
       <el-form-item label="ID">
-        <el-input v-model="formInline.id" placeholder="请输入ID" clearable></el-input>
+        <el-input v-model="params.id" placeholder="请输入ID" clearable></el-input>
       </el-form-item>
       <el-form-item label="身份">
-        <el-select v-model="formInline.identity" placeholder="请选择" clearable @close="clearIdentity">
+        <el-select v-model="params.type" placeholder="请选择" clearable @close="clearIdentity">
           <el-option
             v-for="item in identitys"
             :key="item.value"
@@ -81,11 +81,6 @@ export default {
     return {
       loading: true,
       tableLoading: false,
-      formInline: {
-        nickname: '',
-        identity: '',
-        id: ''
-      },
       identitys: [
         {
         label: '全部',
@@ -117,9 +112,7 @@ export default {
         page: 1,
         pageSize: 10,
         name: '',
-        type: '',
-        beginT: '',
-        endT: '',
+        type: ''
       },
       tableData: [],
       total: 0
@@ -141,21 +134,10 @@ export default {
       })
     },
     resetParams() {
-      this.params = {
-        page: 1,
-        pageSize: 10,
-        name: '',
-        beginT: '',
-        endT: '',
-        type: '',
-        id: ''
-      }
+      this.params.page = 1
     },
     onSubmit() {
       this.resetParams()
-      this.params.name = this.formInline.nickname
-      this.params.type = this.formInline.identity
-      this.params.id = this.formInline.id
       this.getData()
       console.log('submit!')
     },
