@@ -2,7 +2,7 @@
 	<el-row style="margin-bottom: 15px;">
 		<el-col>
 			{{links.title}}：
-			<el-button v-for="(v, i) in links.links" :key="i" @click.native="select(v.value)" :class="{'active': type == v.value}">{{v.label}}</el-button>
+			<el-button v-for="(v, i) in links.links" :key="i" @click.native="select(v.value)" :class="{'active': type === v.value}">{{v.label}}</el-button>
 		</el-col>
 	</el-row>
 </template>

@@ -46,6 +46,7 @@
         prop=""
         label="充值类型">
         <template slot-scope="scope">
+          <template v-if="scope.row.pay_type == '3'">红包</template>
           <template v-if="scope.row.pay_type == '1'">牛角消费</template>
           <template v-if="scope.row.pay_type == '2'">直接支付</template>
         </template>

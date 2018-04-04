@@ -92,3 +92,28 @@ export function getExchangeList(data) {
     data
   })
 }
+
+/**
+ * 获取红包列表
+ * @param {*} data
+ */
+export function getRedOrderList(data) {
+  return request({
+    url: '/admin/recharge/getRedOrderList',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 获取红包详情
+ * @param {*} data
+ */
+export function getRedOrderDetail(data) {
+  return request({
+    url: '/admin/recharge/getRedOrderDetail',
+    method: 'post',
+    data
+  })
+}
+

@@ -5,7 +5,7 @@
         <el-input v-model="params.id" placeholder="请输入ID" clearable></el-input>
       </el-form-item>
       <el-form-item label="昵称">
-        <el-input v-model="params.name" clearable></el-input>
+        <el-input v-model="params.nickname" clearable></el-input>
       </el-form-item>
       <el-form-item label="时间">
         <el-date-picker
@@ -22,15 +22,15 @@
         <el-button type="primary" @click="onSubmit">搜索</el-button>
       </el-form-item>
     </el-form>
-    <link-search v-model="params.type" :links="{ title: '红包类型', links: [{label: '全部', value: 1}, {label: '男士', value: 2}, {label: '女士', value: 3}, {label: '自定义', value: 4}]}" @onClick="onClick"></link-search>
-    <link-search v-model="params.backMoney" :links="{ title: '退回金额', links: [{label: '全部', value: 0}, {label: '有', value: 1}, {label: '无', value: 2}]}" @onClick="onClick"></link-search>
+    <link-search v-model="params.type" :links="{ title: '红包类型', links: [{label: '全部', value: ''}, {label: '牛角红包', value: 1}, {label: '现金红包', value: 0}]}" @onClick="onClick"></link-search>
+    <link-search v-model="params.is_refund" :links="{ title: '退回金额', links: [{label: '全部', value: 0}, {label: '有', value: 1}, {label: '无', value: 2}]}" @onClick="onClick"></link-search>
     <el-table
       v-loading="tableLoading"
       :data="tableData"
       style="width: 100%">
       <el-table-column
         fixed
-        prop=""
+        prop="id"
         label="ID">
       </el-table-column>
       <el-table-column
@@ -39,7 +39,7 @@
         label="昵称">
       </el-table-column>
       <el-table-column
-        prop=""
+        prop="money"
         width="100px"
         label="红包金额">
       </el-table-column>
@@ -47,22 +47,22 @@
         width="100px"
         label="红包类型">
         <template slot-scope="scope">
-          <el-tag type="danger" v-if="scope.row.pay_type == 1">现金红包</el-tag>
-          <el-tag type="success" v-if="scope.row.pay_type == 2">牛角红包</el-tag>
+          <el-tag type="danger" v-if="scope.row.pay_type == 0">现金红包</el-tag>
+          <el-tag type="success" v-if="scope.row.pay_type == 1">牛角红包</el-tag>
         </template>
       </el-table-column>
       <el-table-column
-        prop=""
+        prop="refund_money"
         width="100px"
         label="退回金额">
       </el-table-column>
       <el-table-column
-        prop=""
+        prop="real_money"
         width="180px"
         label="实际发红包金额">
       </el-table-column>
       <el-table-column
-        prop=""
+        prop="order_no"
         label="订单号"
         width="140px">
       </el-table-column>
@@ -74,16 +74,16 @@
       <el-table-column
         label="发放对象">
         <template slot-scope="scope">
-          <template v-if="scope.row.pay_type == 1">
+          <template v-if="scope.row.type == 0">
             全场
           </template>
-          <template v-if="scope.row.pay_type == 2">
+          <template v-if="scope.row.type == 2">
             男士
           </template>
-          <template v-if="scope.row.pay_type == 3">
+          <template v-if="scope.row.type == 1">
             女士
           </template>
-          <template v-if="scope.row.pay_type == 4">
+          <template v-if="scope.row.type == 3">
             自定义
           </template>
         </template>
@@ -91,7 +91,7 @@
       <el-table-column
         label="操作">
         <template slot-scope="scope">
-          <el-button type="primary">查看详情</el-button>
+          <el-button type="primary" @click.native="viewPacketDetail(scope.row.id)">查看详情</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -104,11 +104,38 @@
       :total="total">
       </el-pagination>
     </div>
+    <el-dialog title="收货地址" :visible.sync="dialogVisible" @close="paramsDetail.page = 1">
+      <el-table :data="detailData" v-loading="tableDetailLoading">
+        <el-table-column prop="mc_id" label="ID" width="60"></el-table-column>
+        <el-table-column prop="nickname" label="昵称" width="160"></el-table-column>
+        <el-table-column label="红包类型">
+          <template slot-scope="scope">
+            <el-tag type="danger" v-if="scope.row.pay_type == 0">现金红包</el-tag>
+            <el-tag type="success" v-if="scope.row.pay_type == 1">牛角红包</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="money" label="抢到金额">
+          <!-- <template slot-scope="scope">
+            <el-tag type="danger" v-if="scope.row.pay_type == 0">现金红包</el-tag>
+            <el-tag type="success" v-if="scope.row.pay_type == 1">牛角红包</el-tag>
+          </template> -->
+        </el-table-column>
+      </el-table>
+      <div class="pagination-container">
+        <el-pagination
+        background
+        @size-change="handleSizeChangeDetail"
+        @current-change="handleCurrentChangeDetail"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="totalDetail">
+        </el-pagination>
+      </div>
+    </el-dialog>
   </div> 
 </template>
 
 <script>
-import { getOrderList } from '@/api/finance'
+import { getRedOrderList, getRedOrderDetail } from '@/api/finance'
 import LinkSearch from '@/components/LinkSearch/index'
 export default {
   name: 'orderList',
@@ -116,31 +143,54 @@ export default {
     return {
       loading: false,
       tableLoading: false,
+      tableDetailLoading: false,
       params: {
         page: 1,
         pageSize: 10,
         name: '',
-        type: '1',
+        type: '',
         beginT: '',
         endT: '',
         id: '',
         dateValue: '',
-        backMoney: 0
+        is_refund: 0
       },
       tableData: [],
-      total: 0
+      total: 0,
+      dialogVisible: false,
+      detailData: [],
+      totalDetail: 0,
+      paramsDetail: {
+        page: 1,
+        pageSize: 10
+      },
+      curDetailId: 0
     }
   },
   created() {
-    // this.getData()
+    this.getData()
   },
   methods: {
     onClick () {
-      console.log(this.params)
+      this.getData()
+    },
+    viewPacketDetail (id) {
+      this.tableDetailLoading = true
+      if (id) {
+        this.curDetailId = id
+      }
+      this.dialogVisible = true
+      var params = Object.assign(this.paramsDetail, {hb_id: this.curDetailId})
+      getRedOrderDetail(params).then((response) => {
+        let result = response.data.result
+        this.detailData = result.data
+        this.totalDetail = result.total
+        this.tableDetailLoading = false
+      })
     },
     getData () {
       this.loading = true
-      getOrderList(this.params).then((response) => {
+      getRedOrderList(this.params).then((response) => {
         let result = response.data.result
         this.tableData = result.data
         this.total = result.total
@@ -168,6 +218,15 @@ export default {
     handleCurrentChange(val) {
       this.params.page = val
       this.getData()
+      console.log(`当前页: ${val}`)
+    },
+    handleSizeChangeDetail(val) {
+      this.paramsDetail.pageSize = val
+      this.viewPacketDetail()
+    },
+    handleCurrentChangeDetail(val) {
+      this.paramsDetail.page = val
+      this.viewPacketDetail()
       console.log(`当前页: ${val}`)
     },
     dateChange(value) {
