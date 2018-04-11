@@ -348,8 +348,8 @@ export default {
       if (data != null) {
         var o = {
           address: data.addressComponents.street + data.addressComponents.streetNumber,
-          locationLng: data.point.lat,
-          locationLat: data.point.lng,
+          locationLng: data.point.lng,
+          locationLat: data.point.lat,
           province_name: data.addressComponents.province,
           city_name: data.addressComponents.city,
           area_name: data.addressComponents.district
