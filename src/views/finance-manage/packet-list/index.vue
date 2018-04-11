@@ -22,7 +22,7 @@
         <el-button type="primary" @click="onSubmit">搜索</el-button>
       </el-form-item>
     </el-form>
-    <link-search v-model="params.type" :links="{ title: '红包类型', links: [{label: '全部', value: ''}, {label: '牛角红包', value: 1}, {label: '现金红包', value: 0}]}" @onClick="onClick"></link-search>
+    <link-search v-model="params.type" :links="{ title: '红包类型', links: [{label: '全部', value: ''}, {label: '牛角红包', value: 1}, {label: '现金红包', value: 2}]}" @onClick="onClick"></link-search>
     <link-search v-model="params.is_refund" :links="{ title: '退回金额', links: [{label: '全部', value: 0}, {label: '有', value: 1}, {label: '无', value: 2}]}" @onClick="onClick"></link-search>
     <el-table
       v-loading="tableLoading"
@@ -30,7 +30,7 @@
       style="width: 100%">
       <el-table-column
         fixed
-        prop="id"
+        prop="mc_id"
         label="ID">
       </el-table-column>
       <el-table-column
@@ -47,7 +47,7 @@
         width="100px"
         label="红包类型">
         <template slot-scope="scope">
-          <el-tag type="danger" v-if="scope.row.pay_type == 0">现金红包</el-tag>
+          <el-tag type="danger" v-if="scope.row.pay_type == 2">现金红包</el-tag>
           <el-tag type="success" v-if="scope.row.pay_type == 1">牛角红包</el-tag>
         </template>
       </el-table-column>
@@ -110,7 +110,7 @@
         <el-table-column prop="nickname" label="昵称" width="160"></el-table-column>
         <el-table-column label="红包类型">
           <template slot-scope="scope">
-            <el-tag type="danger" v-if="scope.row.pay_type == 0">现金红包</el-tag>
+            <el-tag type="danger" v-if="scope.row.pay_type == 2">现金红包</el-tag>
             <el-tag type="success" v-if="scope.row.pay_type == 1">牛角红包</el-tag>
           </template>
         </el-table-column>

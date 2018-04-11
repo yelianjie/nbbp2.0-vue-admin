@@ -73,6 +73,7 @@
         <template slot-scope="scope">
           <el-tag type="danger" v-if="scope.row.odr_type == 1">{{scope.row.title}}</el-tag>
           <el-tag v-if="scope.row.odr_type == 2">{{scope.row.title}}</el-tag>
+          <el-tag type="warning" v-if="scope.row.odr_type == 3">红包</el-tag>
         </template>
       </el-table-column>
       <el-table-column
@@ -87,11 +88,11 @@
         prop="u_money"
         label="分成金额">
         <template slot-scope="scope">
-          <el-tag class="tag">平台：{{scope.row.company_money | filtetMoney}}</el-tag>
-          <el-tag class="tag" type="success">代理：{{scope.row.agent_money | filtetMoney}}</el-tag>
-          <el-tag class="tag" type="info">商户：{{scope.row.merchant_money | filtetMoney}}</el-tag>
-          <el-tag class="tag" type="warning">管理：{{scope.row.supervise_money | filtetMoney}}</el-tag>
-          <el-tag class="tag" type="danger">用户：{{scope.row.user_money | filtetMoney}}</el-tag>
+          <el-tag class="tag" v-if="Number(scope.row.company_money) != 0">平台：{{scope.row.company_money | filtetMoney}}</el-tag>
+          <el-tag class="tag" v-if="Number(scope.row.agent_money) != 0" type="success">代理：{{scope.row.agent_money | filtetMoney}}</el-tag>
+          <el-tag class="tag" v-if="Number(scope.row.merchant_money) != 0" type="info">商户：{{scope.row.merchant_money | filtetMoney}}</el-tag>
+          <el-tag class="tag" v-if="Number(scope.row.supervise_money) != 0" type="warning">管理：{{scope.row.supervise_money | filtetMoney}}</el-tag>
+          <el-tag class="tag" v-if="Number(scope.row.user_money) != 0" type="danger">用户：{{scope.row.user_money | filtetMoney}}</el-tag>
         </template>
       </el-table-column>
       <el-table-column

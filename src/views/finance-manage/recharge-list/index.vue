@@ -47,7 +47,7 @@
         label="充值类型">
         <template slot-scope="scope">
           <template v-if="scope.row.pay_type == '3'">红包</template>
-          <template v-if="scope.row.pay_type == '1'">牛角消费</template>
+          <template v-if="scope.row.pay_type == '1'">牛角充值</template>
           <template v-if="scope.row.pay_type == '2'">直接支付</template>
         </template>
       </el-table-column>
@@ -57,7 +57,7 @@
         label="订单编号">
       </el-table-column>
       <el-table-column
-        prop="create_time"
+        prop="subscribe_time"
         label="充值时间"
         width="200px">
       </el-table-column>
@@ -111,6 +111,9 @@ export default {
       this.loading = true
       getRechargeList(this.params).then((response) => {
         let result = response.data.result
+        result.data.forEach((v) => {
+          v.subscribe_time = this.formatDateTime(v.subscribe_time * 1000)
+        })
         this.tableData = result.data
         this.total = result.total
         this.zongji = result.zongji
@@ -165,6 +168,21 @@ export default {
       })
 
       return sums
+    },
+    formatDateTime(inputTime) {
+      var date = new Date(inputTime)
+      var y = date.getFullYear()
+      var m = date.getMonth() + 1
+      m = m < 10 ? ('0' + m) : m
+      var d = date.getDate()
+      d = d < 10 ? ('0' + d) : d
+      var h = date.getHours()
+      h = h < 10 ? ('0' + h) : h
+      var minute = date.getMinutes()
+      var second = date.getSeconds()
+      minute = minute < 10 ? ('0' + minute) : minute
+      second = second < 10 ? ('0' + second) : second
+      return y + '-' + m + '-' + d+' '+h+':'+minute+':'+second
     }
   }
 }

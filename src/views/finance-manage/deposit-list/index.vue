@@ -28,10 +28,10 @@
       style="width: 100%">
       <el-table-column
         prop="uid"
+        width="100px"
         label="提现人ID">
       </el-table-column>
       <el-table-column
-        width="160px"
         prop="nickname"
         label="提现人昵称">
       </el-table-column>

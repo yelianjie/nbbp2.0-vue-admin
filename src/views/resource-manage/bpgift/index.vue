@@ -76,10 +76,10 @@
           <el-input v-model="bpGiftForm.type" auto-complete="off"></el-input>
         </el-form-item> -->
         <el-form-item label="价格" prop="default_price">
-          <el-input v-model.number="bpGiftForm.default_price" auto-complete="off" type="number"></el-input>
+          <el-input v-model="bpGiftForm.default_price" auto-complete="off" type="number"></el-input>
         </el-form-item>
         <el-form-item label="时间" prop="time">
-          <el-input v-model.number="bpGiftForm.time" auto-complete="off" type="number"></el-input>
+          <el-input v-model="bpGiftForm.time" auto-complete="off" type="number"></el-input>
         </el-form-item>
         <el-form-item label="礼物地址" prop="url">
           <el-input v-model="bpGiftForm.url" auto-complete="off"></el-input>
@@ -118,7 +118,7 @@ export default {
       if (!value) {
         return callback(new Error('请输入' + rule.label));
       }
-      if (!Number.isInteger(value)) {
+      if (!Number.isInteger(Number(value))) {
         callback(new Error('请输入整数'))
       } else {
         callback()
@@ -128,7 +128,7 @@ export default {
       if (!value) {
         return callback(new Error('请输入' + rule.label));
       }
-      if (!Number.isInteger(value)) {
+      if (!Number.isInteger(Number(value))) {
         callback(new Error('请输入整数'))
       } else {
         callback()
