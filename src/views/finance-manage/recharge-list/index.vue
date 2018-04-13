@@ -57,7 +57,7 @@
         label="订单编号">
       </el-table-column>
       <el-table-column
-        prop="subscribe_time"
+        prop="create_time"
         label="充值时间"
         width="200px">
       </el-table-column>
@@ -111,9 +111,6 @@ export default {
       this.loading = true
       getRechargeList(this.params).then((response) => {
         let result = response.data.result
-        result.data.forEach((v) => {
-          v.subscribe_time = this.formatDateTime(v.subscribe_time * 1000)
-        })
         this.tableData = result.data
         this.total = result.total
         this.zongji = result.zongji
