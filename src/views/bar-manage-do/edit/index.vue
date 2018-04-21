@@ -127,7 +127,8 @@
         <div class="qrcode-img">
           <img :src="form.phone_er_url | uploadPrefixUrl" v-if="form.phone_er_url">
           <canvas id="qrcode-zhuotie" style="display:none;"></canvas>
-          <img v-if="zhuotieUrl" :src="zhuotieUrl" @click="showLargeQrcode" id="zhuotie" style="cursor:pointer;"/>
+          <img v-if="zhuotieUrl" :src="zhuotieUrl" @click="showLargeQrcode(zhuotieUrl)" id="zhuotie" style="cursor:pointer;"/>
+          <img v-if="zhuotieUrl2" :src="zhuotieUrl2" @click="showLargeQrcode(zhuotieUrl2)" id="zhuotie2" style="cursor:pointer;" />
         </div>
       </div>
     </el-card>
@@ -142,7 +143,7 @@ import QRious from 'qrious'
 import BigPicture from '../../../vendor/BigPicture'
 import { getBarInfo, updateBarInfo, updateRateInfo } from '@/api/barManage'
 import { uploadImg } from '@/api/resource' 
-import { BASE_API } from '../../../../config/prod.env.js'
+// import { BASE_API } from '../../../../config/prod.env.js'
 import Logo from '@/assets/logo.png'
 export default {
   name: 'barManageEdit',
@@ -175,7 +176,8 @@ export default {
       disableManagers: true,
       disableAgent: true,
       oldSelectAgent: '',
-      zhuotieUrl: ''
+      zhuotieUrl: '',
+      zhuotieUrl2: ''
     }
   },
   created () {
@@ -186,34 +188,16 @@ export default {
       var zhuotieImg = new Image()
       zhuotieImg.src = './static/zhuotie.png'
       zhuotieImg.onload = () => {
-        this.qr = new QRious({
-          element: document.getElementById('qrcode-zhuotie'),
-          value: BASE_API.replace(/"/g, '') + '/dist/#/Main/' + this.$route.params.id,
-          size: 400,
-          padding: 20
+        this.generateQrcode(document.getElementById('qrcode-zhuotie'), zhuotieImg, (url) => {
+          this.zhuotieUrl = url
         })
-        var dataUrl = this.qr.toDataURL('image/png')
-        var qrcodeImg = new Image()
-        qrcodeImg.onload = () => {
-          var logo = new Image()
-          logo.src = Logo
-          logo.onload = () => {
-            var canvas = document.createElement('canvas')
-            canvas.width = zhuotieImg.width
-            canvas.height = zhuotieImg.height
-            var ctx = canvas.getContext('2d')
-            ctx.drawImage(zhuotieImg, 0, 0)
-            ctx.save()
-            ctx.fillStyle = 'rgba(0,0,0,.2)'
-            ctx.fillRect(325, 285, 230, 230)
-            ctx.restore()
-            ctx.globalCompositeOperation = 'source-over'
-            ctx.drawImage(qrcodeImg, 0, 0, 400, 400, 340, 300, 200, 200)
-            ctx.drawImage(logo, 0, 0, 300, 300, 420, 380, 40, 40)
-            this.zhuotieUrl = canvas.toDataURL('image/png')
-          }
-        }
-        qrcodeImg.src = dataUrl
+      }
+      var zhuotieImg2 = new Image()
+      zhuotieImg2.src = './static/zhuotie2.png'
+      zhuotieImg2.onload = () => {
+        this.generateQrcode(document.getElementById('qrcode-zhuotie2'), zhuotieImg2, (url) => {
+          this.zhuotieUrl2 = url
+        })
       }
     })
   },
@@ -238,6 +222,36 @@ export default {
     }
   },
   methods: {
+    generateQrcode (dom, zhuotieImg, cb) {
+      var qr = new QRious({
+        element: dom,
+        value: process.env.BASE_API.replace(/"/g, '') + '/dist/#/Main/' + this.$route.params.id,
+        size: 400,
+        padding: 20
+      })
+      var dataUrl = qr.toDataURL('image/png')
+      var qrcodeImg = new Image()
+      qrcodeImg.onload = () => {
+        var logo = new Image()
+        logo.src = Logo
+        logo.onload = () => {
+          var canvas = document.createElement('canvas')
+          canvas.width = zhuotieImg.width
+          canvas.height = zhuotieImg.height
+          var ctx = canvas.getContext('2d')
+          ctx.drawImage(zhuotieImg, 0, 0)
+          ctx.save()
+          ctx.fillStyle = 'rgba(0,0,0,.2)'
+          ctx.fillRect(325, 285, 230, 230)
+          ctx.restore()
+          ctx.globalCompositeOperation = 'source-over'
+          ctx.drawImage(qrcodeImg, 0, 0, 400, 400, 340, 300, 200, 200)
+          ctx.drawImage(logo, 0, 0, 300, 300, 420, 380, 40, 40)
+          cb(canvas.toDataURL('image/png'))
+        }
+      }
+      qrcodeImg.src = dataUrl
+    },
     getData () {
       getBarInfo({ht_id: this.$route.params.id}).then((response) => {
         this.form = response.data.result.hotel
@@ -368,11 +382,11 @@ export default {
     openNewWindow() {
       window.open(this.$options.filters.filterUrl(this.$route.params.id, 'screen'))
     },
-    showLargeQrcode() {
+    showLargeQrcode(url) {
       var target = event.target
       BigPicture({
         el: target,
-        imgSrc: this.zhuotieUrl
+        imgSrc: url
       })
     }
   },
@@ -382,9 +396,9 @@ export default {
   filters: {
     filterUrl (value, type) {
       if (type === 'screen') {
-        return BASE_API.replace(/\"/g, '') + '/screen/?ht_id=' + value
+        return process.env.BASE_API.replace(/\"/g, '') + '/screen/?ht_id=' + value
       } else {
-        return BASE_API.replace(/\"/g, '') + '/dist/#/Main/' + value
+        return process.env.BASE_API.replace(/\"/g, '') + '/dist/#/Main/' + value
       }
     }
   },
