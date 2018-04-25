@@ -1,28 +1,25 @@
 <template>
  <div class="container" v-loading="loading">
-   <el-button style="float:right;" type="primary" icon="el-icon-edit" @click.native="dialogFormVisible = true">新增版本</el-button>
-    <el-table
-      v-loading="tableLoading"
-      :data="tableData" 
-      fit
-      highlight-current-row
-      style="width: 100%">
-      <el-table-column 
-      label="版本号"
-      prop=""
-      width="360">
-      </el-table-column>
-      <el-table-column min-width="300px" label="版本标题">
-        
-      </el-table-column>
-      <el-table-column align="center" label="操作" width="120">
-        <template slot-scope="scope">
-          <el-button type="primary" @click='' size="small" icon="el-icon-edit">编辑</el-button>
-          <el-button type="primary" @click='' size="small" icon="el-icon-document">查看</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <div class="pagination-container">
+  <el-button type="primary" icon="el-icon-edit" @click.native="showDialog(false, 1)">新增主版本</el-button>
+  <el-collapse accordion style="margin-top:20px;">
+  <el-collapse-item v-for="(v, i) in versions" :key="i">
+    <template slot="title">
+      <div>
+        <div class="version-top"><span class="version">V{{v.version_num}}</span><span class="v_time">创建时间：{{$options.filters.formatDateTime(v.create_time)}}</span><i class="el-icon-edit" @click.stop="showEditDialog(true, v.id, 1)"></i></div>
+        <p class="desc">{{v.title}}</p>
+      </div> 
+    </template>
+    <div class="subversion-list">
+      <el-button type="primary" icon="el-icon-edit" style="margin-bottom: 20px;" @click.native="showDialog(false, 2, v.id)">新增次版本</el-button>
+      <div class="subverison-item" v-for="(vv, ii) in v.next_version" :key="ii">
+        <div class="version-top"><span class="version">V{{vv.version_num}}</span><span class="v_time">创建时间：{{$options.filters.formatDateTime(vv.create_time)}}</span><i class="el-icon-edit" @click.stop="showEditDialog(true, vv.id, 2)"></i></div>
+        <p class="desc">{{vv.title}}</p>
+      </div> 
+    </div>
+    
+  </el-collapse-item>
+</el-collapse>
+<div class="pagination-container">
       <el-pagination
       background
       @size-change="handleSizeChange"
@@ -31,25 +28,49 @@
       :total="total">
       </el-pagination>
     </div>
-    <el-dialog title="版本添加" :visible.sync="dialogFormVisible">
-      <el-form :model="formInline">
-        <el-form-item label="版本号">
-          <el-input v-model="formInline.version" auto-complete="off"></el-input>
+    <el-dialog :title="title" :visible.sync="dialogFormVisible" @close="resetFormValue">
+      <el-form :model="formInline" label-width="120px" status-icon :rules="formRules" ref="updateForm">
+        <el-form-item label="版本更新类别" prop="versionIds" v-if="versionType == 2">
+          <el-checkbox-group 
+            v-model="formInline.versionIds"
+            @change="versionChange"
+            :disabled="edit">
+            <el-checkbox :label="1">用户端调整</el-checkbox>
+            <el-checkbox :label="2">商户端</el-checkbox>
+            <el-checkbox :label="3">代理端</el-checkbox>
+            <el-checkbox :label="4">平台端</el-checkbox>
+          </el-checkbox-group>
         </el-form-item>
-        <el-form-item label="版本标题" >
-          <el-input v-model="formInline.title" auto-complete="off"></el-input>
+        <el-form-item label="版本号">{{formInline.version_num}}</el-form-item>
+        <el-form-item label="更新标题" prop="title">
+          <el-input v-model="formInline.title" auto-complete="off" placeholder="有新版本更新啦！"></el-input>
         </el-form-item>
-        <el-form-item>
+        <el-form-item label="更新内容" prop="content">
+          <el-input type="textarea" v-model="formInline.content" :rows="4"></el-input>
+        </el-form-item>
+        <!-- <el-form-item>
           <div class="tinymce-container editor-container">
             <textarea class="tinymce-textarea" id="view"></textarea>
             <div class="editor-custom-btn-container">
               </div>
           </div>
+        </el-form-item> -->
+        <el-form-item label="是否上线版本" prop="is_online">
+          <el-radio v-model="formInline.is_online" label="1">是</el-radio>
+          <el-radio v-model="formInline.is_online" label="0">否</el-radio>
+        </el-form-item>
+        <el-form-item label="上线时间" prop="online_time">
+          <el-date-picker
+            v-model="formInline.online_time"
+            type="datetime"
+            placeholder="选择日期时间"
+            value-format="yyyy-MM-dd HH:mm:ss">
+          </el-date-picker>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        <el-button type="primary" @click="updateVersion">确 定</el-button>
       </div>
     </el-dialog>
   </div> 
@@ -57,35 +78,56 @@
 
 <script>
 import { getAgents } from '@/api/userManage'
-import { setAgentRate } from '@/api/finance'
+import { AddVersion, getVersion, checkVersion, editVersion } from '@/api/version'
 export default {
-  name: 'defaultDivide',
+  name: 'systemVersionUser',
   data() {
     return {
       loading: false,
-      tableLoading: false,
-      formInline: {
-        version: '',
-        title: '',
-        content: ''
+      params: {
+        page: 1,
+        pageSize: 2,
+        beginT: '',
+        endT: '',
+        type: 0
       },
-      tableData: [],
-      total: 0,
+      formInline: {
+        type: 0,
+        v_id: 0,
+        version_ids: '',
+        versionIds: [],
+        is_online: '',
+        version_num: '',
+        title: '',
+        content: '',
+        online_time: ''
+      },
       dialogFormVisible: false,
       value: '',
       toolbar: ['removeformat undo redo |  bullist numlist | outdent indent | forecolor | fullscreen code', 'bold italic blockquote | h2 p  media link | alignleft aligncenter alignright'],
       menubar: '',
       height: 260,
-      params: {
-        page: 1,
-        pageSize: 10
-      },
       hasChange: false,
       hasInit: false,
+      edit: false,
+      editVersion: '',
+      versionType: 1, // 1主版本添加 2次版本添加
+      formRules: {
+        version_ids: [
+          { required: true, trigger: 'blur', message: '请选择更新类别' }
+        ],
+        title: [{ required: true, trigger: 'blur', message: '请填写更新标题' }],
+        content: [{ required: true, trigger: 'blur', message: '请填写更新内容'}],
+        is_online: [{ required: true, trigger: 'blur', message: '请选择是否上线版本' }],
+        online_time: [{ required: true, trigger: 'blur', message: '请填写上线时间'}]
+      },
+      total: 0,
+      versions: [],
+      lastVersion: ''
     }
   },
   created() {
-    // this.getData()
+    this.getData()
   },
   mounted() {
   },
@@ -103,19 +145,101 @@ export default {
       }
     }
   },
+  computed: {
+    title () {
+      return this.edit === true ? '版本编辑' : '版本添加'
+    }
+  },
   methods: {
+    resetFormValue () {
+      this.formInline = {
+        type: 0,
+        v_id: 0,
+        version_ids: '',
+        versionIds: [],
+        is_online: '',
+        version_num: '',
+        title: '',
+        content: '',
+        online_time: ''
+      }
+      this.$refs.updateForm.resetFields()
+    },
+    updateVersion () {
+      this.$refs.updateForm.validate(valid => {
+        if (valid) {
+          this.formInline.version_ids = this.formInline.versionIds.join(',')
+          var _actions = AddVersion
+          if (this.edit) {
+            _actions = editVersion
+          }
+          _actions(this.formInline).then((res) => {
+            this.dialogFormVisible = false
+            this.getData()
+          })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    showDialog (state, vType, parentId) {
+      if (parentId) {
+        this.formInline.v_id = parentId
+      }
+      this.dialogFormVisible = true
+      this.edit = state
+      this.versionType = vType
+      if (vType === 1) {
+        var arr = this.lastVersion.split('.')
+        arr[0] = ~~(arr[0]) + 1
+        arr[1] = 0
+        arr[2] = 0
+        this.formInline.version_num = arr.join('.')
+      } else {
+        this.formInline.version_num = this.lastVersion
+      }
+    },
+    showEditDialog (state, vid, vType) {
+      this.formInline.v_id = vid
+      this.dialogFormVisible = true
+      this.edit = state
+      this.versionType = vType
+      checkVersion({v_id: vid}).then((res) => {
+        res.data.result.data.versionIds = res.data.result.data.version_ids.map(v => ~~(v))
+        res.data.result.data.online_time = this.$options.filters.formatDateTime(res.data.result.data.online_time)
+        this.formInline = Object.assign({}, this.formInline, res.data.result.data)
+        console.log(this.formInline)
+      })
+    },
+    versionChange (value) {
+      var arr = this.editVersion.split('.')
+      if (value.indexOf(1) != - 1) {
+        arr[1] = ~~(arr[1]) + 1
+      }
+      var nextVersions = value.filter((v) => [2,3,4].indexOf(v) > -1)
+      if (nextVersions.length > 0) {
+        arr[2] = ~~(arr[2]) + 1
+      }
+      this.formInline.version_num = arr.join('.')
+    },
     getData () {
       this.loading = true
-      getAgents(this.params).then((response) => {
-        let result = response.data.result
-        result.data.map((v) => {
-          v.edit = false
-        })
-        this.tableData = result.data
-        this.total = result.total
+      getVersion(this.params).then((res) => {
+        this.versions = res.data.result.data
+        if (this.versions[0]) {
+          if (this.versions[0].next_version.length > 0) {
+            this.lastVersion =  this.versions[0].next_version[0].version_num
+          } else {
+            this.lastVersion = this.versions[0].version_num
+          }
+          this.editVersion = this.lastVersion
+        } else {
+          this.lastVersion = '1.0.0'
+          this.editVersion = this.lastVersion
+        }
         this.loading = false
-      }).catch((error) => {
-        this.loading = false
+        this.total = ~~(res.data.result.total)
       })
     },
     handleSizeChange(val) {
@@ -249,6 +373,61 @@ export default {
 }
 .editor-upload-btn {
   display: inline-block;
+}
+.container /deep/ {
+  .version-top {
+    padding: 8px 0;
+  }
+  .el-collapse-item__header {
+    height: auto;
+    line-height: 1;
+  }
+  .el-collapse-item__content {
+    padding-bottom: 0;
+  }
+  .el-collapse-item__arrow {
+    font-size: 20px;
+  }
+}
+.version-top {
+  .el-icon-edit {
+    font-size: 20px;
+    float: right;
+    margin-top: 4px;
+    margin-right: 8px;
+  }
+}
+.version {
+  line-height: 24px;
+  margin: 5px 0;
+  font-size: 24px;
+  font-weight: normal;
+}
+.v_time {
+  margin-left: 20px;
+  color: #a2a1a1;
+}
+.desc {
+  line-height: 20px;
+  font-size: 16px;
+  margin: 0 0 8px;
+}
+.subversion-list {
+  padding: 10px 0 10px 40px;
+}
+.subverison-item {
+  padding: 0 10px 10px 10px;
+  background-color: #fbfbfb;
+  position: relative;
+  &::after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: #f1f1f1;
+    content: "";
+  }
 }
 </style>
 
