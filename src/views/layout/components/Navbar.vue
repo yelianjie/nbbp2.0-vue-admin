@@ -16,7 +16,7 @@
       <el-tooltip effect="dark" :content="$t('navbar.theme')" placement="bottom">
         <theme-picker class="theme-switch right-menu-item"></theme-picker>
       </el-tooltip>-->
-
+      <div class="version-tip" style="float:left;font-size: 14px;">当前版本：V{{version}}</div>
       <el-dropdown class="avatar-container right-menu-item" trigger="click">
         <div class="avatar-wrapper">
           <img class="user-avatar" :src="avatar+'?imageView2/1/w/80/h/80'">
@@ -45,8 +45,21 @@ import ErrorLog from '@/components/ErrorLog'
 import Screenfull from '@/components/Screenfull'
 import LangSelect from '@/components/LangSelect'
 import ThemePicker from '@/components/ThemePicker'
+import { getNewVersion } from '@/api/version'
 
 export default {
+  data () {
+    return {
+      version: '1.0.0'
+    }
+  },
+  created () {
+    getNewVersion({type: 0}).then((res) => {
+      if (!Array.isArray(res.data.result)) {
+        this.version = res.data.result.data[0].version_num
+      }
+    })
+  },
   components: {
     Breadcrumb,
     Hamburger,

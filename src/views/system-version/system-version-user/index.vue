@@ -235,7 +235,7 @@ export default {
           }
           this.editVersion = this.lastVersion
         } else {
-          this.lastVersion = '1.0.0'
+          this.lastVersion = '0.0.0'
           this.editVersion = this.lastVersion
         }
         this.loading = false

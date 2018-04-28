@@ -41,3 +41,14 @@ export function editVersion(data) {
     data
   })
 }
+
+/**
+ * 获取版本
+ */
+export function getNewVersion(data) {
+  return request({
+    url: '/weixin/version/getNewVersion',
+    method: 'post',
+    data
+  })
+}
