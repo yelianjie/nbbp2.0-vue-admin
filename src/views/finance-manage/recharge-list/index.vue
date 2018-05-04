@@ -22,12 +22,13 @@
         <el-button type="primary" @click="onSubmit">搜索</el-button>
       </el-form-item>
     </el-form>
+    <Summary>
+      总计人数<el-tag size="small">{{zongji.nj_user}}</el-tag>人，充值金额<el-tag size="small">{{zongji.nj_amount}}</el-tag>元，微信手续费<el-tag size="small">{{zongji.wx_fee}}</el-tag>元，实际到账金额<el-tag size="small">{{zongji.wx_real}}</el-tag>元
+    </Summary>
     <el-table
       v-loading="tableLoading"
       fit
       :data="tableData"
-      show-summary
-      :summary-method="getSummaries"
       style="width: 100%">
       <el-table-column
         prop="uid"
@@ -84,8 +85,12 @@
 
 <script>
 import { getRechargeList } from '@/api/finance'
+import Summary from '@/components/Summary/index'
 export default {
   name: 'rechargeList',
+  components: {
+    Summary
+  },
   data() {
     return {
       loading: true,
@@ -161,6 +166,12 @@ export default {
         }
         if (index === 2) {
           sums[index] = this.zongji.nj_amount
+        }
+        if (index === 6) {
+          sums[index] = this.zongji.wx_fee
+        }
+        if (index === 7) {
+          sums[index] = this.zongji.wx_real
         }
       })
 

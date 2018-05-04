@@ -13,8 +13,8 @@
            <el-input-number v-model="form.user_divide_into" controls-position="right" size="small" :min="0" :max="100" class="input-number-percent"></el-input-number>%
            <el-button type="primary" @click="setRate" style="margin-left:10px;">设置</el-button> -->
            <span class="percent-tip">{{v.describe}}</span>
-           <el-input-number v-if="rules[v.code].type == 'inputNumber'" v-model="v.value" controls-position="right" size="small" :min="rules[v.code].min" :max="rules[v.code].max" class="input-number-percent"></el-input-number>
-           <el-input class="el-input-text" v-model="v.value" v-if="rules[v.code].type == 'inputText'" :placeholder="'请输入' + v.describe"></el-input>
+           <el-input-number v-if="rules[v.code] && rules[v.code].type == 'inputNumber'" v-model="v.value" controls-position="right" size="small" :min="rules[v.code].min" :max="rules[v.code].max" class="input-number-percent"></el-input-number>
+           <el-input class="el-input-text" v-model="v.value" v-if="rules[v.code] && rules[v.code].type == 'inputText'" :placeholder="'请输入' + v.describe"></el-input>
            <el-button type="primary" @click="setRate(v.code, v.value)" style="margin-left:10px;">设置</el-button>
          </el-col>
        </el-row>
@@ -55,6 +55,21 @@ export default {
         platform_sxfei: {
           min: 0,
           max: 100,
+          type: 'inputNumber'
+        },
+        hongbao_exp: {
+          min: 0,
+          max: 999999,
+          type: 'inputNumber'
+        },
+        manager_monthly: {
+          min: 0,
+          max: 999999,
+          type: 'inputNumber'
+        },
+        manager_hotel: {
+          min: 0,
+          max: 999999,
           type: 'inputNumber'
         }
       }
