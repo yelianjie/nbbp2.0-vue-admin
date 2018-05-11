@@ -2,17 +2,16 @@
   <div class="container" v-loading="loading">
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
       <el-form-item label="酒吧名称">
-        <el-input v-model="formInline.barName" placeholder="请输入酒吧名称" clearable></el-input>
+        <el-input v-model="params.name" placeholder="请输入酒吧名称" clearable></el-input>
       </el-form-item>
-      <el-form-item label="状态">
+      <!-- <el-form-item label="状态">
         <el-select v-model="formInline.status" placeholder="状态选择">
           <el-option label="全部" value=""></el-option>
           <el-option label="审核通过" value="1"></el-option>
           <el-option label="审核未通过" value="0"></el-option>
           <el-option label="已解约" value="-1"></el-option>
-          <!-- <el-option label="已删除" value="-2"></el-option> -->
         </el-select>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item  label="地区">
         <el-cascader
           :options="CityInfo"
@@ -27,6 +26,10 @@
         <el-button type="primary" @click="onSubmit">搜索</el-button>
       </el-form-item>
     </el-form>
+    <el-row>
+      <link-search v-model="params.status" :links="{ title: '审核状态', links: [{label: '全部', value: ''}, {label: '审核通过', value:'1'}, {label: '审核未通过', value: '0'}, {label: '已解约', value: '-1'}]}" @onClick="getData"></link-search>
+      <!-- <link-search v-model="params.screenStatus" :links="{ title: '大屏幕开启状态', links: [{label: '全部', value: ''}, {label: '开启中', value:'1'}, {label: '未开启', value: '0'}]}" @onClick="getData"></link-search> -->
+    </el-row>
     <el-table
       v-loading="tableLoading"
       :data="tableData"
@@ -47,6 +50,21 @@
         label="地区">
         <template slot-scope="scope">
           {{scope.row.province_name}}{{scope.row.city_name}}
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="大屏幕开启状态">
+        <template slot-scope="scope">
+          <el-tag type="success" v-if="scope.row.is_open_client == 1">开启中</el-tag>
+          <el-tag type="info" v-if="scope.row.is_open_client == 0">未开启</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="大屏幕昨日开启时长"
+        :render-header="renderScreenTimeTitle">
+        <template slot-scope="scope">
+          <span v-if="scope.row.time != 0" style="color: #409EFF;cursor: pointer;" @click="showTimeTable(scope.row.id, scope.row.name)">{{scope.row.time}}</span>
+          <span v-else>{{scope.row.time}}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -101,17 +119,57 @@
         <el-button type="primary" @click="DeleteBar">确 定</el-button>
       </span>
     </el-dialog>
+
+    <el-dialog :title="curTitle" :visible.sync="timeVisible" @close="resetTimeParams">
+      <el-form :inline="true" :model="timeParams" class="demo-form-inline">
+        <el-form-item label="时间">
+          <el-date-picker
+            @change="dateChange"
+            v-model="timeParams.dateValue"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            value-format="yyyy-MM-dd">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="onSubmit">搜索</el-button>
+        </el-form-item>
+      </el-form>
+      <Summary>
+      总计时长：{{time_duration_total}}
+    </Summary>
+      <el-table :data="timeTableData">
+        <el-table-column property="date" label="日期" width="150"></el-table-column>
+        <el-table-column property="duration" label="时长" width="200"></el-table-column>
+        <el-table-column property="detail" label="详情"></el-table-column>
+      </el-table>
+      <div class="pagination-container">
+      <el-pagination
+        background
+        @size-change="handleTimeTableSizeChange"
+        @current-change="handleTimeTableCurrentChange"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="timeTotal">
+        </el-pagination>
+      </div>
+    </el-dialog>
+
  </div>
 </template>
 
 <script>
 import CityInfo from '@/vendor/city-data.js'
-import { getBars, deleteBar } from '@/api/barManage'
+import { getBars, deleteBar, getScreenDetailTime } from '@/api/barManage'
+import LinkSearch from '@/components/LinkSearch/index'
+import Summary from '@/components/Summary/index'
 export default {
   name: 'barManage',
   data() {
     return {
       loading: true,
+      timeVisible: false,
       tableLoading: false,
       CityInfo: CityInfo,
       status: {
@@ -128,8 +186,6 @@ export default {
         value: 9
       }],
       formInline: {
-        barName: '',
-        status: '',
         city: '',
         erae: '',
         minerae: '',
@@ -141,11 +197,23 @@ export default {
         pageSize: 10,
         name: '',
         status: '',
-        area: ''
+        area: '',
+        screenStatus: ''
       },
       tableData: [],
       total: 0,
-      deleteData: {}
+      deleteData: {},
+      timeParams: {
+        page: 1,
+        pageSize: 10,
+        beginT: '',
+        endT: '',
+        dateValue: ''
+      },
+      timeTableData: [],
+      timeTotal: 0,
+      curTitle: '',
+      time_duration_total: 0
     }
   },
   created() {
@@ -163,6 +231,19 @@ export default {
         this.loading = false
       }).catch((error) => {
         this.loading = false
+      })
+    },
+    showTimeTable (ht_id, ht_name) {
+      this.timeVisible = true
+      this.timeParams.ht_id = ht_id
+      this.curTitle = ht_name + '--大屏幕开启时间'
+      this.getTimeData()
+    },
+    getTimeData () {
+      getScreenDetailTime(this.timeParams).then((response) => {
+        this.timeTableData = response.data.result.data
+        this.timeTotal = response.data.result.total
+        this.time_duration_total = response.data.result.total_time
       })
     },
     onSubmit() {
@@ -189,8 +270,6 @@ export default {
 					}
 				}
       } */
-      this.params.name = this.formInline.barName
-      this.params.status = this.formInline.status
       this.params.area = this.formInline.minerae
       console.log(this.params)
       this.getData()
@@ -227,10 +306,18 @@ export default {
       this.params.pageSize = val
       this.getData()
     },
+    handleTimeTableSizeChange () {
+      this.timeParams.pageSize = val
+      this.getTimeData()
+    },
     handleCurrentChange(val) {
       this.params.page = val
       this.getData()
       console.log(`当前页: ${val}`)
+    },
+    handleTimeTableCurrentChange (val) {
+      this.timeParams.page = val
+      this.getTimeData()
     },
     resetParams() {
       this.params = {
@@ -240,7 +327,46 @@ export default {
         status: '',
         area: ''
       }
-    }
+    },
+    resetTimeParams () {
+      this.timeParams = {
+        page: 1,
+        pageSize: 10,
+        beginT: '',
+        endT: '',
+        dateValue: ''
+      }
+    },
+    renderScreenTimeTitle(h,{column}){
+      return(
+          <div class="cell">{column.label}<el-tooltip
+        class="item"
+        effect="dark"
+        content="昨日中午12点到今日中午12点"
+        placement="top"
+        ><i class="el-icon-question"></i></el-tooltip></div> 
+      )
+    },
+    dateChange(value) {
+      if (value == null) {
+        this.timeParams.beginT = ''
+        this.timeParams.endT = ''
+      } else {
+        
+      }
+    },
+    onSubmit() {
+      if (Array.isArray(this.timeParams.dateValue) && this.timeParams.dateValue.length > 0) {
+        this.timeParams.beginT = this.timeParams.dateValue[0]
+        this.timeParams.endT = this.timeParams.dateValue[1]
+      }
+      this.getTimeData()
+      console.log('submit!')
+    },
+  },
+  components: {
+    LinkSearch,
+    Summary
   }
 }
 </script>

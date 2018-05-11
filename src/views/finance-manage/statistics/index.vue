@@ -29,8 +29,10 @@
         label="酒吧名称">
       </el-table-column>
       <el-table-column
-        prop="total"
         label="总收益">
+        <template slot-scope="scope">
+          {{scope.row | calTotalIncome}}
+        </template>
       </el-table-column>
       <el-table-column
         prop="t1"
@@ -77,7 +79,7 @@
 
 <script>
 import { getHtFinanceList } from '@/api/finance'
-import { Subtr } from '@/utils/index'
+import math from 'mathjs'
 export default {
   name: 'statistics',
   data() {
@@ -169,8 +171,11 @@ export default {
   },
   filters: {
     calNotSysMoney (value) {
-      var sum = value.total == null ? 0 : value.total
-      return Subtr(sum, value.t5)
+      return math.chain(0).add(value.t1).add(value.t2).add(value.t3).add(value.t4).done()
+    },
+    calTotalIncome (value) {
+      var result = math.chain(0).add(value.t1).add(value.t2).add(value.t3).add(value.t4).add(value.platform_sxf_income).add(value.t5).done()
+      return math.format(result, {precision: 14})
     }
   }
 }

@@ -46,27 +46,29 @@
       </el-table-column>
       <el-table-column
         width="160px"
-        prop=""
+        prop="balance"
         label="牛角余额">
       </el-table-column>
       <el-table-column
         width="160px"
-        prop=""
+        prop="profit_balance"
         label="收益余额">
       </el-table-column>
       <el-table-column
         width="160px"
-        prop=""
         label="贵族等级">
+        <template slot-scope="scope">
+          <el-tag>{{scope.row.grade_title}}</el-tag>
+        </template>
       </el-table-column>
       <el-table-column
         width="160px"
-        prop=""
+        prop="total_consume_balance"
         label="总消费">
       </el-table-column>
       <el-table-column
         width="160px"
-        prop=""
+        prop="total_profit_balance"
         label="总收益">
       </el-table-column>
       <el-table-column
@@ -125,10 +127,12 @@ export default {
         number: 0
       }], [{
         label: '牛角余额',
-        number: 0
+        number: 0,
+        decimals: 2
       }, {
         label: '收益余额',
-        number: 0
+        number: 0,
+        decimals: 2
       }]],
       params: {
         page: 1,
@@ -147,9 +151,16 @@ export default {
     this.getData()
     getMemberNum().then((response) => {
       let result = response.data.result
-      this.panelData[0].number = result.tNum
-      this.panelData[1].number = result.yIncNum
-      this.panelData[2].number = result.acNum
+      console.log(result)
+      this.panelData[0][0].number = ~~(result.tNum)
+      this.panelData[0][1].number = result.sNum
+      this.panelData[0][2].number = result.tMember
+      this.panelData[1][0].number = result.yIncNum
+      this.panelData[1][2].number = result.yIncMNum
+      this.panelData[1][3].number = result.acNum
+      this.panelData[2][0].number = result.balance
+      this.panelData[2][1].number = result.profit_balance
+      console.log(this.panelData)
     }).catch((error) => {
     })
   },

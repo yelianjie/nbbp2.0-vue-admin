@@ -59,3 +59,16 @@ export function updateRateInfo(data) {
     data
   })
 }
+
+/**
+ * 获取打开和关闭大屏详细时间
+ * @param {*} data
+ */
+export function getScreenDetailTime(data) {
+  return request({
+    url: '/admin/hotel/getScreenDetailTime',
+    method: 'post',
+    data
+  })
+}
+

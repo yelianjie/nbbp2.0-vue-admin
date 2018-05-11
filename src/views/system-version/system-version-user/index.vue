@@ -1,6 +1,14 @@
 <template>
  <div class="container" v-loading="loading">
   <el-button type="primary" icon="el-icon-edit" @click.native="showDialog(false, 1)">新增主版本</el-button>
+  <el-tooltip placement="right">
+    <div slot="content" class="tooltip-custom">
+      <p v-if="versions && versions.length > 0">V{{versions[0].version_num}}</p>
+      <p>第一位：主版本号，标识客户端大版本更新，新增的次版本都基于此</p>
+      <p>第二位、第三位：次版本号，第二位标识客户端更新，第三位表示大屏幕端更新</p>
+    </div>
+    <i class="el-icon-question"></i>
+  </el-tooltip>
   <el-collapse accordion style="margin-top:20px;">
   <el-collapse-item v-for="(v, i) in versions" :key="i">
     <template slot="title">
@@ -427,6 +435,13 @@ export default {
     height: 1px;
     background-color: #f1f1f1;
     content: "";
+  }
+}
+.tooltip-custom {
+  max-width: 300px;
+  p {
+    margin: 0;
+    line-height: 1.4;
   }
 }
 </style>

@@ -35,7 +35,7 @@ export default {
       sysItems: [],
       rules: {
         platform_divide_into: {
-          min: 20,
+          min: 0,
           max: 100,
           type: 'inputNumber'
         },

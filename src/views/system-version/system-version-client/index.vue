@@ -1,6 +1,16 @@
 <template>
  <div class="container" v-loading="loading">
   <el-button type="primary" icon="el-icon-edit" @click.native="showDialog(false, 1)">新增主版本</el-button>
+  <el-tooltip placement="right">
+    <div slot="content" class="tooltip-custom">
+      <p v-if="versions && versions.length > 0">V{{versions[0].version_num}}</p>
+      <p>第一位：主版本号，标识客户端大版本更新，新增的次版本都基于此</p>
+      <p>第二位：次版本号，表示用户端调整更新</p>
+      <p>第三位：次版本号，表示代理、商户端、平台端的更新</p>
+      <p>每一次更新都基于上一次新建的版本号</p>
+    </div>
+    <i class="el-icon-question"></i>
+  </el-tooltip>
   <el-collapse accordion style="margin-top:20px;">
   <el-collapse-item v-for="(v, i) in versions" :key="i">
     <template slot="title">
@@ -46,6 +56,17 @@
         <el-form-item label="更新内容" prop="content">
           <el-input type="textarea" v-model="formInline.content" :rows="4"></el-input>
         </el-form-item>
+        <!-- <el-form-item label="升级文件">
+          <el-upload
+            class="upload-demo"
+            action="https://jsonplaceholder.typicode.com/posts/"
+            :before-remove="beforeRemove"
+            :limit="1"
+            :file-list="fileList">
+            <el-button size="small" type="primary">点击上传</el-button>
+            <div slot="tip" class="el-upload__tip">只能上传ZIP文件</div>
+          </el-upload>
+        </el-form-item> -->
         <!-- <el-form-item>
           <div class="tinymce-container editor-container">
             <textarea class="tinymce-textarea" id="view"></textarea>
@@ -82,6 +103,7 @@ export default {
   data() {
     return {
       loading: false,
+      fileList: [{name: 'food.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'}, {name: 'food2.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'}],
       params: {
         page: 1,
         pageSize: 10,
@@ -326,6 +348,12 @@ export default {
     },
     getContent() {
       window.tinymce.get(this.tinymceId).getContent()
+    },
+    handleRemove(file, fileList) {
+      console.log(file, fileList)
+    },
+    beforeRemove(file, fileList) {
+      return this.$confirm(`确定移除 ${ file.name }？`)
     }
   },
   destroyed() {
@@ -424,6 +452,13 @@ export default {
     height: 1px;
     background-color: #f1f1f1;
     content: "";
+  }
+}
+.tooltip-custom {
+  max-width: 300px;
+  p {
+    margin: 0;
+    line-height: 1.4;
   }
 }
 </style>
