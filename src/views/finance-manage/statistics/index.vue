@@ -1,5 +1,5 @@
 <template>
-  <div class="container" v-loading="loading">
+  <div class="container">
     <el-form :inline="true" :model="params" class="demo-form-inline">
       <el-form-item label="酒吧名称">
         <el-input v-model="params.name" placeholder="请输入酒吧名称" clearable></el-input>
@@ -20,7 +20,7 @@
       </el-form-item>
     </el-form>
     <el-table
-      v-loading="tableLoading"
+      v-loading="loading"
       :data="tableData"
       style="width: 100%">
       <el-table-column
@@ -171,11 +171,12 @@ export default {
   },
   filters: {
     calNotSysMoney (value) {
-      return math.chain(0).add(value.t1).add(value.t2).add(value.t3).add(value.t4).done()
+      var result = math.chain(0).add(value.t1).add(value.t2).add(value.t3).add(value.t4).done()
+      return math.format(result, {notation: 'fixed', precision: 2})
     },
     calTotalIncome (value) {
       var result = math.chain(0).add(value.t1).add(value.t2).add(value.t3).add(value.t4).add(value.platform_sxf_income).add(value.t5).done()
-      return math.format(result, {precision: 14})
+      return math.format(result, {notation: 'fixed', precision: 2})
     }
   }
 }

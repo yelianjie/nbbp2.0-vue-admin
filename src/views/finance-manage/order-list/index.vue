@@ -1,5 +1,5 @@
 <template>
-  <div class="container" v-loading="loading">
+  <div class="container">
     <el-form :inline="true" :model="params" class="demo-form-inline">
       <el-form-item label="ID">
         <el-input v-model="params.id" placeholder="请输入ID" clearable></el-input>
@@ -7,7 +7,10 @@
       <el-form-item label="酒吧名称">
         <el-input v-model="params.name" clearable></el-input>
       </el-form-item>
-      <el-form-item label="类型">
+      <el-form-item label="昵称">
+        <el-input v-model="params.nickname" clearable></el-input>
+      </el-form-item>
+      <!-- <el-form-item label="类型">
         <el-select v-model="params.type" placeholder="请选择" clearable @clear="clearType">
           <el-option
             v-for="item in types"
@@ -16,7 +19,7 @@
             :value="item.value">
           </el-option>
         </el-select>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="时间">
         <el-date-picker
           @change="dateChange"
@@ -32,8 +35,13 @@
         <el-button type="primary" @click="onSubmit">搜索</el-button>
       </el-form-item>
     </el-form>
+    <link-search :label-width="80" v-model="params.type" :links="{ title: '类型', links: [{label: '全部', value: ''}, {label: '主题霸屏', value:'2'}, {label: '礼物打赏', value: '1'}]}" @onClick="getData"></link-search>
+    <link-search :label-width="80" v-model="params.fee" :links="{ title: '订单属性', links: [{label: '全部', value: '0'}, {label: '付费', value:'1'}, {label: '免费', value: '2'}]}" @onClick="getData"></link-search>
+    <SummaryLine>
+      总计金额<el-tag size="small">{{summaryMoney.totle_money}}</el-tag>元，霸屏<el-tag size="small">{{summaryMoney.bp_money}}</el-tag>元，打赏<el-tag size="small">{{summaryMoney.ds_money}}</el-tag>元，红包<el-tag size="small">{{summaryMoney.hb_money}}</el-tag>元
+    </SummaryLine>
     <el-table
-      v-loading="tableLoading"
+      v-loading="loading"
       :data="tableData"
       style="width: 100%">
       <el-table-column
@@ -114,6 +122,8 @@
 
 <script>
 import { getOrderList } from '@/api/finance'
+import LinkSearch from '@/components/LinkSearch/index'
+import SummaryLine from '@/components/Summary/index'
 export default {
   name: 'orderList',
   data() {
@@ -142,10 +152,13 @@ export default {
         beginT: '',
         endT: '',
         id: '',
-        dateValue: ''
+        dateValue: '',
+        fee: '0',
+        nickname: ''
       },
       tableData: [],
-      total: 0
+      total: 0,
+      summaryMoney: {}
     }
   },
   created() {
@@ -158,6 +171,7 @@ export default {
         let result = response.data.result
         this.tableData = result.data
         this.total = result.total
+        this.summaryMoney = result.money
         this.loading = false
       }).catch((error) => {
         this.loading = false
@@ -211,6 +225,10 @@ export default {
         return '0.00'
       }
     }
+  },
+  components: {
+    LinkSearch,
+    SummaryLine
   }
 }
 </script>

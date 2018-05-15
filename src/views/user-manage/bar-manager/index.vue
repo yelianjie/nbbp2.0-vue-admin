@@ -1,5 +1,5 @@
 <template>
-  <div class="container" v-loading="loading">
+  <div class="container">
     <!-- <el-row>
       <el-col :span="24">
         <el-button type="primary" @click.native="showEmptyDiaLog">添加酒吧管理</el-button>
@@ -18,7 +18,7 @@
     </el-form>
     <div style="height:24px;"></div>
     <el-table
-      v-loading="tableLoading"
+      v-loading="loading"
       :data="tableData"
       style="width: 100%">
       <el-table-column

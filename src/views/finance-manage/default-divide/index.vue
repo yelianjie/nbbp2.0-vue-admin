@@ -1,5 +1,5 @@
 <template>
- <div class="container" v-loading="loading">
+ <div class="container">
    <el-form :inline="true" :model="params" class="divide-form-inline">
       <el-form-item label="用户名">
         <el-input v-model="params.name" placeholder="用户名" clearable></el-input>
@@ -14,7 +14,7 @@
     </el-form>
 
     <el-table
-      v-loading="tableLoading"
+      v-loading="loading"
       :data="tableData" 
       fit
       highlight-current-row

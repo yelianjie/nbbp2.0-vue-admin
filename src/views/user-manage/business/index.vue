@@ -1,5 +1,5 @@
 <template>
-  <div class="container" v-loading="loading">
+  <div class="container">
     <el-form :inline="true" :model="params" class="demo-form-inline">
       <el-form-item label="昵称">
         <el-input v-model="params.name" placeholder="请输入昵称" clearable></el-input>
@@ -12,7 +12,7 @@
       </el-form-item>
     </el-form>
     <el-table
-      v-loading="tableLoading"
+      v-loading="loading"
       fit
       :data="tableData"
       style="width: 100%">

@@ -1,11 +1,14 @@
 <template>
-  <div class="container" v-loading="loading">
+  <div class="container">
     <el-form :inline="true" :model="params" class="demo-form-inline">
       <el-form-item label="ID">
         <el-input v-model="params.id" placeholder="请输入ID" clearable></el-input>
       </el-form-item>
       <el-form-item label="昵称">
         <el-input v-model="params.nickname" clearable></el-input>
+      </el-form-item>
+      <el-form-item label="酒吧名称">
+        <el-input v-model="params.hotel_name" clearable></el-input>
       </el-form-item>
       <el-form-item label="时间">
         <el-date-picker
@@ -25,7 +28,7 @@
     <link-search v-model="params.type" :links="{ title: '红包类型', links: [{label: '全部', value: ''}, {label: '牛角红包', value: 1}, {label: '现金红包', value: 2}]}" @onClick="onClick"></link-search>
     <link-search v-model="params.is_refund" :links="{ title: '退回金额', links: [{label: '全部', value: 0}, {label: '有', value: 1}, {label: '无', value: 2}]}" @onClick="onClick"></link-search>
     <el-table
-      v-loading="tableLoading"
+      v-loading="loading"
       :data="tableData"
       style="width: 100%">
       <el-table-column
@@ -87,6 +90,10 @@
             自定义
           </template>
         </template>
+      </el-table-column>
+      <el-table-column
+        prop="name"
+        label="所属酒吧">
       </el-table-column>
       <el-table-column
         label="操作">
@@ -153,6 +160,7 @@ export default {
         endT: '',
         id: '',
         dateValue: '',
+        hotel_name: '',
         is_refund: 0
       },
       tableData: [],

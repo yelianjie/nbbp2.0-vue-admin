@@ -1,5 +1,5 @@
 <template>
-  <div class="container" v-loading="loading">
+  <div class="container">
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
       <el-form-item label="酒吧名称">
         <el-input v-model="params.name" placeholder="请输入酒吧名称" clearable></el-input>
@@ -31,7 +31,7 @@
       <!-- <link-search v-model="params.screenStatus" :links="{ title: '大屏幕开启状态', links: [{label: '全部', value: ''}, {label: '开启中', value:'1'}, {label: '未开启', value: '0'}]}" @onClick="getData"></link-search> -->
     </el-row>
     <el-table
-      v-loading="tableLoading"
+      v-loading="loading"
       :data="tableData"
       style="width: 100%">
       <el-table-column
@@ -137,9 +137,9 @@
           <el-button type="primary" @click="onSubmit">搜索</el-button>
         </el-form-item>
       </el-form>
-      <Summary>
+      <SummaryLine>
       总计时长：{{time_duration_total}}
-    </Summary>
+    </SummaryLine>
       <el-table :data="timeTableData">
         <el-table-column property="date" label="日期" width="150"></el-table-column>
         <el-table-column property="duration" label="时长" width="200"></el-table-column>
@@ -163,7 +163,7 @@
 import CityInfo from '@/vendor/city-data.js'
 import { getBars, deleteBar, getScreenDetailTime } from '@/api/barManage'
 import LinkSearch from '@/components/LinkSearch/index'
-import Summary from '@/components/Summary/index'
+import SummaryLine from '@/components/Summary/index'
 export default {
   name: 'barManage',
   data() {
@@ -366,7 +366,7 @@ export default {
   },
   components: {
     LinkSearch,
-    Summary
+    SummaryLine
   }
 }
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <div class="container" v-loading="loading">
+  <div class="container">
     <el-form :inline="true" :model="params" class="demo-form-inline">
       <el-form-item label="昵称">
         <el-input v-model="params.name" placeholder="请输入昵称" clearable></el-input>
@@ -22,11 +22,11 @@
         <el-button type="primary" @click="onSubmit">搜索</el-button>
       </el-form-item>
     </el-form>
-    <Summary>
+    <SummaryLine>
       总计人数<el-tag size="small">{{zongji.nj_user}}</el-tag>人，充值金额<el-tag size="small">{{zongji.nj_amount}}</el-tag>元，微信手续费<el-tag size="small">{{zongji.wx_fee}}</el-tag>元，实际到账金额<el-tag size="small">{{zongji.wx_real}}</el-tag>元
-    </Summary>
+    </SummaryLine>
     <el-table
-      v-loading="tableLoading"
+      v-loading="loading"
       fit
       :data="tableData"
       style="width: 100%">
@@ -85,11 +85,11 @@
 
 <script>
 import { getRechargeList } from '@/api/finance'
-import Summary from '@/components/Summary/index'
+import SummaryLine from '@/components/Summary/index'
 export default {
   name: 'rechargeList',
   components: {
-    Summary
+    SummaryLine
   },
   data() {
     return {
