@@ -35,7 +35,7 @@
         <el-button type="primary" @click="onSubmit">搜索</el-button>
       </el-form-item>
     </el-form>
-    <link-search :label-width="80" v-model="params.type" :links="{ title: '类型', links: [{label: '全部', value: ''}, {label: '主题霸屏', value:'2'}, {label: '礼物打赏', value: '1'}]}" @onClick="getData"></link-search>
+    <link-search :label-width="80" v-model="params.type" :links="{ title: '类型', links: [{label: '全部', value: ''}, {label: '主题霸屏', value:'2'}, {label: '礼物打赏', value: '1'}, {label: '红包', value: '3'}]}" @onClick="getData"></link-search>
     <link-search :label-width="80" v-model="params.fee" :links="{ title: '订单属性', links: [{label: '全部', value: '0'}, {label: '付费', value:'1'}, {label: '免费', value: '2'}]}" @onClick="getData"></link-search>
     <SummaryLine>
       总计金额<el-tag size="small">{{summaryMoney.totle_money}}</el-tag>元，霸屏<el-tag size="small">{{summaryMoney.bp_money}}</el-tag>元，打赏<el-tag size="small">{{summaryMoney.ds_money}}</el-tag>元，红包<el-tag size="small">{{summaryMoney.hb_money}}</el-tag>元
@@ -45,10 +45,13 @@
       :data="tableData"
       style="width: 100%">
       <el-table-column
-        fixed
-        width="160px"
-        prop="order_no"
-        label="订单编号">
+      fixed
+        prop="name"
+        label="酒吧名称">
+      </el-table-column>
+      <el-table-column
+        prop="buy_uid"
+        label="消费者ID">
       </el-table-column>
       <el-table-column
         width="220px"
@@ -56,32 +59,23 @@
         label="消费者昵称">
       </el-table-column>
       <el-table-column
-        prop="buy_uid"
-        label="消费者ID">
-      </el-table-column>
-      <el-table-column
-        label="支付类型">
+        prop="order_type"
+        label="消费类型">
         <template slot-scope="scope">
-          <el-tag type="danger" v-if="scope.row.pay_type == 1">牛角消费</el-tag>
-          <el-tag type="success" v-if="scope.row.pay_type == 2">直接支付</el-tag>
+          <el-tag type="danger" v-if="scope.row.odr_type == 1">{{scope.row.title}}</el-tag>
+          <el-tag v-if="scope.row.odr_type == 2">{{scope.row.title}}</el-tag>
+          <el-tag type="warning" v-if="scope.row.odr_type == 3">红包</el-tag>
         </template>
-      </el-table-column>
-      <el-table-column
-        prop="create_time"
-        label="订单时间"
-        width="200px">
       </el-table-column>
       <el-table-column
         prop="show_time"
         label="霸屏时长">
       </el-table-column>
       <el-table-column
-        prop="order_type"
-        label="类型">
+        label="支付类型">
         <template slot-scope="scope">
-          <el-tag type="danger" v-if="scope.row.odr_type == 1">{{scope.row.title}}</el-tag>
-          <el-tag v-if="scope.row.odr_type == 2">{{scope.row.title}}</el-tag>
-          <el-tag type="warning" v-if="scope.row.odr_type == 3">红包</el-tag>
+          <el-tag type="danger" v-if="scope.row.pay_type == 1">牛角消费</el-tag>
+          <el-tag type="success" v-if="scope.row.pay_type == 2">直接支付</el-tag>
         </template>
       </el-table-column>
       <el-table-column
@@ -104,8 +98,14 @@
         </template>
       </el-table-column>
       <el-table-column
-        prop="name"
-        label="酒吧名称">
+        prop="create_time"
+        label="订单时间"
+        width="200px">
+      </el-table-column>
+      <el-table-column
+        width="160px"
+        prop="order_no"
+        label="订单号">
       </el-table-column>
     </el-table>
     <div class="pagination-container">
@@ -153,7 +153,7 @@ export default {
         endT: '',
         id: '',
         dateValue: '',
-        fee: '0',
+        fee: '1',
         nickname: ''
       },
       tableData: [],

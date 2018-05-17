@@ -4,7 +4,7 @@
 		<div class="main-container">
 			<div class="top_layout_fixed">
 				<navbar></navbar>
-				<tags-view></tags-view>
+				<!-- <tags-view></tags-view> -->
 			</div>
 			
 			<app-main></app-main>

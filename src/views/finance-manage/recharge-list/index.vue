@@ -53,11 +53,6 @@
         </template>
       </el-table-column>
       <el-table-column
-        width="360px"
-        prop="recharge_order_no"
-        label="订单编号">
-      </el-table-column>
-      <el-table-column
         prop="create_time"
         label="充值时间"
         width="200px">
@@ -69,6 +64,11 @@
       <el-table-column
         prop="wx_real"
         label="实际到账金额">
+      </el-table-column>
+      <el-table-column
+        width="360px"
+        prop="recharge_order_no"
+        label="订单号">
       </el-table-column>
     </el-table>
     <div class="pagination-container">
