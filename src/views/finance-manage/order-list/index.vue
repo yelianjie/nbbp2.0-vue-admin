@@ -35,7 +35,7 @@
         <el-button type="primary" @click="onSubmit">搜索</el-button>
       </el-form-item>
     </el-form>
-    <link-search :label-width="80" v-model="params.type" :links="{ title: '类型', links: [{label: '全部', value: ''}, {label: '主题霸屏', value:'2'}, {label: '礼物打赏', value: '1'}, {label: '红包', value: '3'}]}" @onClick="getData"></link-search>
+    <link-search :label-width="80" v-model="params.type" :links="{ title: '类型', links: [{label: '全部', value: ''}, {label: '主题霸屏', value:'2'}, {label: '礼物打赏', value: '1'}, {label: '红包', value: '3'}, {label: '点歌', value: '4'}]}" @onClick="getData"></link-search>
     <link-search :label-width="80" v-model="params.fee" :links="{ title: '订单属性', links: [{label: '全部', value: '0'}, {label: '付费', value:'1'}, {label: '免费', value: '2'}]}" @onClick="getData"></link-search>
     <SummaryLine>
       总计金额<el-tag size="small">{{summaryMoney.totle_money}}</el-tag>元，霸屏<el-tag size="small">{{summaryMoney.bp_money}}</el-tag>元，打赏<el-tag size="small">{{summaryMoney.ds_money}}</el-tag>元，红包<el-tag size="small">{{summaryMoney.hb_money}}</el-tag>元
@@ -65,6 +65,7 @@
           <el-tag type="danger" v-if="scope.row.odr_type == 1">{{scope.row.title}}</el-tag>
           <el-tag v-if="scope.row.odr_type == 2">{{scope.row.title}}</el-tag>
           <el-tag type="warning" v-if="scope.row.odr_type == 3">红包</el-tag>
+          <el-tag type="success" v-if="scope.row.odr_type == 4">点歌</el-tag>
         </template>
       </el-table-column>
       <el-table-column

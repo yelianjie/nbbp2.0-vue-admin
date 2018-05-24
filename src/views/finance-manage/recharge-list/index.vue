@@ -47,10 +47,24 @@
         prop=""
         label="充值类型">
         <template slot-scope="scope">
-          <template v-if="scope.row.pay_type == '3'">红包</template>
-          <template v-if="scope.row.pay_type == '1'">牛角充值</template>
+          <template v-if="scope.row.pay_type == '3'">充值购买</template>
+          <template v-if="scope.row.pay_type == '1'">牛角支付</template>
           <template v-if="scope.row.pay_type == '2'">直接支付</template>
         </template>
+      </el-table-column>
+      <el-table-column
+        label="充值来源">
+        <template slot-scope="scope">
+          <template v-if="scope.row.source_type == '1'">霸屏</template>
+          <template v-if="scope.row.source_type == '2'">礼物</template>
+          <template v-if="scope.row.source_type == '3'">红包</template>
+          <template v-if="scope.row.source_type == '4'">点歌</template>
+          <template v-if="scope.row.source_type == '5'">其他</template>
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="hotel_name"
+        label="酒吧来源">
       </el-table-column>
       <el-table-column
         prop="create_time"

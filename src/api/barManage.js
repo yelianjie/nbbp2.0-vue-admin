@@ -72,3 +72,15 @@ export function getScreenDetailTime(data) {
   })
 }
 
+/**
+ * 设置商户的点歌分成比例
+ * @param {*} data
+ */
+export function sysMerchantDgSet(data) {
+  return request({
+    url: '/admin/sys/sysMerchantDgSet',
+    method: 'post',
+    data
+  })
+}
+

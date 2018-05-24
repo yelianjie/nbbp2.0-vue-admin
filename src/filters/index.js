@@ -120,7 +120,7 @@ export function uploadPrefixUrl(url) {
 }
 
 export function formatDateTime(inputTime) {
-  inputTime = inputTime.length == 10 ? inputTime * 1000 : inputTime
+  inputTime = inputTime.toString().length == 10 ? inputTime * 1000 : inputTime
   var date = new Date(inputTime)
   var y = date.getFullYear()
   var m = date.getMonth() + 1

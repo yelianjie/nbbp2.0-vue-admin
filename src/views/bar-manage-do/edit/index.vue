@@ -114,6 +114,25 @@
           <el-button type="primary" @click.native="updateRateAction">确定</el-button>
         </el-row>
     </el-card>
+    
+
+    <el-card class="box-card">
+      <div slot="header" class="clearfix">
+        <span>点歌分成设置</span>
+      </div>
+      <el-form ref="rateForm" :model="form" label-width="80px">
+        <el-row class="rate-row">
+          <el-col>
+            <span class="percent-tip">商户分成</span>
+            <el-input-number v-model="dgRate" controls-position="right" size="small" :min="1" :max="100" class="input-number-percent"></el-input-number>%
+            <span style="font-size:13px;margin-left:15px;">商户分成比例+平台分成比例+平台管理比例=100%</span>
+          </el-col>
+        </el-row>
+      </el-form>
+      <el-row style="text-align: right;">
+          <el-button type="primary" @click.native="updateDgRateAction">确定</el-button>
+        </el-row>
+    </el-card>
 
     <el-card class="box-card">
       <div slot="header" class="clearfix">
@@ -141,7 +160,7 @@ import BaiduMap from '../components/map'
 import clipboard from '@/directive/clipboard/index.js'
 import QRious from 'qrious'
 import BigPicture from '../../../vendor/BigPicture'
-import { getBarInfo, updateBarInfo, updateRateInfo } from '@/api/barManage'
+import { getBarInfo, updateBarInfo, updateRateInfo, sysMerchantDgSet } from '@/api/barManage'
 import { uploadImg } from '@/api/resource' 
 // import { BASE_API } from '../../../../config/prod.env.js'
 import Logo from '@/assets/logo.png'
@@ -177,7 +196,8 @@ export default {
       disableAgent: true,
       oldSelectAgent: '',
       zhuotieUrl: '',
-      zhuotieUrl2: ''
+      zhuotieUrl2: '',
+      dgRate: 0
     }
   },
   created () {
@@ -258,6 +278,7 @@ export default {
         this.form.status = this.form.status.toString()
         console.log(this.form.status)
         this.rate = response.data.result.rate
+        this.dgRate = Number(response.data.result.rate.merchant_rate)
         this.managers = response.data.result.superviseList
         this.agents = response.data.result.agentList
         this.selectAgent =  response.data.result.agent ? response.data.result.agent.mc_id : ''
@@ -287,6 +308,11 @@ export default {
           this.$message.success('修改成功')
         })
       }  
+    },
+    updateDgRateAction () {
+      sysMerchantDgSet({ht_id: this.$route.params.id, value: this.dgRate}).then((response) => {
+        this.$message.success('修改成功')
+      })
     },
     calPercent () {
       if (this.form.ht_separate + this.form.manage_separate + this.form.yewu_separate + this.form.company_separate > 100) {
