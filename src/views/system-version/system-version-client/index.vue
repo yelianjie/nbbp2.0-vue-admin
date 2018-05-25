@@ -1,5 +1,19 @@
 <template>
  <div class="container" v-loading="loading">
+  <el-row style="margin-bottom: 10px;">
+    <div style="float:left;">牛霸最新安装包：<a :href="exeForm.url" download="niuba.zip" v-if="exeForm.url"><el-button type="primary" plain>下载</el-button></a><el-button type="primary" plain v-else :disabled="true">下载</el-button></div>
+    <el-upload
+      class="upload-demo"
+      accept="application/zip"
+      :headers="headers"
+      :action="'/admin/file_upload/uploadClientExe'| uploadPrefixUrl"
+      :show-file-list="false"
+      :limit="1"
+      :on-success="handleZipExeSuccess">
+      <el-button size="small" type="primary">点击上传</el-button>
+    </el-upload>
+  <div style="float:left;margin-top: 9px;margin-left: 8px;color: #939393;" v-if="exeForm.create_time">上传时间：{{exeForm.create_time}}</div>
+  </el-row>
   <el-button type="primary" icon="el-icon-edit" @click.native="showDialog(false, 1)">新增主版本</el-button>
   <el-tooltip placement="right">
     <div slot="content" class="tooltip-custom">
@@ -56,17 +70,17 @@
         <el-form-item label="更新内容" prop="content">
           <el-input type="textarea" v-model="formInline.content" :rows="4"></el-input>
         </el-form-item>
-        <!-- <el-form-item label="升级文件">
+        <el-form-item label="升级文件" prop="file" v-if="formInline.versionIds == 1 || !formInline.v_id">
           <el-upload
-            class="upload-demo"
-            action="https://jsonplaceholder.typicode.com/posts/"
-            :before-remove="beforeRemove"
-            :limit="1"
-            :file-list="fileList">
-            <el-button size="small" type="primary">点击上传</el-button>
-            <div slot="tip" class="el-upload__tip">只能上传ZIP文件</div>
-          </el-upload>
-        </el-form-item> -->
+          accept="application/zip"
+          :headers="headers"
+          :action="'/admin/file_upload/uploadUpdate'| uploadPrefixUrl"
+          :file-list="fileList"
+          :on-success="handleZipSuccess">
+          <el-button size="small" type="primary">点击上传</el-button>
+          <div slot="tip" class="el-upload__tip">只能上传ZIP文件</div>
+        </el-upload>
+        </el-form-item>
         <!-- <el-form-item>
           <div class="tinymce-container editor-container">
             <textarea class="tinymce-textarea" id="view"></textarea>
@@ -86,6 +100,9 @@
             value-format="yyyy-MM-dd HH:mm:ss">
           </el-date-picker>
         </el-form-item>
+        <el-form-item label="备注信息" prop="notes">
+          <el-input type="textarea" v-model="formInline.notes" :rows="4" placeholder="请输入备注内容"></el-input>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -97,13 +114,15 @@
 
 <script>
 import { getAgents } from '@/api/userManage'
-import { AddVersion, getVersion, checkVersion, editVersion } from '@/api/version'
+import { mapGetters } from 'vuex'
+import { AddVersion, getVersion, checkVersion, editVersion, getClientMsg } from '@/api/version'
 export default {
   name: 'systemVersionUser',
   data() {
     return {
       loading: false,
-      fileList: [{name: 'food.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'}, {name: 'food2.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'}],
+      fileList: [],
+      headers: {},
       params: {
         page: 1,
         pageSize: 10,
@@ -120,7 +139,10 @@ export default {
         version_num: '',
         title: '',
         content: '',
-        online_time: ''
+        online_time: '',
+        notes: '',
+        file: '',
+        update_file_url: ''
       },
       dialogFormVisible: false,
       value: '',
@@ -139,17 +161,31 @@ export default {
         title: [{ required: true, trigger: 'blur', message: '请填写更新标题' }],
         content: [{ required: true, trigger: 'blur', message: '请填写更新内容'}],
         is_online: [{ required: true, trigger: 'blur', message: '请选择是否上线版本' }],
-        online_time: [{ required: true, trigger: 'blur', message: '请填写上线时间'}]
+        online_time: [{ required: true, trigger: 'blur', message: '请填写上线时间'}],
+        notes: [{ required: true, trigger: 'blur', message: '请填写备注信息'}],
+        file: [{ required: true, trigger: 'blur', message: '请上传zip文件'}]
       },
       total: 0,
       versions: [],
-      lastVersion: ''
+      lastVersion: '',
+      exeForm:  {
+        url: '',
+        upload_time: ''
+      }
     }
   },
   created() {
     this.getData()
+    getClientMsg().then((response) => {
+      if (Array.isArray(response.data.result)) {
+        this.exeForm = response.data.result[0]
+      } 
+    })
   },
   mounted() {
+    this.headers = {
+      tId: this.token
+    }
   },
   watch: {
     value(val) {
@@ -168,9 +204,31 @@ export default {
   computed: {
     title () {
       return this.edit === true ? '版本编辑' : '版本添加'
-    }
+    },
+    ...mapGetters([
+      'token'
+    ])
   },
   methods: {
+    handleZipExeSuccess (response, file, fileList) {
+      this.$message({
+        message: '上传成功',
+        type: 'success'
+      })
+      this.exeForm = response.result
+    },
+    handleZipSuccess(response, file, fileList) {
+      this.$message({
+        message: '上传成功',
+        type: 'success'
+      })
+      this.formInline.file = response.result
+      this.formInline.update_file_url = response.result
+      this.fileList = [{
+        name: this.filterExtension(response.result),
+        url: response.result
+      }]
+    },
     resetFormValue () {
       this.formInline = {
         type: 1,
@@ -181,9 +239,13 @@ export default {
         version_num: '',
         title: '',
         content: '',
-        online_time: ''
+        online_time: '',
+        notes: '',
+        file: '',
+        update_file_url: ''
       }
       this.$refs.updateForm.resetFields()
+      this.fileList = []
     },
     updateVersion () {
       this.$refs.updateForm.validate(valid => {
@@ -206,6 +268,8 @@ export default {
     showDialog (state, vType, parentId) {
       if (parentId) {
         this.formInline.v_id = parentId
+      } else {
+        this.formInline.v_id = 0
       }
       this.dialogFormVisible = true
       this.edit = state
@@ -229,7 +293,17 @@ export default {
         res.data.result.data.versionIds = res.data.result.data.version_ids.map(v => ~~(v))
         res.data.result.data.online_time = this.$options.filters.formatDateTime(res.data.result.data.online_time)
         this.formInline = Object.assign({}, this.formInline, res.data.result.data)
+        var url = res.data.result.data.update_file_url
+        if (url) {
+          this.fileList.push({
+            name: this.filterExtension(url),
+            url: url
+          })
+        }
       })
+    },
+    filterExtension (str) {
+      return str.substring(str.lastIndexOf('/') + 1)
     },
     versionChange (value) {
       var arr = this.editVersion.split('.')
@@ -460,6 +534,10 @@ export default {
     margin: 0;
     line-height: 1.4;
   }
+}
+.upload-demo {
+  float: left;
+  margin-left: 10px;
 }
 </style>
 

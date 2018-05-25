@@ -61,7 +61,7 @@
         label="平台收益">
       </el-table-column>
       <el-table-column
-        prop="platform_sxf_income"
+        prop="t6"
         label="手续费">
       </el-table-column>
     </el-table>
