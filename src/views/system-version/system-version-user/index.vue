@@ -5,7 +5,9 @@
     <div slot="content" class="tooltip-custom">
       <p v-if="versions && versions.length > 0">V{{versions[0].version_num}}</p>
       <p>第一位：主版本号，标识客户端大版本更新，新增的次版本都基于此</p>
-      <p>第二位、第三位：次版本号，第二位标识客户端更新，第三位表示大屏幕端更新</p>
+      <p>第二位：次版本号，表示用户端调整更新</p>
+      <p>第三位：次版本号，表示代理、商户端、平台端的更新</p>
+      <p>每一次更新都基于上一次新建的版本号</p>
     </div>
     <i class="el-icon-question"></i>
   </el-tooltip>

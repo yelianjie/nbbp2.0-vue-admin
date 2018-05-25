@@ -1,7 +1,7 @@
 <template>
  <div class="container" v-loading="loading">
   <el-row style="margin-bottom: 10px;">
-    <div style="float:left;">牛霸最新安装包：<a :href="exeForm.url" download="niuba.zip" v-if="exeForm.url"><el-button type="primary" plain>下载</el-button></a><el-button type="primary" plain v-else :disabled="true">下载</el-button></div>
+     <div class="time-wrap" v-if="exeForm.create_time"><div>上传时间：{{exeForm.create_time}}</div><div class="time">{{exeForm.filename}}</div></div>
     <el-upload
       class="upload-demo"
       accept="application/zip"
@@ -12,16 +12,15 @@
       :on-success="handleZipExeSuccess">
       <el-button size="small" type="primary">点击上传</el-button>
     </el-upload>
-  <div style="float:left;margin-top: 9px;margin-left: 8px;color: #939393;" v-if="exeForm.create_time">上传时间：{{exeForm.create_time}}</div>
+    <div style="float:right;">牛霸最新安装包：<a :href="exeForm.url" download="niuba.zip" v-if="exeForm.url"><el-button type="primary" plain>下载</el-button></a>
+    <el-button type="primary" plain v-else :disabled="true">下载</el-button></div>
   </el-row>
   <el-button type="primary" icon="el-icon-edit" @click.native="showDialog(false, 1)">新增主版本</el-button>
   <el-tooltip placement="right">
-    <div slot="content" class="tooltip-custom">
+    <div slot="content" class="tooltip-custom"> 
       <p v-if="versions && versions.length > 0">V{{versions[0].version_num}}</p>
       <p>第一位：主版本号，标识客户端大版本更新，新增的次版本都基于此</p>
-      <p>第二位：次版本号，表示用户端调整更新</p>
-      <p>第三位：次版本号，表示代理、商户端、平台端的更新</p>
-      <p>每一次更新都基于上一次新建的版本号</p>
+      <p>第二位、第三位：次版本号，第二位标识客户端更新，第三位表示大屏幕端更新</p>
     </div>
     <i class="el-icon-question"></i>
   </el-tooltip>
@@ -70,7 +69,7 @@
         <el-form-item label="更新内容" prop="content">
           <el-input type="textarea" v-model="formInline.content" :rows="4"></el-input>
         </el-form-item>
-        <el-form-item label="升级文件" prop="file" v-if="formInline.versionIds == 1 || !formInline.v_id">
+        <el-form-item label="升级文件" prop="file" v-if="formInline.versionIds.indexOf(1) != -1 || !formInline.v_id || versionType == 1">
           <el-upload
           accept="application/zip"
           :headers="headers"
@@ -162,7 +161,6 @@ export default {
         content: [{ required: true, trigger: 'blur', message: '请填写更新内容'}],
         is_online: [{ required: true, trigger: 'blur', message: '请选择是否上线版本' }],
         online_time: [{ required: true, trigger: 'blur', message: '请填写上线时间'}],
-        notes: [{ required: true, trigger: 'blur', message: '请填写备注信息'}],
         file: [{ required: true, trigger: 'blur', message: '请上传zip文件'}]
       },
       total: 0,
@@ -176,11 +174,7 @@ export default {
   },
   created() {
     this.getData()
-    getClientMsg().then((response) => {
-      if (Array.isArray(response.data.result)) {
-        this.exeForm = response.data.result[0]
-      } 
-    })
+    this.getNewestPackage()
   },
   mounted() {
     this.headers = {
@@ -210,6 +204,13 @@ export default {
     ])
   },
   methods: {
+    getNewestPackage () {
+      getClientMsg().then((response) => {
+        if (Array.isArray(response.data.result)) {
+          this.exeForm = response.data.result[0]
+        } 
+      })
+    },
     handleZipExeSuccess (response, file, fileList) {
       this.$message({
         message: '上传成功',
@@ -258,6 +259,7 @@ export default {
           _actions(this.formInline).then((res) => {
             this.dialogFormVisible = false
             this.getData()
+            this.getNewestPackage()
           })
         } else {
           console.log('error submit!!')
@@ -271,6 +273,7 @@ export default {
       } else {
         this.formInline.v_id = 0
       }
+      console.log(this.formInline.v_id)
       this.dialogFormVisible = true
       this.edit = state
       this.versionType = vType
@@ -536,8 +539,18 @@ export default {
   }
 }
 .upload-demo {
-  float: left;
+  float: right;
   margin-left: 10px;
+}
+.time-wrap {
+  float:right;
+  margin-left: 8px;
+  color: #939393;
+  position:relative;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 </style>
 
