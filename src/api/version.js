@@ -52,3 +52,14 @@ export function getNewVersion(data) {
     data
   })
 }
+
+/**
+ * 获取安装包最新信息
+ */
+export function getClientMsg(data) {
+  return request({
+    url: '/admin/version/getClientMsg',
+    method: 'post',
+    data
+  })
+}
