@@ -5,6 +5,7 @@
         <el-button type="primary" @click.native="showEmptyDiaLog">添加酒吧管理</el-button>
       </el-col>
     </el-row> -->
+    <toolTips :toolTipsData="toolTipsData" ></toolTips>
     <el-form :inline="true" :model="params" class="demo-form-inline">
       <el-form-item label="用户名">
         <el-input v-model="params.name" placeholder="请输入昵称" clearable></el-input>
@@ -17,13 +18,17 @@
       </el-form-item>
     </el-form>
     <div style="height:24px;"></div>
+    <SummaryLine>
+      总计: 总收益<el-tag size="small">{{summaryMoney.supervise_income}}</el-tag>元&nbsp;当前收益<el-tag size="small">{{summaryMoney.supervise_balance}}</el-tag>元
+    </SummaryLine>
     <el-table
       v-loading="loading"
       :data="tableData"
       style="width: 100%">
       <el-table-column
         prop="mc_id"
-        label="ID">
+        label="ID"
+        width=120>
       </el-table-column>
       <el-table-column
         prop="nickname"
@@ -45,6 +50,14 @@
       <el-table-column
         prop="create_time"
         label="创建时间">
+      </el-table-column>
+      <el-table-column
+        prop="supervise_income"
+        label="总收益">
+      </el-table-column>
+      <el-table-column
+        prop="supervise_balance"
+        label="当前收益">
       </el-table-column>
       <!-- <el-table-column
       label="操作">
@@ -94,8 +107,14 @@
 
 <script>
 import { getBarManager, deleteBarManager } from '@/api/userManage'
+import toolTips from '@/components/Tips/index'
+import SummaryLine from '@/components/Summary/index'
 export default {
   name: 'barManager',
+  components: {
+    SummaryLine,
+    toolTips
+  },
   data() {
     return {
       loading: true,
@@ -124,7 +143,15 @@ export default {
         name: ''
       },
       tableData: [],
-      total: 0
+      total: 0,
+      toolTipsData : [{
+        title: '总收益',
+        tooltip: '酒吧管理获得的所有分成收益总额'
+      },{
+        title: '当前收益',
+        tooltip: '该酒吧管理当前账户未提现的分成收益总额'
+      }],
+      summaryMoney: {}
     }
   },
   created() {
@@ -138,6 +165,7 @@ export default {
       getBarManager(this.params).then((response) => {
         let result = response.data.result
         this.tableData = result.data
+        this.summaryMoney = result.money
         this.total = result.total
         this.loading = false
       }).catch((error) => {

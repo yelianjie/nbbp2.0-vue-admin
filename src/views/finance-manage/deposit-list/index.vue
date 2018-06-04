@@ -36,20 +36,26 @@
         label="提现人昵称">
       </el-table-column>
       <el-table-column
-        width="200px"
-        prop="create_time"
-        label="提现时间">
-      </el-table-column>
-      <el-table-column
         prop="money"
         label="提现金额"
         width="200px">
       </el-table-column>
       <el-table-column
-        label="身份">
+        label="身份"
+        width="200px">
         <template slot-scope="scope">
           {{scope.row.type | filterText(identitys)}}
         </template>
+      </el-table-column>
+      <el-table-column
+        prop="name"
+        label="提现酒吧"
+        width="200px">
+      </el-table-column>
+      <el-table-column
+        width="200px"
+        prop="create_time"
+        label="提现时间">
       </el-table-column>
       <el-table-column
         prop="status"
@@ -99,7 +105,7 @@ export default {
         value: '4'
       }],
       states: [{
-        label: '提现中',
+        label: '提现失败',
         value: '0'
       }, {
         label: '提现成功',

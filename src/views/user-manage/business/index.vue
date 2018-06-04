@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <toolTips :toolTipsData="toolTipsData" ></toolTips>
     <el-form :inline="true" :model="params" class="demo-form-inline">
       <el-form-item label="昵称">
         <el-input v-model="params.name" placeholder="请输入昵称" clearable></el-input>
@@ -11,6 +12,9 @@
         <el-button type="primary" @click="onSubmit">搜索</el-button>
       </el-form-item>
     </el-form>
+    <SummaryLine>
+      总计: 总收益<el-tag size="small">{{summaryMoney.merchant_income}}</el-tag>元&nbsp;当前收益<el-tag size="small">{{summaryMoney.merchant_balance}}</el-tag>元
+    </SummaryLine>
     <el-table
       v-loading="loading"
       fit
@@ -18,7 +22,8 @@
       style="width: 100%">
       <el-table-column
         prop="mc_id"
-        label="ID">
+        label="ID"
+        width=120px>
       </el-table-column>
       <el-table-column
         width="160px"
@@ -42,11 +47,11 @@
         label="注册时间">
       </el-table-column>
       <el-table-column
-        prop=""
+        prop="merchant_income"
         label="总收益">
       </el-table-column>
       <el-table-column
-        prop=""
+        prop="merchant_balance"
         label="当前收益">
       </el-table-column>
     </el-table>
@@ -64,8 +69,14 @@
 
 <script>
 import { getGridData } from '@/api/userManage'
+import toolTips from '@/components/Tips/index'
+import SummaryLine from '@/components/Summary/index'
 export default {
   name: 'rechargeManager',
+  components: {
+    SummaryLine,
+    toolTips
+  },
   data() {
     return {
       loading: true,
@@ -88,7 +99,15 @@ export default {
         pageSize: 10
       },
       tableData: [],
-      total: 0
+      total: 0,
+      toolTipsData : [{
+        title: '总收益',
+        tooltip: '该商户获得的所有分成收益总额'
+      },{
+        title: '当前收益',
+        tooltip: '该商户当前账户未提现的分成收益总额'
+      }],
+      summaryMoney: {}
     }
   },
   created() {
@@ -102,6 +121,7 @@ export default {
       getGridData(this.params).then((response) => {
         let result = response.data.result
         this.tableData = result.data
+        this.summaryMoney = result.money
         this.total = result.total
         this.loading = false
       }).catch((error) => {

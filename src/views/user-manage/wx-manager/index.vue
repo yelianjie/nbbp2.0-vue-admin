@@ -1,5 +1,13 @@
 <template>
   <div class="container">
+    <el-tooltip placement="left-end">
+      <div slot="content" class="tooltip-custom"> 
+        <p v-for="(v, i) in toolTipsData"  >
+          {{v.title}} : {{v.tooltip}}
+        </p>
+      </div>
+      <i class="el-icon-question icon-custom"  ></i>
+    </el-tooltip>
     <panel-number :paneldata="panelData"></panel-number>
     <el-form :inline="true" :model="params" class="demo-form-inline">
       <el-form-item label="昵称">
@@ -106,25 +114,22 @@ export default {
       tableLoading: false,
       panelData: [[{
         label: '用户总数',
-        number: 0
+        number: 0,
       }, {
         label: '关注用户',
-        number: 0
+        number: 0,
       }, {
         label: '会员用户',
-        number: 0
+        number: 0,
       }], [{
         label: '昨日新增用户数',
-        number: 0
-      }, {
-        label: '昨日新增关注',
-        number: 0
+        number: 0,
       }, {
         label: '昨日新增会员用户',
-        number: 0
+        number: 0,
       }, {
         label: '昨日活跃用户',
-        number: 0
+        number: 0,
       }], [{
         label: '牛角余额',
         number: 0,
@@ -134,6 +139,37 @@ export default {
         number: 0,
         decimals: 2
       }]],
+      toolTipsData : [{
+        title: '用户总数',
+        tooltip: '所有访问牛霸用户系统的用户总数'
+      }, {
+        title: '关注用户',
+        tooltip: '指关注牛霸霸屏公众号的用户总数'
+      }, {
+        title: '会员用户',
+        tooltip: '有充值牛角和兑换牛角行为的用户总数(包括充值购买)'
+      }, {
+        title: '昨日新增用户数',
+        tooltip: '指既访问过我们牛霸系统也关注了牛霸霸屏公众号的总人数'
+      }, {
+        title: '昨日新增会员用户',
+        tooltip: '指昨日新增的有充值牛角和兑换牛角行为的用户数量'
+      }, {
+        title: '昨日活跃用户',
+        tooltip: '指昨日访问牛霸系统的用户数量'
+      }, {
+        title: '牛角余额',
+        tooltip: '所有微信用户当前账户的牛角总数'
+      }, {
+        title: '收益余额',
+        tooltip: '所有微信用户当前账户的收益总额'
+      }, {
+        title: '总消费',
+        tooltip: '指该用户订单消费总额 —— 即主题霸屏+打赏礼物+发红包金额（不含红包退款）+点歌霸屏订单金额'
+      },{
+        title: '总收益',
+        tooltip: '指该用户获得的所有收益总额 （目前有抢现金红包收益、收到打赏礼物的分成收益）'
+      }],
       params: {
         page: 1,
         pageSize: 10,
@@ -156,8 +192,8 @@ export default {
       this.panelData[0][1].number = result.sNum
       this.panelData[0][2].number = result.tMember
       this.panelData[1][0].number = result.yIncNum
-      this.panelData[1][2].number = result.yIncMNum
-      this.panelData[1][3].number = result.acNum
+      this.panelData[1][1].number = result.yIncMNum
+      this.panelData[1][2].number = result.acNum
       this.panelData[2][0].number = result.balance
       this.panelData[2][1].number = result.profit_balance
       console.log(this.panelData)
@@ -213,3 +249,13 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+  .icon-custom {
+    font-size: 24px;
+    position: absolute;
+    top: 2rem;
+    right: 1.5rem;
+    z-index: 1;
+  }
+</style>

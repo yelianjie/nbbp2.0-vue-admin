@@ -1,13 +1,15 @@
 <template>
   <el-row class="panel-group" :gutter="24">
+
     <el-col :xs="12" :sm="8" :lg="8" class="card-panel-col" v-for="(v, i) in paneldata" :key="i">
         <div class='card-panel'>
           <el-row class="panel-group" :gutter="24">
           <el-col :span="v.length | getRow" v-for="(vv, ii) in v" :key="ii" class="number-col">
           <div class="card-panel-description">
-            <div class="card-panel-text">{{vv.label}}</div>
-            <count-to class="card-panel-num" :startVal="0" :endVal="vv.number" :duration="2000" :decimals="vv.decimals" v-if="vv.decimals"></count-to>
-            <count-to class="card-panel-num" :startVal="0" :endVal="vv.number" :duration="2000" v-else></count-to>
+            <div class="card-panel-text">{{vv.label}}
+            </div>
+            <count-to class="card-panel-num" :startVal="0" :endVal="vv.number" :duration="200" :decimals="vv.decimals" v-if="vv.decimals"></count-to>
+            <count-to class="card-panel-num" :startVal="0" :endVal="vv.number" :duration="200" v-else></count-to>
           </div>
           </el-col>
           </el-row>
@@ -42,6 +44,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.panel-group {
+  padding-right:30px
+}
 .card-panel {
   padding: 24px;
   border: 1px solid #e9e9e9;
@@ -60,6 +65,9 @@ export default {
 }
 .number-col {
   margin-bottom: 15px;
+}
+i.light {
+  color:#ddd
 }
 </style>
 

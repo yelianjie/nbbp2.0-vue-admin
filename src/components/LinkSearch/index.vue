@@ -2,7 +2,7 @@
 	<el-row style="margin-bottom: 15px;">
 		<el-col class="flex">
       <div :style="{'width': labelWidth == -1 ? 'auto' : labelWidth + 'px'}">{{links.title}}：</div>
-      <div class="flex-1"><el-button v-for="(v, i) in links.links" :key="i" @click.native="select(v.value)" :class="{'active': type === v.value}">{{v.label}}</el-button></div>
+      <div class="flex-1"><el-button size="small" v-for="(v, i) in links.links" :key="i" @click.native="select(v.value)" :class="{'active': type === v.value}">{{v.label}}</el-button></div>
 		</el-col>
 	</el-row>
 </template>

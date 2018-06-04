@@ -17,6 +17,12 @@
           end-placeholder="结束日期"
           value-format="yyyy-MM-dd">
         </el-date-picker>
+        快捷入口：
+        <el-button size="mini" round @click='setDate("prev",1)' v-if="this.params.dateValue">上一天</el-button>
+        <el-button size="mini" round @click='setDate("next",1)' v-if="this.params.dateValue">下一天</el-button>
+        <el-button size="mini" round @click='setDate("tday",0)' >今天</el-button>
+        <el-button size="mini" round @click='setDate("yday",0)'>昨天</el-button>
+        <el-button size="mini" round @click='setDate("lastweek",0)'>近7天</el-button>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">搜索</el-button>
@@ -112,6 +118,33 @@ export default {
     this.getData()
   },
   methods: {
+    setDate(day,type) {
+      if (type == 0) {
+        let today = new Date().getTime()
+        switch(day) {
+          case "tday":
+            this.params.dateValue = [Acan.time('Y-m-d',today),Acan.time('Y-m-d',today)]
+            break
+          case "yday":
+            this.params.dateValue = [Acan.time('Y-m-d',today-24*60*60*1000),Acan.time('Y-m-d',today-24*60*60*1000)]
+            break
+          case "lastweek":
+            this.params.dateValue = [Acan.time('Y-m-d',today-24*60*60*1000*6),Acan.time('Y-m-d',today)]
+            break
+        }
+      } else if (type == 1) {
+        let cuday = new Date(this.params.dateValue[0]).getTime()
+        switch(day) {
+          case "prev":
+            this.params.dateValue = [Acan.time('Y-m-d',cuday-24*60*60*1000),Acan.time('Y-m-d',cuday-24*60*60*1000)]
+            break
+          case "next":
+            this.params.dateValue = [Acan.time('Y-m-d',cuday+24*60*60*1000),Acan.time('Y-m-d',cuday+24*60*60*1000)]
+            break
+        }
+      }
+      this.onSubmit()
+    },
     getData () {
       this.loading = true
       getRechargeList(this.params).then((response) => {
