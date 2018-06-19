@@ -4,8 +4,9 @@
   <el-tooltip placement="right">
     <div slot="content" class="tooltip-custom">
       <p v-if="versions && versions.length > 0">V{{versions[0].version_num}}</p>
-      <p>第一位：主版本号，标识客户端大版本更新，新增的次版本都基于此</p>
-      <p>第二位、第三位：次版本号，第二位标识客户端更新，第三位表示大屏幕端更新</p>
+      <p>第一位：主版本号，表示用户端大版本更新，新增的次版本都基于此</p>
+      <p>第二位：次版本号，表示用户端调整更新</p>
+      <p>第三位：次版本号，表示代理、商户端、平台端的更新,每一次更新都基于上一次新建的版本号</p>
     </div>
     <i class="el-icon-question"></i>
   </el-tooltip>
@@ -49,9 +50,19 @@
             <el-checkbox :label="4">平台端</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
-        <el-form-item label="版本号">{{formInline.version_num}}</el-form-item>
+        <el-form-item label="版本号" >{{formInline.version_num}}
+          <el-tooltip placement="right" v-if="versionType == 2">
+            <div slot="content" class="tooltip-custom">
+              <p v-if="versions && versions.length > 0">V{{versions[0].version_num}}</p>
+              <p>第一位：主版本号，表示用户端大版本更新，新增的次版本都基于此</p>
+              <p>第二位：次版本号，表示用户端调整更新</p>
+              <p>第三位：次版本号，表示代理、商户端、平台端的更新,每一次更新都基于上一次新建的版本号</p>
+            </div>
+            <i class="el-icon-question"></i>
+          </el-tooltip>
+        </el-form-item>
         <el-form-item label="更新标题" prop="title">
-          <el-input v-model="formInline.title" auto-complete="off" placeholder="有新版本更新啦！"></el-input>
+          <el-input v-model="formInline.title" auto-complete="off" maxlength= 10 placeholder="有新版本更新啦！"></el-input>
         </el-form-item>
         <el-form-item label="更新内容" prop="content">
           <el-input type="textarea" v-model="formInline.content" :rows="4"></el-input>
@@ -72,7 +83,8 @@
             v-model="formInline.online_time"
             type="datetime"
             placeholder="选择日期时间"
-            value-format="yyyy-MM-dd HH:mm:ss">
+            value-format="yyyy-MM-dd HH:mm:ss"
+            :picker-options="pickerOptions">
           </el-date-picker>
         </el-form-item>
       </el-form>
@@ -94,7 +106,7 @@ export default {
       loading: false,
       params: {
         page: 1,
-        pageSize: 2,
+        pageSize: 10,
         beginT: '',
         endT: '',
         type: 0
@@ -121,7 +133,7 @@ export default {
       editVersion: '',
       versionType: 1, // 1主版本添加 2次版本添加
       formRules: {
-        version_ids: [
+        versionIds: [
           { required: true, trigger: 'blur', message: '请选择更新类别' }
         ],
         title: [{ required: true, trigger: 'blur', message: '请填写更新标题' }],
@@ -131,7 +143,12 @@ export default {
       },
       total: 0,
       versions: [],
-      lastVersion: ''
+      lastVersion: '',
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() < Date.now() - 8.64e7;
+        }
+      }, 
     }
   },
   created() {
@@ -182,6 +199,11 @@ export default {
             _actions = editVersion
           }
           _actions(this.formInline).then((res) => {
+            if (res.data && res.data.code !== "301000") 
+            return this.$message({
+              message: res.data.result,
+              type: 'error'
+            })
             this.dialogFormVisible = false
             this.getData()
           })

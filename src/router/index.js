@@ -276,6 +276,16 @@ export const asyncRouterMap = [
         icon: 'member',
         roles: ['admin'] // or you can only set roles in sub nav
       }
+    }, {
+      path: 'adminManager',
+      component: _import('user-manage/admin-manager/index'),
+      name: 'adminManager',
+      meta: {
+        noCache: true,
+        title: 'adminManager',
+        icon: 'barmanager',
+        roles: ['admin'] // or you can only set roles in sub nav
+      }
     }]
   },
   {

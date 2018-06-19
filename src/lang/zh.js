@@ -19,6 +19,7 @@ export default {
     agentManager: '代理管理',
     wxManager: '微信用户',
     business: '商家用户',
+    adminManager: '用户端超管',
     systemManage: '系统管理',
     systemUser: '系统用户',
     modifyPassword: '修改密码',
