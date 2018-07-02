@@ -94,3 +94,86 @@ export function getGridData(data) {
     data
   })
 }
+
+/**
+ * 获取超管列表
+ * @param {*} data
+ */
+export function getSuperManageData(data) {
+  return request({
+    url: '/admin/supermanage/getData',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 搜索关注微信用户
+ * @param {*} data
+ */
+export function getWXMemberBySearch(data) {
+  return request({
+    url: '/admin/supermanage/getMemberBySearch',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 获取超管和关联酒吧信息
+ * @param {*} data
+ */
+export function getSuperManageModel(data) {
+  return request({
+    url: '/admin/supermanage/getModel',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 保存编辑超管
+ * @param {*} data
+ */
+export function updateSuperManage(data) {
+  return request({
+    url: '/admin/supermanage/saveEdit',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 保存新增超管
+ * @param {*} data
+ */
+export function addSuperManage(data) {
+  return request({
+    url: '/admin/supermanage/saveAdd',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 删除超管
+ * @param {*} data
+ */
+export function deleteSuperManage(data) {
+  return request({
+    url: '/admin/supermanage/delData',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 获取所有酒吧
+ * @param {*} data
+ */
+export function getAllHotel() {
+  return request({
+    url: '/admin/supermanage/getAllHotel',
+    method: 'post',
+  })
+}

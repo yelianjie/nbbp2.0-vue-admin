@@ -1,21 +1,22 @@
 <template>
   <div class="container">
-    <el-row>
-      <el-col :span="24">
-        <el-button type="primary" @click.native="showEmptyDiaLog">添加</el-button>
-      </el-col>
-    </el-row>
+    
     <el-form :inline="true" :model="params" class="demo-form-inline">
       <el-form-item label="用户名">
-        <el-input v-model="params.name" placeholder="请输入昵称" clearable></el-input>
+        <el-input v-model="params.search" placeholder="请输入昵称" clearable></el-input>
       </el-form-item>
       <el-form-item label="ID">
-        <el-input v-model="params.id" placeholder="请输入ID" clearable></el-input>
+        <el-input v-model="params.searchId" placeholder="请输入ID" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">搜索</el-button>
       </el-form-item>
     </el-form>
+    <el-row>
+      <el-col :span="24" style='text-align: right'>
+        <el-button type="primary" @click.native="showEmptyDiaLog">添加</el-button>
+      </el-col>
+    </el-row>
     <div style="height:24px;"></div>
     <el-table
       v-loading="loading"
@@ -27,33 +28,33 @@
         width=120>
       </el-table-column>
       <el-table-column
-        prop="nickname"
-        label="微信昵称"
-        width="220">
-      </el-table-column>
-      <el-table-column
-        label="头像"
+        label="微信头像"
         width="150">
         <template slot-scope="scope">
           <img class="avatar-user-img" :src="scope.row.headimgurl | uploadPrefixUrl"/>
         </template>
       </el-table-column>
       <el-table-column
-        prop="phone"
-        label="联系电话"
-        width="180">
+        prop="nickname"
+        label="微信昵称"
+        width="220">
+      </el-table-column>
+      <el-table-column
+        prop="real_name"
+        label="真实姓名"
+        width=120>
       </el-table-column>
       <el-table-column
         prop="create_time"
-        label="创建时间">
+        label="添加时间">
       </el-table-column>
       <el-table-column
-        prop="supervise_income"
-        label="总收益">
+        prop="identity"
+        label="身份">
       </el-table-column>
       <el-table-column
-        prop="supervise_balance"
-        label="当前收益">
+        prop="remark"
+        label="备注">
       </el-table-column>
       <el-table-column
       label="操作">
@@ -74,68 +75,55 @@
 
       <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible" @close="clearForm">
         <div v-if="dialogType === '1'" >
-        <el-row :gutter="24">
+        <el-row :gutter="24" type="flex">
           <el-col :span="18">
             <el-input v-model="adminParam" placeholder="请输入关注牛霸霸屏的微信昵称" clearable></el-input>
           </el-col>
           <el-col :span="2">
           </el-col>
           <el-col :span="4">
-            <el-button @click="handleAdd()" type="primary" size="medium">搜索</el-button>
+            <el-button @click="getWXData" type="primary" size="medium">搜索</el-button>
           </el-col>
         </el-row>
-        <el-button @click="handleAdd()" type="primary" size="medium">添加</el-button>
-        <!-- <el-tabs v-model="activeName">
-          <el-tab-pane label="扫码绑定" name="s1">
-            <img src="http://nb.siweiquanjing.com/attachment/bar/20171227191747_227.png" class="scanQrcode">
-            <p class="scanTip">扫一扫二维码，直接绑定</p>
-          </el-tab-pane>
-          <el-tab-pane label="完善信息" name="s2" :disabled="!isScan">
-            <el-form :model="barManagerForm" :rules="barManagerFormRules" label-width="80px" ref="barManagerForm">
-              <el-form-item label="微信昵称" prop="nickname">
-                <el-input v-model="barManagerForm.nickname" auto-complete="off" :disabled="true"></el-input>
-              </el-form-item>
-              <el-form-item label="头像" prop="img">
-                <el-input v-model="barManagerForm.img" auto-complete="off" type="hidden" class="hidden-input" :disabled="true"></el-input>
-                <img src="http://nb.siweiquanjing.com/attachment/bar/20171227191747_227.png" class="wx_avatar" />
-              </el-form-item>
-              <el-form-item label="联系电话" prop="phone">
-                <el-input v-model="barManagerForm.phone" auto-complete="off" type="number"></el-input>
-              </el-form-item>
-            </el-form>
-          </el-tab-pane>
-        </el-tabs> -->
-        
-        <!-- <div slot="footer" class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="handleAdd">确 定</el-button>
-        </div> -->
+        <el-row :gutter="24" class='wx-user'>
+          <p v-if= 'typeof(wxData) != "string" && wxData.length == 0' class='text-center'>暂无数据</p>
+          <el-col  :sm="12" :md="6" :lg="4"  v-for='(v,i) in wxData' :key = "i" class='text-center wx-user-item'>
+            <div class='wx_avatar'><img :src='v.headimgurl'></div>
+            <p class='fs13' style='margin: 8px 0'>{{v.nickname}}</p>
+            <el-button @click="handleAdd(v)" type="primary" size="small">添加</el-button>
+          </el-col>
+        </el-row>
         </div>
 
         <div v-if="dialogType === '2'">
           <el-row :gutter="24">
-          <el-col :span="4">
-            <span>1111</span>
+          <el-col :span="4" class='text-center'>
+            <div class='wx_avatar'><img :src='activeUser.headimgurl'></div>
+            <p class='fs13' style='margin: 8px 0'>{{activeUser.nickname}}</p>
           </el-col>
           <el-col :span="2">
           </el-col>
           <el-col :span="18">
-            <p>说明：<br>1、可无限限制免费购买主题霸屏、礼物霸屏、点歌霸屏。<br>2、点歌霸屏在已点列表显示免费标签。<br>3、可拉黑用户。<br>4、可删除上墙消息。</p>
+            <p style='margin-top:0'>说明：<br>1、可无限限制免费购买主题霸屏、礼物霸屏、点歌霸屏。<br>2、点歌霸屏在已点列表显示免费标签。<br>3、可拉黑用户。<br>4、可删除上墙消息。</p>
           </el-col>
         </el-row>
-        <el-form :model="adminManagerForm" :rules="adminManagerFormRules" label-width="80px" ref="adminManagerForm">
-          <el-form-item label="真实姓名" prop="nickname">
-            <el-input v-model="adminManagerForm.nickname" auto-complete="off" ></el-input>
+        <el-form :model="adminManagerForm"  label-width="80px" ref="adminManagerForm">
+          <el-form-item label="真实姓名" prop="real_name">
+            <el-input v-model="adminManagerForm.real_name" ></el-input>
           </el-form-item>
-          <el-form-item label="备注信息" prop="nickname">
-            <el-input type="textarea" v-model="adminManagerForm.nickname"></el-input>
+          <el-form-item label="备注信息" prop="remark">
+            <el-input type="textarea" v-model="adminManagerForm.remark"></el-input>
           </el-form-item>
-          <el-form-item label="生效酒吧" prop="nickname">
-            <el-radio v-model="transferVisible" :label="false" >全部</el-radio>
-            <el-radio v-model="transferVisible" :label="true" >自定义</el-radio>
+          <el-form-item label="生效酒吧" prop="is_all_auth">
+            <el-radio v-model="adminManagerForm.is_all_auth" :label="1" @change = 'adminManagerForm.hts = []'>全部</el-radio>
+            <el-radio v-model="adminManagerForm.is_all_auth" :label="0" >自定义</el-radio>
           </el-form-item>
-          <el-form-item label="" prop="nickname">
-            <el-transfer v-if="transferVisible" v-model="value1" :data="data"></el-transfer>
+          <el-form-item >
+            <el-transfer v-if="transferVisible" v-model="adminManagerForm.hts" filterable  :data="barData"></el-transfer>
+          </el-form-item>
+          <el-form-item style='text-align:right'>
+            <el-button @click="dialogFormVisible = false">取 消</el-button>
+            <el-button type="primary" @click="handleSave">确 定</el-button>
           </el-form-item>
         </el-form>
         </div>
@@ -145,65 +133,79 @@
 </template>
 
 <script>
-import { getBarManager, deleteBarManager } from '@/api/userManage'
+import { getSuperManageData, getWXMemberBySearch, getSuperManageModel, updateSuperManage, addSuperManage, deleteSuperManage, getAllHotel} from '@/api/userManage'
 export default {
   name: 'adminManager',
   data() {
-    const generateData = _ => {
-        const data = [];
-        for (let i = 1; i <= 15; i++) {
-          data.push({
-            key: i,
-            label: `备选项 ${ i }`,
-            disabled: i % 4 === 0
-          })
-        }
-        return data;
-      }
     return {
       loading: true,
-      tableLoading: false,
-      activeName: 's1',
-      isScan: false,
       dialogTitle: '添加用户端超管',
       dialogFormVisible: false,
       transferVisible: false,
       dialogType: '1',
       adminParam : '',
       adminManagerForm: {
-        nickname: '',
-        img: '',
-        phone: ''
-      },
-      adminManagerFormRules: {
-        nickname: [{ required: true, trigger: 'blur', message: '请输入微信昵称' }],
-        img: [{ required: true, trigger: 'blur', message: '头像不能为空' }],
-        phone: [
-          { required: true, trigger: 'blur', message: '请输入联系电话' },
-          { min: 11, max: 11, trigger: 'blur', message: '请输入正确的电话号码' },
-        ]
+        id: '',
+        mc_id: '',
+        real_name:'',
+        remark:'',
+        is_all_auth: 1,
+        hts:[]
       },
       params: {
-        page: 1,
-        pageSize: 10,
-        id: '',
-        name: ''
+        pageindex: 1,
+        pagesize: 10,
+        searchId: '',
+        search: ''
       },
       tableData: [],
+      wxData:'',
+      barData:[],
       total: 0,
-      data: generateData(),
-      value1: [1, 4]
+      activeUser: ''
     }
   },
   created() {
     this.getData()
+    this.getbarData()
   },
   mounted() {
   },
+  watch: {
+    'adminManagerForm.is_all_auth' (newVal, oldVal) {
+      if (newVal) {
+        this.transferVisible = false
+      } else {
+        this.transferVisible = true
+      }
+    },
+  },
   methods: {
+    getWXData () {
+      if (!this.adminParam) {
+        this.$message.error('请输入微信昵称')
+        return false
+      }
+      getWXMemberBySearch({ search : this.adminParam }).then((res) => {
+        let result = res.data.result
+        this.wxData = result
+      })
+    },
+    getbarData () {
+      getAllHotel().then((res) => {
+        let result = res.data.result
+        result.forEach((v,i) => {
+          this.barData.push({
+            key: v.id,
+            label: v.name
+          })
+        })
+        console.log(this.barData)
+      })
+    },
     getData () {
       this.loading = true
-      getBarManager(this.params).then((response) => {
+      getSuperManageData(this.params).then((response) => {
         let result = response.data.result
         this.tableData = result.data
         this.total = result.total
@@ -218,11 +220,11 @@ export default {
       console.log('submit')
     },
     handleSizeChange(val) {
-      this.params.pageSize = val
+      this.params.pagesize = val
       this.getData()
     },
     handleCurrentChange(val) {
-      this.params.page = val
+      this.params.pageindex = val
       this.getData()
       console.log(`当前页: ${val}`)
     },
@@ -237,48 +239,108 @@ export default {
       this.dialogType = '1'
       this.dialogFormVisible = true
     },
-    handleAdd() {
+    handleAdd(val) {
       this.dialogTitle = '添加超级管理员'
       this.dialogType = '2'
       this.dialogFormVisible = true
+      this.activeUser = val
+      this.adminManagerForm.mc_id = this.activeUser.id
     },
-    handleEdit() {
+    handleEdit(val) {
       this.dialogTitle = '编辑超级管理员'
       this.dialogType = '2'
       this.dialogFormVisible = true
+      this.activeUser = val
+      getSuperManageModel({id : val.id}).then((res) => {
+        let result = res.data.result
+        let htData = []
+        result.smrh.forEach((v,i) => {
+           htData.push(v.ht_id)
+        })
+        console.log(htData)
+        this.adminManagerForm = {
+          id : val.id,
+          mc_id: result.sm.mc_id,
+          real_name: result.sm.real_name,
+          remark: result.sm.remark,
+          is_all_auth: parseInt(result.sm.is_all_auth),
+          hts: htData
+        }
+        console.log(result)
+        console.log(this.adminManagerForm)
+      })
+    },
+    handleSave() {
+      let _action,msg
+      if (this.adminManagerForm.id) {
+        _action = updateSuperManage
+        msg = '编辑成功'
+      } else {
+        _action = addSuperManage
+        msg = '添加成功'
+      }
+      _action(this.adminManagerForm).then((res) => {
+        console.log(res)
+        if (res.data.code != '301000') {
+          return this.$message.error({
+            type: 'error',
+            message: res.data.result
+          })
+        }
+        this.$message({
+          type: 'success',
+          message: msg
+        })
+        this.dialogFormVisible = false
+        this.clearForm()
+        this.resetParams()
+        this.getData()
+      })
     },
     handleDelete(row, index) {
-      this.$confirm('是否确定删除该酒吧管理?', '提示', {
+      this.$confirm('是否确定删除该超级管理员?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        deleteBarManager({id: row.id}).then(() => {
+        deleteSuperManage({id: row.id}).then((res) => {
+        if (res.data.code != '301000') {
+          return this.$message.error({
+            type: 'error',
+            message: res.data.result
+          })
+        }
           this.$message({
             type: 'success',
             message: '删除成功!'
           })
           this.getData()
         }).catch((error) => {
-          this.$message({
-            type: 'error',
-            message: error.msg
-          })
-        })
-
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
+          // this.$message({
+          //   type: 'error',
+          //   message: error.msg
+          // })
         })
       }).catch(() => {    
       })
     },
     clearForm() {
-      // this.$refs.barManagerForm.clearValidate()
-      // this.$refs.barManagerForm.resetFields()
+      this.adminParam = ''
+      this.wxData = ''
+      this.activeUser = ''
+      this.adminManagerForm = {
+        id: '',
+        mc_id: '',
+        real_name:'',
+        remark:'',
+        is_all_auth: 1,
+        hts:[]
+      }
     },
     resetParams() {
-      this.params.page = 1
+      this.params.pageindex = 1
+      this.params.searchId = ''
+      this.params.search = ''
     }
   }
 }
@@ -286,22 +348,19 @@ export default {
 
 <style lang="scss" scoped>
 
+.wx-user {
+  padding:20px 10px 0;
+  max-height:500px;
+  overflow:auto;
+  .wx-user-item {
+    margin-bottom:10px
+  }
+}
 .wx_avatar {
-  width: 100px;
-  height: 100px;
-}
-.hidden-input {
-  position: absolute;
-  clip: rect(1px, 1px, 1px, 1px);
-}
-.scanQrcode {
-  width: 300px;
-  height: 300px;
-  margin: 0 auto;
-  display: block;
-}
-.scanTip {
-  text-align: center;
-  font-size: 14px;
+  height:0;
+  padding-bottom:80%;
+  img{
+    width:80%;
+  }
 }
 </style>
