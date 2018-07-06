@@ -69,3 +69,77 @@ export function sysValueSet(data) {
     data
   })
 }
+
+/**
+ * 搜索微信关注用户
+* @param {*} data
+ */
+export function getSubscribeMember(data) {
+  return request({
+    url: '/admin/role/getSubscribeMember',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 设置系统用户状态
+* @param {*} data
+ */
+export function setSysUserStatus(data) {
+  return request({
+    url: '/admin/role/setSysUserStatus',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 添加系统用户
+* @param {*} data
+ */
+export function addWxSysUser(data) {
+  return request({
+    url: '/admin/role/addWxSysUser',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 获取编辑用户信息
+* @param {*} data
+ */
+export function getWxSysUser(data) {
+  return request({
+    url: '/admin/role/getWxSysUser',
+    method: 'post',
+    data
+  })
+}
+
+
+/**
+ * 编辑系统用户
+* @param {*} data
+ */
+export function updateWxSysUser(data) {
+  return request({
+    url: '/admin/role/modifyWxSysUser',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 获取权限列表
+* @param {*} data
+ */
+export function getRoleList() {
+  return request({
+    url: '/admin/role/getRoleList',
+    method: 'post',
+  })
+}
+
+

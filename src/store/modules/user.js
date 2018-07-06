@@ -1,4 +1,4 @@
-import { loginByUsername, logout, getUserInfo } from '@/api/login'
+import { loginByUsername, logout, getUserInfo, loginByWx, getSysUserInfo} from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 
 const user = {
@@ -64,12 +64,56 @@ const user = {
       })
     },
 
-    // 获取用户信息
-    GetUserInfo({ commit, state }) {
+    LoginByWx({ commit }, userInfo) {
       return new Promise((resolve, reject) => {
-        commit('SET_ROLES', ['admin'])
-        commit('SET_AVATAR', 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif')
-        resolve(['admin'])
+        loginByWx(userInfo).then(response => {
+          console.log(response) 
+          const data = response.data
+          if (data.code != 301000) return 
+          if (data._error) {
+            reject(data._error)
+          } else {
+            commit('SET_TOKEN', data.result.tokenId)
+            setToken(data.result.tokenId)
+            commit('SET_NAME', data.result.userinfo.nickname)
+            // commit('SET_ROLES', ['admin'])
+            // commit('SET_AVATAR', data.result.userinfo.head_img)
+            resolve(data)
+          }
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
+
+    // 获取用户信息
+    GetUserInfo({ commit, userInfo }) {
+      return new Promise((resolve, reject) => {
+        getSysUserInfo().then(response => {
+          console.log(response) 
+          const data = response.data
+          if (data.code != 301000) return 
+          if (data._error) {
+            reject(data._error)
+          } else {
+            // commit('SET_TOKEN', data.result.tokenId)
+            // setToken(data.result.tokenId)
+            // commit('SET_NAME', data.result.userinfo.nickname)
+            commit('SET_ROLES', ['admin'])
+            commit('SET_AVATAR', data.result.userinfo.head_img)
+            commit('SET_NAME', data.result.userinfo.nickname)
+            //resolve(data)
+            // commit('SET_ROLES', ['admin'])
+            // commit('SET_AVATAR', 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif')
+            resolve(['admin'])
+          }
+        }).catch(error => {
+          reject(error)
+        })
+
+        // commit('SET_ROLES', ['admin'])
+        // commit('SET_AVATAR', 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif')
+        // resolve(['admin'])
         /* getUserInfo(state.token).then(response => {
           if (!response.data) { // 由于mockjs 不支持自定义状态码只能这样hack
             reject('error')

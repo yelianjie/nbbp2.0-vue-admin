@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 /**
- * 后台登录
+ * 账号密码登录
  * @param {Object} data 
  */
 export function loginByUsername(data) {
@@ -10,6 +10,30 @@ export function loginByUsername(data) {
     data
   })
 }
+
+/**
+ * 微信登录
+ * @param {Object} data 
+ */
+export function loginByWx(data) {
+  return request({
+    url: '/admin/login/getWxLoginById',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 获取微信登录二维码
+ * @param {Object} data 
+ */
+export function getLoginQrcode() {
+  return request({
+    url: '/admin/login/getLoginQrcode',
+    method: 'post',
+  })
+}
+  
 /**
  * 退出登录
  */
@@ -28,3 +52,9 @@ export function getUserInfo(token) {
   })
 }
 
+export function getSysUserInfo() {
+  return request({
+    url: '/admin/users/getSysUserInfo',
+    method: 'get',
+  })
+}

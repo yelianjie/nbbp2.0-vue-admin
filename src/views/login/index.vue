@@ -6,6 +6,8 @@
         <h3 class="title">{{$t('login.title')}}</h3>
         <!-- <lang-select class="set-language"></lang-select> -->
       </div>
+      
+      <template v-if="loginType == 1">
       <el-form-item prop="name">
         <span class="svg-container svg-container_login">
           <svg-icon icon-class="user" />
@@ -24,7 +26,24 @@
       </el-form-item>
 
       <el-button type="primary" style="width:100%;margin-bottom:30px;" :loading="loading" @click.native.prevent="handleLogin">{{$t('login.logIn')}}</el-button>
+      </template>
+      
+      <template v-if='loginType == 2'>
+        <div class='text-center'>
+          <img :src="QRScan.url" style='width:250px;height:250px'>
+          <p style='color:#fff;margin-bottom: 40px'>请使用微信二维码扫描登录</p>
+        </div>
 
+      </template>
+      <el-row>
+        <el-col :span="8"><hr></el-col>
+        <el-col :span="8" class='text-center' style='color:#fff'>其他登录方式</el-col>
+        <el-col :span="8"><hr></el-col>
+      </el-row>
+      <div class="text-center" style='padding:20px 0'>
+        <el-button v-if='loginType == 1' @click.native="loginType = 2" class='pointer'>微信扫码登录</el-button>
+        <el-button v-if='loginType == 2' @click.native="loginType = 1" class='pointer'>账号密码登录</el-button>
+      </div>
       <!--<div class="tips">
         <span>{{$t('login.username')}} : admin</span>
         <span>{{$t('login.password')}} : {{$t('login.any')}}</span>
@@ -51,6 +70,7 @@
 <script>
 // import LangSelect from '@/components/LangSelect'
 // import SocialSign from './socialsignin'
+import  { getLoginQrcode, loginByWx} from '@/api/login'
 
 export default {
   // components: { LangSelect, SocialSign },
@@ -58,9 +78,14 @@ export default {
   data() {
     return {
       message: null,
+      loginType: 1,
       loginForm: {
         name: '',
         pwd: ''
+      },
+      QRScan: {
+        url: '',
+        id: ''
       },
       loginRules: {
         name: [{ required: true, trigger: 'blur', message: '请输入用户名' }],
@@ -104,6 +129,34 @@ export default {
         }
       })
     },
+    getQRScan() {
+      getLoginQrcode().then((res) => {
+        console.log(res)
+        let data = res.data.result
+        this.QRScan = {
+          url: data.imgurl,
+          id: data.id
+        }
+      })
+    },
+    handleLoginByWx() {
+      this.$store.dispatch('LoginByWx', {id:this.QRScan.id}).then((response) => {
+        //this.loading = false
+        this.$message({
+          message: '登录成功',
+          type: 'success'
+        });
+        this.$router.push({ path: '/' })
+        clearTimeout(this.interval)
+      }).catch((error) => {
+        console.log(error)
+        //this.loading = false
+        // this.$message({
+        //   message: error.msg,
+        //   type: 'error'
+        // });
+      })
+    },
     afterQRScan() {
       // const hash = window.location.hash.slice(1)
       // const hashObj = getQueryObject(hash)
@@ -124,6 +177,8 @@ export default {
     }
   },
   created() {
+    this.getQRScan()
+    this.interval = setInterval(this.handleLoginByWx,3000)
     // window.addEventListener('hashchange', this.afterQRScan)
   },
   destroyed() {
@@ -239,6 +294,9 @@ $light_gray:#eee;
     position: absolute;
     right: 35px;
     bottom: 28px;
+  }
+  .other-title {
+
   }
 }
 </style>
