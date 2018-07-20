@@ -95,7 +95,7 @@
       label="操作"
       width="150">
       <template slot-scope="scope">
-        <el-button type="text" size="small" @click="handleEdit(scope.row, scope.$index)">审核&编辑</el-button>
+        <el-button type="text" size="small" @click="$router.push({path: '/barManageDo/edit', query: {id: scope.row.id}})" >审核&编辑</el-button>
         <el-button @click="handleDelete(scope.row, scope.$index)" type="text" size="small" v-if="scope.row.status == -1">删除</el-button>
       </template>
       </el-table-column>
@@ -290,12 +290,12 @@ export default {
       this.dialogVisible = false  
     },
     handleEdit(row, index) {
-      this.$router.push({
-        path: `/barManageDo/edit/${row.id}`,
-        query: {
-          edit: Math.random()
-        }
-      })
+      // this.$router.push({
+      //   path: `/barManageDo/edit`,
+      //   query: {
+      //     id: row.id
+      //   }
+      // })
     },
     handleChange(value) {
       this.formInline.city = this.formInline.selectedOptions[0]

@@ -228,7 +228,7 @@ export default {
       this.loading = false
     }).catch((error) => {
       this.loading = false
-      this.$message.error(error.message)
+      //this.$message.error(error.message)
     })
   },
   mounted() {

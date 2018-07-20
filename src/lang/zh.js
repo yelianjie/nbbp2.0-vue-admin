@@ -1,5 +1,6 @@
 export default {
   route: {
+    main: '主页',
     dashboard: '数据总览',
     barManage: '商户列表',
     barManageEdit: '酒吧编辑',
@@ -20,13 +21,17 @@ export default {
     wxManager: '微信用户',
     business: '商家用户',
     adminManager: '用户端超管',
+    blackManager: '黑名单用户',
     systemManage: '系统管理',
     systemUser: '系统用户',
-    modifyPassword: '修改密码',
+    roleManage: '角色管理',
+    roleManageEdit: '角色详情',
+    modifyPassword: '账户管理',
     systemSetting: '系统设置',
     systemVersion: '版本管理',
     systemVersionUser: '用户端',
     systemVersionClient: '客户端',
+    messageManage: '消息管理',
     city: '省市区管理',
     introduction: '简述',
     documentation: '文档',
@@ -80,7 +85,7 @@ export default {
     theme: '换肤'
   },
   login: {
-    title: '牛霸霸平后台管理系统',
+    title: '牛霸霸屏后台管理系统',
     logIn: '登录',
     username: '账号',
     password: '密码',

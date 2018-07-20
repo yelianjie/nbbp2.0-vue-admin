@@ -121,8 +121,8 @@
       </div>
       <div class="url-wrap">
         <div class="url-item">
-          <p>&emsp;大屏URL：{{$route.params.id | filterUrl('screen')}}<el-button type="primary" plain v-clipboard:copy='$options.filters.filterUrl($route.params.id, "screen")' v-clipboard:success='clipboardSuccess'>复制</el-button><el-button type="primary" plain @click.native="openNewWindow">打开</el-button></p>
-          <p>手机端URL：{{$route.params.id | filterUrl}}<el-button type="primary" plain v-clipboard:copy='$options.filters.filterUrl($route.params.id)' v-clipboard:success='clipboardSuccess'>复制</el-button></p>
+          <p>&emsp;大屏URL：{{$route.query.id | filterUrl('screen')}}<el-button type="primary" plain v-clipboard:copy='$options.filters.filterUrl($route.params.id, "screen")' v-clipboard:success='clipboardSuccess'>复制</el-button><el-button type="primary" plain @click.native="openNewWindow">打开</el-button></p>
+          <p>手机端URL：{{$route.query.id | filterUrl}}<el-button type="primary" plain v-clipboard:copy='$options.filters.filterUrl($route.query.id)' v-clipboard:success='clipboardSuccess'>复制</el-button></p>
         </div>
         <div class="qrcode-img">
           <img :src="form.phone_er_url | uploadPrefixUrl" v-if="form.phone_er_url">
@@ -225,7 +225,7 @@ export default {
     generateQrcode (dom, zhuotieImg, cb) {
       var qr = new QRious({
         element: dom,
-        value: process.env.BASE_API.replace(/"/g, '') + '/dist/#/Main/' + this.$route.params.id,
+        value: process.env.BASE_API.replace(/"/g, '') + '/dist/#/Main/' + this.$route.query.id,
         size: 400,
         padding: 20
       })
@@ -253,7 +253,7 @@ export default {
       qrcodeImg.src = dataUrl
     },
     getData () {
-      getBarInfo({ht_id: this.$route.params.id}).then((response) => {
+      getBarInfo({ht_id: this.$route.query.id}).then((response) => {
         this.form = response.data.result.hotel
         this.form.status = this.form.status.toString()
         console.log(this.form.status)
@@ -266,7 +266,7 @@ export default {
       })
     },
     updateBarAction() {
-      this.form.ht_id = this.$route.params.id
+      this.form.ht_id = this.$route.query.id
       //this.form.supervise_id = this.selectManager
       updateBarInfo(this.form).then((response) => {
         this.$message.success('修改成功')
@@ -280,7 +280,7 @@ export default {
       })
     },
     updateRateAction () {
-      this.form.ht_id = this.$route.params.id
+      this.form.ht_id = this.$route.query.id
       var isPass = this.calPercent()
       if (isPass) {
         updateRateInfo(this.form).then((response) => {
@@ -380,7 +380,7 @@ export default {
       })
     },
     openNewWindow() {
-      window.open(this.$options.filters.filterUrl(this.$route.params.id, 'screen'))
+      window.open(this.$options.filters.filterUrl(this.$route.query.id, 'screen'))
     },
     showLargeQrcode(url) {
       var target = event.target

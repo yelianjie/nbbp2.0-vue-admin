@@ -41,54 +41,61 @@
         label="ID">
       </el-table-column>
       <el-table-column
-        width="160px"
         label="用户头像">
         <template slot-scope="scope">
           <img class="avatar-user-img" :src="scope.row.headimgurl | uploadPrefixUrl"/>
         </template>
       </el-table-column>
       <el-table-column
-        width="160px"
         prop="nickname"
         label="微信昵称">
       </el-table-column>
       <el-table-column
-        width="160px"
         prop="balance"
         label="牛角余额">
       </el-table-column>
       <el-table-column
-        width="160px"
         prop="profit_balance"
         label="收益余额">
       </el-table-column>
       <el-table-column
-        width="160px"
         label="贵族等级">
         <template slot-scope="scope">
           <el-tag>{{scope.row.grade_title}}</el-tag>
         </template>
       </el-table-column>
       <el-table-column
-        width="160px"
         prop="total_consume_balance"
         label="总消费">
       </el-table-column>
       <el-table-column
-        width="160px"
         prop="total_profit_balance"
         label="总收益">
       </el-table-column>
       <el-table-column
-        label="地区"
-        width="200px">
+        label="地区">
         <template slot-scope="scope">
           {{scope.row.province}}-{{scope.row.city}}
         </template>
       </el-table-column>
       <el-table-column
         prop="time"
-        label="上次活跃时间">
+        label="上次活跃时间"
+        width="200">
+      </el-table-column>
+      <el-table-column
+        label="状态"
+        width="">
+        <template slot-scope="scope">
+          <el-tag type="success" v-if='scope.row.status == 0'>使用中</el-tag>
+          <el-tag type="danger" v-if='scope.row.status == -1'>禁用</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column
+      label="操作">
+      <template slot-scope="scope">
+        <el-button @click="handleDisable(scope.row, scope.$index)" type="text" size="small"><template v-if="scope.row.status == 0">禁用</template><template v-else >取消禁用</template></el-button>
+      </template>
       </el-table-column>
     </el-table>
     <div class="pagination-container">
@@ -105,7 +112,7 @@
 
 <script>
 import panelNumber from '../components/panelNumber'
-import { getMembers, getMemberNum } from '@/api/userManage'
+import { getMembers, getMemberNum, disableWxUser } from '@/api/userManage'
 export default {
   name: 'wxManager',
   data() {
@@ -242,6 +249,27 @@ export default {
     },
     resetParams() {
       this.params.page = 1
+    },
+    handleDisable(row, index) {
+      let status
+      if (row.status == 0) {
+        status = -1
+      } else {
+        status = 0
+      }
+      disableWxUser({id: row.mc_id, status: status}).then((res) =>{
+          if (res.data.code != '301000') {
+            return this.$message.error({
+              type: 'error',
+              message: res.data.result
+            })
+          }
+          this.$message({
+            type: 'success',
+            message: '操作成功!'
+          })
+          this.getData()
+        })
     }
   },
   components: {

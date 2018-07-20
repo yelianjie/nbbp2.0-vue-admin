@@ -70,7 +70,13 @@ export default {
         if (valid) {
           var form = Object.assign({}, this.modifyForm)
           delete form.confirmNewPass
-          modifyPassword(form).then((response) => {
+          modifyPassword(form).then((res) => {
+            if (res.data.code != '301000') {
+              return this.$message.error({
+                type: 'error',
+                message: res.data.result
+              })
+            }
             this.$message({
               type: 'success',
               message: '修改成功!'

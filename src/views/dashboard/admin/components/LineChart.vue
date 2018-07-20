@@ -58,7 +58,7 @@ export default {
     }
 
     const sidebarElm = document.getElementsByClassName('sidebar-container')[0]
-    sidebarElm.removeEventListener('transitionend', this.__resizeHanlder)
+    //sidebarElm.removeEventListener('transitionend', this.__resizeHanlder)
 
     this.chart.dispose()
     this.chart = null

@@ -183,6 +183,11 @@ code {
   }
 }
 
+.single-hide {
+  overflow: hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
+}
 //refine vue-multiselect plugin
 .multiselect {
   line-height: 16px;

@@ -1,7 +1,7 @@
 import axios from 'axios'
-import { Message } from 'element-ui'
+import { Message, MessageBox} from 'element-ui'
 import store from '@/store'
-import { getToken } from '@/utils/auth'
+import { getToken, removeToken } from '@/utils/auth'
 import { filterCode } from '@/utils/code'
 // create an axios instance
 const service = axios.create({
@@ -28,15 +28,26 @@ service.interceptors.request.use(config => {
 // respone interceptor
 service.interceptors.response.use(
   response => {
-    const result = filterCode(response.data.code)
-    if (result && !result.flag) {
-      response.data._error = {
-        msg: response.data.result,
-        code: result.code
+    if (response.data.code == '301001') {
+        removeToken()
+        MessageBox.alert('账号异常，请重新登录', '账号异常', {
+          confirmButtonText: '重新登录',
+          showClose: false,
+          callback: action => {
+            location.reload()
+          }
+        })
+    } else {
+      let result = filterCode(response.data.code)
+      if (result && !result.flag) {
+        response.data._error = {
+          msg: response.data.result,
+          code: result.code
+        }
       }
+      /* 如果登录token超时返回登录页或提示 */
+      return response
     }
-    /* 如果登录token超时返回登录页或提示 */
-    return response
   },
   /**
   * 下面的注释为通过response自定义code来标示请求状态，当code返回如下情况为权限有问题，登出并返回到登录页

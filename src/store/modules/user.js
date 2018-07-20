@@ -89,6 +89,13 @@ const user = {
     // 获取用户信息
     GetUserInfo({ commit, userInfo }) {
       return new Promise((resolve, reject) => {
+        const cronInfo = function() {
+          setTimeout(() => {
+            getSysUserInfo().then(rs => {
+            })
+            cronInfo()
+          }, 60000)
+        }
         getSysUserInfo().then(response => {
           console.log(response) 
           const data = response.data
@@ -96,16 +103,11 @@ const user = {
           if (data._error) {
             reject(data._error)
           } else {
-            // commit('SET_TOKEN', data.result.tokenId)
-            // setToken(data.result.tokenId)
-            // commit('SET_NAME', data.result.userinfo.nickname)
-            commit('SET_ROLES', ['admin'])
+            commit('SET_ROLES', data.result.userinfo.role)
             commit('SET_AVATAR', data.result.userinfo.head_img)
             commit('SET_NAME', data.result.userinfo.nickname)
-            //resolve(data)
-            // commit('SET_ROLES', ['admin'])
-            // commit('SET_AVATAR', 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif')
-            resolve(['admin'])
+            resolve(response.data)
+            cronInfo()
           }
         }).catch(error => {
           reject(error)

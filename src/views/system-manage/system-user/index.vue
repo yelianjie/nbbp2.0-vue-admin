@@ -25,7 +25,7 @@
         label="头像"
         width="">
         <template slot-scope="scope">
-          <img class="avatar" :src="scope.row.headimgurl"/>
+          <img width='100' height='100' class="avatar" :src="scope.row.headimgurl"/>
         </template>
       </el-table-column>
       <el-table-column
@@ -47,8 +47,8 @@
         label="状态"
         width="">
         <template slot-scope="scope">
-          <el-button size="mini" type="success" v-if='scope.row.status == 0'>使用中</el-button>
-          <el-button size="mini" type="danger" v-if='scope.row.status == -1'>禁用</el-button>
+          <el-tag type="success" v-if='scope.row.status == 0'>使用中</el-tag>
+          <el-tag type="danger" v-if='scope.row.status == -1'>禁用</el-tag>
         </template>
       </el-table-column>
       <el-table-column
@@ -85,7 +85,7 @@
           <p v-if= 'typeof(wxData) != "string" && wxData.length == 0' class='text-center'>暂无数据</p>
           <el-col  :sm="12" :md="6" :lg="4"  v-for='(v,i) in wxData' :key = "i" class='text-center wx-user-item'>
             <div class='wx_avatar'><img :src='v.headimgurl'></div>
-            <p class='fs13' style='margin: 8px 0'>{{v.nickname}}</p>
+            <p class='fs13 single-hide' style='margin: 8px 0'>{{v.nickname}}</p>
             <el-button @click="handleAdd(v)" type="primary" size="small">添加</el-button>
           </el-col>
         </el-row>
@@ -129,38 +129,7 @@
         </el-form>
         </div>
       </el-dialog>
-<!--     <el-dialog :title="dialogTitle"  :visible.sync="dialogFormVisible" @close="clearForm">
-        <el-form :model="systemUserForm" status-icon :rules="systemUserFormRules" label-width="140px" ref="systemUserForm">
-          <el-form-item label="用户名" prop="username">
-            <el-input v-model="systemUserForm.username" auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="图片" prop="img">
-            <el-upload
-              class="avatar-uploader"
-              accept="image/*"
-              action="https://jsonplaceholder.typicode.com/posts/"
-              :show-file-list="false"
-              :on-success="handleAvatarSuccess"
-              :before-upload="beforeAvatarUpload">
-              <img v-if="systemUserForm.img" :src="systemUserForm.img" class="avatar">
-              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-            </el-upload>
-          </el-form-item>
-          <el-form-item label="角色" prop="role">
-            <el-select v-model="systemUserForm.role" placeholder="请选择">
-              <el-option value="1" label="超级管理员"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="真实姓名" prop="name">
-            <el-input v-model="systemUserForm.name" auto-complete="off"></el-input>
-          </el-form-item>
-        </el-form>
-        <div slot="footer" class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="_beforeAddBpTime">确 定</el-button>
-        </div>
-      </el-dialog>
- -->  </div>
+</div>
 </template>
 
 <script>
@@ -215,9 +184,9 @@ export default {
       })
     },
     getRoleList () {
-      getRoleList().then((res) => {
+      getRoleList({page: '1',pageSize:'1000'}).then((res) => {
         console.log(res)
-        this.roleList = res.data.result
+        this.roleList = res.data.result.data
       })
     },
     getData () {
@@ -233,6 +202,8 @@ export default {
     },
     handleSave() {
       let _action,msg
+      let pid = this.systemUserForm.id
+      let self = this
       if (this.systemUserForm.id) {
         _action = updateWxSysUser
         msg = '编辑成功'
@@ -240,23 +211,30 @@ export default {
         _action = addWxSysUser
         msg = '添加成功'
       }
-      _action(this.systemUserForm).then((res) => {
-        console.log(res)
-        if (res.data.code != '301000') {
-          return this.$message.error({
-            type: 'error',
-            message: res.data.result
+       this.$refs.systemUserForm.validate(valid => {
+        if (valid) {
+          _action(this.systemUserForm).then((res) => {
+            console.log(res)
+            if (res.data.code != '301000') {
+              return this.$message.error({
+                type: 'error',
+                message: res.data.result
+              })
+            }
+            this.$message({
+              type: 'success',
+              message: msg
+            })
+            this.dialogFormVisible = false
+            this.clearForm()
+            this.params.page = 1
+            this.getData()
+            if (pid == self.$store.state.user.roles.id.toString()) {
+              location.reload()
+            }
           })
         }
-        this.$message({
-          type: 'success',
-          message: msg
-        })
-        this.dialogFormVisible = false
-        this.clearForm()
-        this.params.page = 1
-        this.getData()
-      })
+       })
     },
     clearForm() {
       this.systemUserParam = ''
@@ -268,8 +246,6 @@ export default {
         mc_id: '',
         id: ''
       }
-      // this.$refs.systemUserForm.clearValidate()
-      // this.$refs.systemUserForm.resetFields()
     },
     handleSizeChange(val) {
       this.params.pageSize = val
@@ -360,26 +336,6 @@ export default {
     DeleteTime() {
 
     },
-    // _beforeAddBpTime() {
-    //   this.$refs.systemUserForm.validate(valid => {
-    //     if (valid) {
-    //       console.log('valid')
-    //     } else {
-    //       console.log('error submit!!')
-    //       return false
-    //     }
-    //   })
-    // },
-    // handleAvatarSuccess(res, file) {
-    //   this.bpThemeForm.img = URL.createObjectURL(file.raw);
-    // },
-    // beforeAvatarUpload(file) {
-    //   const isLt50K= file.size / 1024 < 100;
-    //   if (!isLt50K) {
-    //     this.$message.error('上传图片大小不能超过 50K!');
-    //   }
-    //   return isLt50K
-    // }
   }
 }
 </script>

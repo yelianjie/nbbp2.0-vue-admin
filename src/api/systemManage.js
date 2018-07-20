@@ -132,14 +132,65 @@ export function updateWxSysUser(data) {
 }
 
 /**
- * 获取权限列表
+ * 获取角色列表
 * @param {*} data
  */
-export function getRoleList() {
+export function getRoleList(data) {
   return request({
     url: '/admin/role/getRoleList',
     method: 'post',
+    data
   })
 }
+
+/**
+ * 添加角色
+* @param {*} data
+ */
+export function addRole(data) {
+  return request({
+    url: '/admin/role/addRole',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 编辑角色
+* @param {*} data
+ */
+export function editRole(data) {
+  return request({
+    url: '/admin/role/editRole',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 删除角色
+* @param {*} data
+ */
+export function delRole(data) {
+  return request({
+    url: '/admin/role/delRole',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 获取角色信息
+* @param {*} data
+ */
+export function getRoleInfo(data) {
+  return request({
+    url: '/admin/role/getRoleInfo',
+    method: 'post',
+    data
+  })
+}
+
+
 
 

@@ -72,7 +72,7 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="total">
       </el-pagination>
-
+    </div>
       <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible" @close="clearForm">
         <div v-if="dialogType === '1'" >
         <el-row :gutter="24" type="flex">
@@ -89,7 +89,7 @@
           <p v-if= 'typeof(wxData) != "string" && wxData.length == 0' class='text-center'>暂无数据</p>
           <el-col  :sm="12" :md="6" :lg="4"  v-for='(v,i) in wxData' :key = "i" class='text-center wx-user-item'>
             <div class='wx_avatar'><img :src='v.headimgurl'></div>
-            <p class='fs13' style='margin: 8px 0'>{{v.nickname}}</p>
+            <p class='fs13 single-hide' style='margin: 8px 0'>{{v.nickname}}</p>
             <el-button @click="handleAdd(v)" type="primary" size="small">添加</el-button>
           </el-col>
         </el-row>
@@ -119,7 +119,7 @@
             <el-radio v-model="adminManagerForm.is_all_auth" :label="0" >自定义</el-radio>
           </el-form-item>
           <el-form-item >
-            <el-transfer v-if="transferVisible" v-model="adminManagerForm.hts" filterable  :data="barData"></el-transfer>
+            <el-transfer v-if="transferVisible" v-model="adminManagerForm.hts" filterable  :data="barData" :titles="['可选酒吧列表','生效酒吧']"></el-transfer>
           </el-form-item>
           <el-form-item style='text-align:right'>
             <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -215,7 +215,7 @@ export default {
       })
     },
     onSubmit() {
-      this.resetParams()
+      this.params.pageindex = 1
       this.getData()
       console.log('submit')
     },

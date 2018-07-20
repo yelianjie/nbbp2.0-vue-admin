@@ -177,3 +177,39 @@ export function getAllHotel() {
     method: 'post',
   })
 }
+
+/**
+ * 获取黑名单列表
+ * @param {*} data
+ */
+export function getBlackUserList(data) {
+  return request({
+    url: '/admin/members/getBlackUserList',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 取消拉黑
+ * @param {*} data
+ */
+export function cancelBlack(data) {
+  return request({
+    url: '/admin/members/cancelBlack',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 禁用微信用户
+ * @param {*} data
+ */
+export function disableWxUser(data) {
+  return request({
+    url: '/admin/members/modifyLoginStatus',
+    method: 'post',
+    data
+  })
+}
